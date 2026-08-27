@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { PortfolioSearch } from "@/components/marketing/PortfolioSearch";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default async function PortfolioPage() {
 
         {items.length === 0 ? (
           <div className="mt-16 text-center">
-            <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
+            <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
             <p className="mt-4 text-sm text-muted">곧 새로운 프로젝트로 찾아뵙겠습니다.</p>
           </div>
         ) : (

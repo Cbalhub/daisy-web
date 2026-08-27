@@ -165,7 +165,7 @@ export function GrowthHero({
 
         <motion.p
           style={{ opacity: headlineOpacity, y: headlineY }}
-          className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent"
+          className="mt-3 text-xs font-semibold tracking-[0.05em] text-accent"
         >
           {eyebrow}
         </motion.p>

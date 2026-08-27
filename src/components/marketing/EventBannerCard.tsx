@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 
 type EventStyle = "dark" | "light" | "festive";
@@ -74,10 +74,13 @@ export function EventBannerCard({
         className={`pointer-events-none absolute -top-24 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full blur-3xl ${tone.glow}`}
       />
 
-      {/* 큰 원형 배지가 시선을 가장 먼저 붙잡고, 그 위에 살짝 걸친 냄비
-          마스코트가 "우리가 만든" 느낌을 더합니다. */}
+      {/* 큰 원형 배지가 시선을 가장 먼저 붙잡고, 그 위에 살짝 걸친 브랜드 심볼이
+          "우리가 만든" 느낌을 더합니다. */}
       <div className={`relative mx-auto flex h-32 w-32 items-center justify-center rounded-full border-2 ${tone.ring}`}>
-        <BrandMark className="absolute -top-4 -right-2 h-9 w-9 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]" />
+        <DaisyAsterisk
+          variant="mono"
+          className="absolute -top-4 -right-2 h-9 w-9 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]"
+        />
         {badge && (
           <span className={`font-display text-3xl font-semibold tracking-tight ${tone.title}`}>
             {badge}

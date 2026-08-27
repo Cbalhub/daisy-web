@@ -350,7 +350,7 @@ export default async function HomePage() {
           배지)로 맞췄습니다. 큰 카드 2개+작은 카드 구성(벤토)만 유지합니다. */}
       <section className="py-24">
         <Container>
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          <p className="text-center text-xs font-semibold tracking-[0.05em] text-accent">
             할 수 있는 일
           </p>
           <h2 className="mx-auto mt-3 max-w-xl text-center font-display text-2xl font-bold tracking-tight text-balance md:text-3xl">
@@ -404,7 +404,7 @@ export default async function HomePage() {
           <Container>
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">포트폴리오</p>
+                <p className="text-xs font-semibold tracking-[0.05em] text-accent">포트폴리오</p>
                 <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-balance md:text-4xl">
                   최근 진행한 프로젝트
                 </h2>
@@ -452,7 +452,7 @@ export default async function HomePage() {
           <Container>
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">후기</p>
+                <p className="text-xs font-semibold tracking-[0.05em] text-accent">후기</p>
                 <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-balance md:text-4xl">
                   함께한 분들의 이야기
                 </h2>
@@ -518,7 +518,7 @@ function PortfolioPreviewCard({ item, index }: { item: PortfolioItem; index: num
       ) : (
         <PlaceholderArt index={index} className="aspect-[4/3]" />
       )}
-      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+      <p className="mt-4 text-xs font-semibold tracking-[0.05em] text-accent">
         {item.category}
       </p>
       <h3 className="mt-1 font-display text-base font-bold transition-opacity group-hover:opacity-70">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { PRIVACY_POLICY_SECTIONS } from "@/lib/privacyPolicy";
@@ -22,6 +22,17 @@ export function PrivacyConsent({ name = "privacyConsent" }: { name?: string }) {
       setScrolledToEnd(true);
     }
   }
+
+  // 내용이 짧아서 스크롤할 필요 자체가 없는 경우(스크롤바 미생성) onScroll이 한 번도
+  // 발생하지 않아 확인 버튼이 영영 비활성 상태로 남는 문제를 방지합니다.
+  useEffect(() => {
+    if (!open) return;
+    const el = bodyRef.current;
+    if (!el) return;
+    if (el.scrollHeight - el.clientHeight < SCROLL_END_THRESHOLD_PX) {
+      setScrolledToEnd(true);
+    }
+  }, [open]);
 
   function confirm() {
     setConsented(true);

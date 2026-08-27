@@ -6,7 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { PortfolioItem } from "@prisma/client";
 import { PlaceholderArt } from "@/components/ui/PlaceholderArt";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import { cn } from "@/lib/utils";
 
 // 검색 결과 그리드는 스크롤로 처음 화면에 들어올 때 한 번만 재생되는 Reveal 대신,
@@ -61,7 +61,7 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
 
       {filtered.length === 0 ? (
         <div className="mt-16 text-center">
-          <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
+          <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
           <p className="mt-4 text-sm text-muted">
             &ldquo;{query}&rdquo;에 해당하는 프로젝트를 찾지 못했습니다.
           </p>

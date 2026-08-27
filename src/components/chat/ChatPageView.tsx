@@ -6,7 +6,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { IconPaymentCard } from "@/components/ui/icons";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
 type OrderSummary = {
   id: string;
@@ -348,7 +348,7 @@ export function ChatPageView({
             >
               {visibleMessages.length === 0 && (
                 <div className="mt-10 text-center">
-                  <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
+                  <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
                   <p className="mt-4 text-sm text-muted">
                     {isDraft
                       ? `"${draftTitle}" 프로젝트에 대해 궁금한 점을 남겨주세요.`

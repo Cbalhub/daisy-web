@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { Carousel } from "@/components/marketing/Carousel";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import { ReviewCard } from "@/components/marketing/ReviewCard";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { prisma } from "@/lib/prisma";
@@ -86,7 +86,7 @@ export default async function ReviewsPage() {
         <Container>
           {REVIEWS.length === 0 ? (
             <div className="text-center">
-              <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
+              <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
               <p className="mt-4 text-sm text-muted">곧 새로운 후기로 찾아뵙겠습니다.</p>
             </div>
           ) : REVIEWS.length >= 3 ? (

@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { OrderList } from "@/components/account/OrderList";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { requireCustomerSession } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
@@ -58,7 +58,7 @@ export default async function AccountDashboardPage() {
             </Reveal>
             <div>
               <Reveal delay={0.04}>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                <p className="text-xs font-semibold tracking-[0.05em] text-accent">
                   마이페이지
                 </p>
               </Reveal>
@@ -101,7 +101,7 @@ export default async function AccountDashboardPage() {
           {customer.orders.length === 0 ? (
             <Reveal delay={0.18}>
               <div className="mt-8 text-center">
-                <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
+                <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
                 <p className="mt-4 text-sm text-muted">
                   아직 주문 내역이 없습니다. 문의를 남기면 견적부터 도와드려요.
                 </p>

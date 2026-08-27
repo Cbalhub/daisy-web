@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
 export const metadata: Metadata = { title: "페이지를 찾을 수 없어요" };
 
@@ -12,7 +12,7 @@ export default function NotFound() {
       <Container>
         <div className="text-center">
           <Reveal>
-            <BrandMark className="mx-auto h-16 w-16 text-accent/70" />
+            <DaisyAsterisk variant="mono" className="mx-auto h-16 w-16 text-accent/70" />
             <p className="mt-4 font-display text-6xl font-semibold tracking-tight text-accent md:text-7xl">
               404
             </p>
