@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const TONES = {
-  neutral: "bg-black/5 text-admin-muted",
+  neutral: "bg-admin-bg-soft text-admin-muted",
   blue: "bg-admin-blue-soft text-admin-blue",
   green: "bg-admin-green-soft text-admin-green",
   amber: "bg-admin-amber-soft text-admin-amber",

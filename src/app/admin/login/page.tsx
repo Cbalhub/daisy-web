@@ -47,7 +47,7 @@ function LoginForm() {
       className="w-full max-w-sm rounded-2xl border border-admin-border bg-admin-surface p-8 shadow-sm"
     >
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-admin-blue">
-        OverCook Admin
+        Daisy Admin
       </p>
       <h1 className="mt-2 text-xl font-semibold text-admin-text">관리자 로그인</h1>
 

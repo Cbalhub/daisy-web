@@ -26,6 +26,7 @@ export async function updateBusinessSettings(
     address: string;
     phone: string;
     contactEmail: string;
+    businessHours: string;
     bankName: string;
     bankAccountNumber: string;
     bankAccountHolder: string;

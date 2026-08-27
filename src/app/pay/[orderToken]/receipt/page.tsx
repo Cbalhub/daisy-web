@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getBusinessSettings } from "@/lib/settings";
 import { PrintButton } from "@/components/payment/PrintButton";
@@ -32,7 +33,7 @@ export default async function ReceiptPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-display text-lg font-semibold">
-            OverCook<span className="text-accent">.</span>
+            Daisy<span className="text-accent">.</span>
           </p>
           <p className="mt-1 text-xs text-muted">
             {settings.businessName}
@@ -71,13 +72,19 @@ export default async function ReceiptPage({
       </div>
 
       <p className="mt-8 text-center text-xs leading-relaxed text-muted">
-        본 영수증은 OverCook 웹사이트에서 자동 발급되었습니다.
+        본 영수증은 Daisy 웹사이트에서 자동 발급되었습니다.
         <br />
         문의: {settings.contactEmail}
       </p>
 
-      <div className="mt-8 flex justify-center print:hidden">
+      <div className="mt-8 flex flex-col items-center gap-3 print:hidden">
         <PrintButton />
+        <Link
+          href={`/pay/${order.orderToken}/confirmation`}
+          className="text-xs font-medium text-accent hover:opacity-70"
+        >
+          거래확인서 보기 &rarr;
+        </Link>
       </div>
     </div>
   );

@@ -9,10 +9,7 @@ export function AdminCard({
 }) {
   return (
     <div
-      className={cn(
-        "rounded-2xl bg-admin-surface p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]",
-        className
-      )}
+      className={cn("rounded-2xl border border-admin-border bg-admin-surface p-6", className)}
     >
       {children}
     </div>

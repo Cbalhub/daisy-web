@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatWidget } from "@/components/chat/openChat";
-import { BrandMark } from "@/components/marketing/BrandMark";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
 const NAV_LINKS = [
   { href: "/services", label: "서비스" },
@@ -50,21 +50,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 px-3 pt-3 md:px-6 md:pt-4">
       <div
         className={cn(
-          "mx-auto flex max-w-[68rem] items-center justify-between rounded-full px-5 py-3 backdrop-blur-md transition-shadow duration-300 md:px-7",
+          "mx-auto flex max-w-[68rem] items-center justify-between rounded-3xl px-5 py-3 backdrop-blur-md transition-shadow duration-300 md:px-7",
           scrolled
             ? "border border-line bg-paper/90 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_32px_-20px_rgba(15,23,42,0.25)]"
             : "border border-transparent bg-paper/70"
         )}
       >
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight md:text-xl"
-        >
-          <BrandMark className="h-6 w-6 shrink-0 text-accent md:h-7 md:w-7" />
-          <span>
-            OverCook
-            <span className="text-accent">.</span>
-          </span>
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <DaisyAsterisk variant="color" className="h-6 w-6" />
+          <span className="font-display text-xl font-bold tracking-tight text-ink">Daisy</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -92,7 +86,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={openChatWidget}
-            className="inline-flex items-center justify-center rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-[transform,opacity] duration-300 ease-out hover:opacity-90 active:scale-[0.97] active:duration-100"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-accent px-5 text-[15px] font-semibold text-white transition-[transform,opacity,filter] duration-200 ease-out hover:opacity-90 active:scale-[0.97] active:brightness-90 active:duration-100"
           >
             프로젝트 문의
           </button>

@@ -45,7 +45,7 @@ type ConversationSummary = {
   unreadCount: number;
 };
 
-const ORIGINAL_TITLE = "채팅 | OverCook";
+const ORIGINAL_TITLE = "채팅 | Daisy";
 
 const ORDER_STATUS_TEXT: Record<string, string> = {
   DRAFT: "결제 대기",
@@ -145,7 +145,7 @@ export function ChatPageView({
 
       const hasNewAdminReply = incoming.some((m) => m.sender === "ADMIN");
       if (hasNewAdminReply && document.hidden) {
-        document.title = "💬 새 메시지 | OverCook";
+        document.title = "💬 새 메시지 | Daisy";
       }
     });
 

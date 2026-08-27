@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -25,15 +25,24 @@ const plexKr = IBM_Plex_Sans_KR({
   display: "swap",
 });
 
-const SITE_NAME = "OverCook";
+// 견적번호(QT-2026-001), 타임스탬프, 금액 같은 "기술적 메타데이터"용 서체 —
+// 본문/헤드라인과 시각적으로 분리해서 문서·데이터 화면에 정확한 인상을 줍니다.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
+
+const SITE_NAME = "Daisy";
 const SITE_DESCRIPTION =
-  "OverCook은 업무 자동화 프로그램과 챗봇을 기획부터 운영까지 함께 만드는 소프트웨어 개발 외주 스튜디오입니다.";
+  "Daisy는 업무 자동화 프로그램과 챗봇을 기획부터 운영까지 함께 만드는 소프트웨어 개발 외주 스튜디오입니다.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://overcook.kr"),
   title: {
-    default: "OverCook — 완성까지 끓어오르는 개발 파트너",
-    template: "%s | OverCook",
+    default: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
+    template: "%s | Daisy",
   },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
@@ -42,12 +51,12 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     url: "/",
     siteName: SITE_NAME,
-    title: "OverCook — 완성까지 끓어오르는 개발 파트너",
+    title: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "OverCook — 완성까지 끓어오르는 개발 파트너",
+    title: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
     description: SITE_DESCRIPTION,
   },
   // 네이버 서치어드바이저 / 구글 서치 콘솔에서 사이트 소유를 확인할 때 발급되는
@@ -118,7 +127,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={`${pretendard.variable} ${plexKr.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${plexKr.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper-dim text-ink">
         <Suspense fallback={null}>

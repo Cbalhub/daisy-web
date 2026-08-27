@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const BRAND = { ink: "#171b3a", paper: "#ffffff", accent: "#3d41c6", muted: "#697095" };
+const BRAND = { ink: "#141f2c", paper: "#ffffff", accent: "#3182f6", muted: "#87919c" };
 
 // 고객명·주문명·메시지 미리보기처럼 사용자가 입력한 값을 HTML 템플릿에 그대로
 // 꽂으면, 그 값에 <script>나 <img onerror=...> 같은 마크업이 섞여 있을 때
@@ -30,7 +30,7 @@ function emailShell(bodyHtml: string) {
     <table role="presentation" width="100%" style="max-width:480px;margin:0 auto;background:${BRAND.paper};border-radius:16px;overflow:hidden;">
       <tr>
         <td style="padding:32px 32px 8px;">
-          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.ink};letter-spacing:-0.01em;">OverCook</p>
+          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.ink};letter-spacing:-0.01em;">Daisy</p>
         </td>
       </tr>
       <tr>
@@ -66,10 +66,10 @@ export async function sendNewMessageNotification(input: {
 
   const { error } = await resend.emails.send({
     // TODO: overcook.kr 도메인을 Resend에서 인증하면 아래를
-    // "OverCook 웹사이트 <notify@overcook.kr>"로 되돌리세요. 그 전까지는 미인증
+    // "Daisy 웹사이트 <notify@overcook.kr>"로 되돌리세요. 그 전까지는 미인증
     // 도메인 발송이 막혀 있어, 관리자 본인 이메일로만 보낼 수 있는 Resend
     // 기본(sandbox) 발신자를 임시로 씁니다.
-    from: "OverCook 웹사이트 <onboarding@resend.dev>",
+    from: "Daisy 웹사이트 <onboarding@resend.dev>",
     to,
     subject: `[새 메시지] ${input.customerName}`,
     text: [
@@ -111,9 +111,9 @@ export async function sendPaymentConfirmedEmail(input: {
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
   const { error } = await resend.emails.send({
-    from: "OverCook 웹사이트 <notify@overcook.kr>",
+    from: "Daisy 웹사이트 <notify@overcook.kr>",
     to: input.customerEmail,
-    subject: `[OverCook] 결제가 완료됐어요 — ${input.orderTitle}`,
+    subject: `[Daisy] 결제가 완료됐어요 — ${input.orderTitle}`,
     text: [
       `${input.customerName} 님, 결제가 정상적으로 완료됐어요.`,
       "",
@@ -160,9 +160,9 @@ export async function sendReviewRequestEmail(input: {
   const reviewUrl = `${siteUrl}/review/${input.orderToken}`;
 
   const { error } = await resend.emails.send({
-    from: "OverCook 웹사이트 <notify@overcook.kr>",
+    from: "Daisy 웹사이트 <notify@overcook.kr>",
     to: input.customerEmail,
-    subject: `[OverCook] "${input.orderTitle}" 프로젝트, 어떠셨나요?`,
+    subject: `[Daisy] "${input.orderTitle}" 프로젝트, 어떠셨나요?`,
     text: [
       `${input.customerName} 님, 프로젝트 전달이 완료됐어요.`,
       "",
@@ -182,4 +182,26 @@ export async function sendReviewRequestEmail(input: {
   });
 
   if (error) throw new Error(`resend 발송 실패: ${error.message}`);
+}
+
+/**
+ * 대표님 본인에게 보내는 일회성 작업 완료 알림입니다(고객 대상 메일이 아님).
+ * 호출하는 쪽에서 요약 텍스트를 그대로 전달합니다.
+ */
+export async function sendOwnerNotification(input: { subject: string; bodyText: string }) {
+  const to = process.env.ADMIN_NOTIFY_EMAIL;
+  if (!resend || !to) return { sent: false, reason: "not-configured" as const };
+
+  const { error } = await resend.emails.send({
+    from: "Daisy 웹사이트 <onboarding@resend.dev>",
+    to,
+    subject: input.subject,
+    text: input.bodyText,
+    html: emailShell(
+      `<div style="font-size:14px;line-height:1.7;color:${BRAND.ink};white-space:pre-line;">${escapeHtml(input.bodyText)}</div>`
+    ),
+  });
+
+  if (error) return { sent: false, reason: error.message };
+  return { sent: true as const };
 }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 import {
   IconGrid,
   IconCard,
@@ -125,8 +126,9 @@ export function Sidebar({
     <>
       {/* 모바일 상단 바 */}
       <div className="flex items-center justify-between border-b border-admin-sidebar-line bg-admin-bg px-4 py-3 text-admin-text md:hidden">
-        <span className="font-display text-base font-semibold">
-          OverCook<span className="text-admin-blue">.</span>
+        <span className="flex items-center gap-1.5 font-display text-base font-semibold">
+          <DaisyAsterisk variant="color" className="h-5 w-5" />
+          Daisy<span className="text-admin-blue">.</span>
         </span>
         <button
           onClick={() => setMobileOpen(true)}
@@ -140,8 +142,9 @@ export function Sidebar({
       {/* 데스크톱 사이드바 */}
       <aside className="hidden h-screen w-60 shrink-0 flex-col border-r border-admin-sidebar-line bg-admin-bg text-admin-text md:flex">
         <div className="flex items-center gap-2 px-5 py-5">
+          <DaisyAsterisk variant="color" className="h-6 w-6" />
           <span className="font-display text-lg font-semibold">
-            OverCook<span className="text-admin-blue">.</span>
+            Daisy<span className="text-admin-blue">.</span>
           </span>
           <span className="rounded-full bg-admin-bg-soft px-2 py-0.5 text-[10px] font-medium text-admin-sidebar-text">
             Admin
@@ -171,8 +174,9 @@ export function Sidebar({
               className="fixed inset-y-0 left-0 z-50 flex w-64 max-w-[80vw] flex-col bg-admin-bg text-admin-text md:hidden"
             >
               <div className="flex items-center justify-between px-5 py-5">
-                <span className="font-display text-lg font-semibold">
-                  OverCook<span className="text-admin-blue">.</span>
+                <span className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <DaisyAsterisk variant="color" className="h-6 w-6" />
+                  Daisy<span className="text-admin-blue">.</span>
                 </span>
                 <button
                   onClick={() => setMobileOpen(false)}

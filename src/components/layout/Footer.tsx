@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SERVICES } from "@/lib/content";
 import { getBusinessSettings } from "@/lib/settings";
+import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
 const COLUMNS = [
   {
@@ -37,11 +38,12 @@ export async function Footer() {
       <Container className="py-16">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
           <div className="col-span-2">
-            <p className="font-display text-2xl font-semibold">
-              OverCook<span className="text-accent">.</span>
-            </p>
+            <div className="flex items-center gap-2">
+              <DaisyAsterisk variant="color-inverse" className="h-7 w-7" />
+              <p className="font-display text-2xl font-semibold">Daisy</p>
+            </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">
-              아이디어가 완성될 때까지, 끝까지 함께 끓이는 개발 파트너.
+              아이디어가 완성될 때까지, 끝까지 함께 키우는 개발 파트너.
             </p>
           </div>
 
@@ -79,8 +81,9 @@ export async function Footer() {
               {settings.contactEmail}
             </a>
             {settings.phone && ` · 대표전화: ${settings.phone}`}
+            {settings.businessHours && ` · 영업시간: ${settings.businessHours}`}
           </p>
-          <p className="mt-4">© {new Date().getFullYear()} OverCook. All rights reserved.</p>
+          <p className="mt-4">© {new Date().getFullYear()} Daisy. All rights reserved.</p>
         </div>
       </Container>
     </footer>

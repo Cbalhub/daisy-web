@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "포트폴리오",
-  description: "OverCook이 함께 만든 프로젝트들을 소개합니다.",
+  description: "Daisy가 함께 만든 프로젝트들을 소개합니다.",
   alternates: { canonical: "/portfolio" },
 };
 

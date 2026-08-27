@@ -15,6 +15,7 @@ const schema = z.object({
   address: z.string().trim().max(200),
   phone: z.string().trim().max(30),
   contactEmail: z.string().trim().max(100),
+  businessHours: z.string().trim().max(100),
   bankName: z.string().trim().max(30),
   bankAccountNumber: z.string().trim().max(50),
   bankAccountHolder: z.string().trim().max(30),

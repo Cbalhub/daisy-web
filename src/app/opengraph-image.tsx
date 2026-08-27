@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 export const runtime = "nodejs";
-export const alt = "OverCook — 완성까지 끓어오르는 개발 파트너";
+export const alt = "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -33,7 +33,7 @@ export default async function OgImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", fontSize: 32, fontWeight: 700 }}>
-          OverCook<span style={{ color: "#3d41c6" }}>.</span>
+          Daisy<span style={{ color: "#3182f6" }}>.</span>
         </div>
         <div
           style={{
@@ -45,10 +45,10 @@ export default async function OgImage() {
             maxWidth: 920,
           }}
         >
-          설익은 채로 내보내지 않습니다.
+          아이디어가 다 자라기 전엔 내보내지 않습니다.
         </div>
         <div style={{ display: "flex", marginTop: 28, fontSize: 26, color: "rgba(255,255,255,0.6)" }}>
-          업무 자동화 · 챗봇 개발 외주 — OverCook
+          업무 자동화 · 챗봇 개발 외주 — Daisy
         </div>
       </div>
     ),

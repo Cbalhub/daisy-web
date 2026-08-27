@@ -11,7 +11,7 @@ import { jsonLdScript } from "@/lib/json-ld";
 
 export const metadata: Metadata = {
   title: "고객 후기",
-  description: "OverCook과 함께한 고객들의 실제 후기입니다.",
+  description: "Daisy와 함께한 고객들의 실제 후기입니다.",
   alternates: { canonical: "/reviews" },
 };
 
@@ -33,7 +33,7 @@ export default async function ReviewsPage() {
       ? {
           "@context": "https://schema.org",
           "@type": "ProfessionalService",
-          name: "OverCook",
+          name: "Daisy",
           url: "https://overcook.kr",
           aggregateRating: {
             "@type": "AggregateRating",
@@ -76,7 +76,7 @@ export default async function ReviewsPage() {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-              OverCook과 프로젝트를 진행한 고객들의 실제 후기입니다.
+              Daisy와 프로젝트를 진행한 고객들의 실제 후기입니다.
             </p>
           </Reveal>
         </Container>

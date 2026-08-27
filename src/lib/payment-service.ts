@@ -5,13 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { updateOrderProgress } from "@/lib/progress";
 import { postAdminReply, getOrCreateDefaultConversation } from "@/lib/chat";
 import { sendPaymentConfirmedEmail } from "@/lib/email";
+import { hashTransactionFacts } from "@/lib/document-hash";
 
 const MAX_INVOICE_NUMBER_RETRIES = 5;
 
 function generateInvoiceNumber() {
   const yyyymm = new Date().toISOString().slice(0, 7).replace("-", "");
   const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `OC-${yyyymm}-${random}`;
+  return `DS-${yyyymm}-${random}`;
 }
 
 /**
@@ -66,6 +67,23 @@ export async function confirmManualPayment(input: {
     return { ok: false, reason: "NOT_CONFIRMABLE" };
   }
 
+  const approvedAt = new Date();
+  // 확인 "그 순간"의 사실을 해시로 고정해 둡니다 — 나중에 누군가 DB에서 금액 등을
+  // 직접 바꾸더라도, 이 저장된 해시와 그때 다시 계산한 해시가 달라져서 위변조를
+  // 알아챌 수 있습니다. 매번 현재 값으로만 새로 해시하면 데이터가 바뀌어도 항상
+  // "일치"로 나와 의미가 없으므로, 반드시 이 시점에 계산해 저장해야 합니다.
+  const integrityHash = hashTransactionFacts({
+    invoiceNumber: order.invoiceNumber,
+    orderToken: order.orderToken,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    title: order.title,
+    amount: order.amount,
+    currency: order.currency,
+    paymentMethod: "bank_transfer",
+    approvedAt: approvedAt.toISOString(),
+  });
+
   const updated = await prisma.$transaction(async (tx) => {
     const result = await tx.order.updateMany({
       where: { id: order.id, status: order.status },
@@ -82,7 +100,7 @@ export async function confirmManualPayment(input: {
         amount: order.amount,
         currency: order.currency,
         status: "PAID",
-        approvedAt: new Date(),
+        approvedAt,
       },
     });
 
@@ -92,7 +110,7 @@ export async function confirmManualPayment(input: {
         action: "order.manual_payment_confirm",
         targetType: "Order",
         targetId: order.id,
-        metadata: { amount: order.amount },
+        metadata: { amount: order.amount, approvedAt: approvedAt.toISOString(), integrityHash },
       },
     });
 

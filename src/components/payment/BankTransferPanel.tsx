@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
 import { copyToClipboard } from "@/lib/clipboard";
+import { RefundConsent } from "@/components/payment/RefundConsent";
 
 const COPIED_RESET_MS = 1500;
 
@@ -22,6 +23,7 @@ export function BankTransferPanel({
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [depositorName, setDepositorName] = useState("");
+  const [refundConsented, setRefundConsented] = useState(false);
   const [copied, setCopied] = useState(false);
   const copiedResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasAccount = Boolean(bankName && bankAccountNumber);
@@ -39,6 +41,10 @@ export function BankTransferPanel({
   async function claimDeposit() {
     if (!depositorName.trim()) {
       toast("입금자명을 입력해 주세요", "error");
+      return;
+    }
+    if (!refundConsented) {
+      toast("환불 정책을 먼저 확인해 주세요", "error");
       return;
     }
 
@@ -105,9 +111,13 @@ export function BankTransferPanel({
         />
       </div>
 
+      <div className="mt-4">
+        <RefundConsent consented={refundConsented} onChange={setRefundConsented} />
+      </div>
+
       <button
         onClick={claimDeposit}
-        disabled={loading}
+        disabled={loading || !refundConsented}
         className="mt-4 w-full rounded-full bg-accent py-3.5 text-sm font-medium text-white transition-opacity duration-200 hover:opacity-90 disabled:opacity-50"
       >
         {loading ? "처리 중..." : "입금 완료했어요"}

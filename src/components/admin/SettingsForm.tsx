@@ -13,6 +13,7 @@ type Settings = {
   address: string;
   phone: string;
   contactEmail: string;
+  businessHours: string;
   bankName: string;
   bankAccountNumber: string;
   bankAccountHolder: string;
@@ -93,6 +94,12 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           <Field label="사업장 주소" name="address" defaultValue={initial.address} />
           <Field label="대표 전화" name="phone" defaultValue={initial.phone} placeholder="000-0000-0000" />
           <Field label="문의 이메일" name="contactEmail" defaultValue={initial.contactEmail} />
+          <Field
+            label="영업시간"
+            name="businessHours"
+            defaultValue={initial.businessHours}
+            placeholder="예: 평일 10:00~18:00 (주말·공휴일 휴무)"
+          />
         </div>
       </AdminCard>
 

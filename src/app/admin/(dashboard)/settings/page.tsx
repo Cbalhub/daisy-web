@@ -20,6 +20,7 @@ export default async function AdminSettingsPage() {
             address: settings.address,
             phone: settings.phone,
             contactEmail: settings.contactEmail,
+            businessHours: settings.businessHours,
             bankName: settings.bankName,
             bankAccountNumber: settings.bankAccountNumber,
             bankAccountHolder: settings.bankAccountHolder,

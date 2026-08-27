@@ -54,7 +54,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
       >
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div style={{ display: "flex", fontSize: 30, fontWeight: 700 }}>
-            OverCook<span style={{ color: "#3d41c6" }}>.</span>
+            Daisy<span style={{ color: "#3182f6" }}>.</span>
           </div>
           <div style={{ display: "flex", fontSize: 20, color: "#6e6e73" }}>{issuedAt}</div>
         </div>
@@ -101,7 +101,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
                 fontSize: 20,
               }}
             >
-              <div style={{ display: "flex", width: 6, height: 6, borderRadius: 3, background: "#3d41c6" }} />
+              <div style={{ display: "flex", width: 6, height: 6, borderRadius: 3, background: "#3182f6" }} />
               <div style={{ display: "flex", flex: 1 }}>{row.label}</div>
               {typeof row.amount === "number" && (
                 <div style={{ display: "flex", fontWeight: 700, color: "#424245" }}>{won(row.amount)}</div>
@@ -118,7 +118,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
             }}
           >
             <div style={{ display: "flex", fontSize: 20, fontWeight: 700 }}>합계</div>
-            <div style={{ display: "flex", fontSize: 32, fontWeight: 700, color: "#3d41c6" }}>
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 700, color: "#3182f6" }}>
               {won(order.amount)}
             </div>
           </div>

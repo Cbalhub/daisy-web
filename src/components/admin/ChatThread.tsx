@@ -450,7 +450,7 @@ function AttachmentBubble({
 function PaymentRequestCard({ order }: { order: OrderSummary }) {
   const status = ORDER_STATUS_LABEL[order.status];
   return (
-    <div className="w-72 max-w-full overflow-hidden rounded-2xl bg-admin-surface shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
+    <div className="w-72 max-w-full overflow-hidden rounded-2xl border border-admin-border bg-admin-surface">
       <div className="px-5 pt-4 pb-4">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-medium text-admin-muted">결제 요청</span>
@@ -474,7 +474,7 @@ function PaymentRequestCard({ order }: { order: OrderSummary }) {
 function ProgressUpdateCard({ order, note }: { order: OrderSummary; note: string }) {
   const stage = PROJECT_STAGE_LABEL[order.progressStage];
   return (
-    <div className="w-72 max-w-full rounded-2xl bg-admin-surface px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
+    <div className="w-72 max-w-full rounded-2xl border border-admin-border bg-admin-surface px-5 py-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-admin-text">{order.title}</p>
@@ -566,7 +566,7 @@ function PaymentRequestForm({
   return (
     <form
       onSubmit={submit}
-      className="mb-3 rounded-2xl bg-admin-surface p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]"
+      className="mb-3 rounded-2xl border border-admin-border bg-admin-surface p-4"
     >
       <p className="text-sm font-semibold text-admin-text">결제 요청 보내기</p>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -721,7 +721,7 @@ function ProgressUpdateForm({
   return (
     <form
       onSubmit={submit}
-      className="mb-3 rounded-2xl bg-admin-surface p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]"
+      className="mb-3 rounded-2xl border border-admin-border bg-admin-surface p-4"
     >
       <p className="text-sm font-semibold text-admin-text">진행 상황 업데이트</p>
       {orders.length > 1 && (

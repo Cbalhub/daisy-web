@@ -6,10 +6,11 @@ import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { FAQ_ITEMS } from "@/lib/content";
 import { jsonLdScript } from "@/lib/json-ld";
+import { getBusinessSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "자주 묻는 질문",
-  description: "OverCook에 문의하기 전 궁금한 점들을 미리 확인해보세요.",
+  description: "Daisy에 문의하기 전 궁금한 점들을 미리 확인해보세요.",
   alternates: { canonical: "/faq" },
 };
 
@@ -23,7 +24,9 @@ const faqJsonLd = {
   })),
 };
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const settings = await getBusinessSettings();
+
   return (
     <section className="pt-20 pb-24 md:pt-28">
       <script
@@ -57,6 +60,9 @@ export default function FaqPage() {
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
               여기 없는 내용은 채팅으로 편하게 물어봐 주세요. 확인 후 바로 답변드려요.
             </p>
+            {settings.businessHours && (
+              <p className="mt-3 text-xs text-muted">상담 가능 시간: {settings.businessHours}</p>
+            )}
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <OpenChatButton>지금 상담하기</OpenChatButton>
               <Link

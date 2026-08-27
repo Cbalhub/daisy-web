@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useInView, useMotionValue, useSpring } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function CountUp({
   value,
@@ -33,7 +34,7 @@ export function CountUp({
   }, [spring, prefix, suffix]);
 
   return (
-    <span ref={ref} className={className}>
+    <span ref={ref} className={cn("tabular-nums", className)}>
       {prefix}0{suffix}
     </span>
   );

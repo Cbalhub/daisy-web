@@ -5,11 +5,19 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { OrderList } from "@/components/account/OrderList";
 import { BrandMark } from "@/components/marketing/BrandMark";
+import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { requireCustomerSession } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = { title: "마이페이지" };
 export const dynamic = "force-dynamic";
+
+// 홈페이지 Stats/PROCESS와 같은 꽃잎 색 순서 — 마이페이지도 같은 브랜드 언어를 씁니다.
+const PETAL_COLORS = [
+  "var(--color-petal-yellow)",
+  "var(--color-petal-pink)",
+  "var(--color-petal-purple)",
+];
 
 export default async function AccountDashboardPage() {
   const session = await requireCustomerSession();
@@ -51,7 +59,7 @@ export default async function AccountDashboardPage() {
             <div>
               <Reveal delay={0.04}>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                  My Page
+                  마이페이지
                 </p>
               </Reveal>
               <Reveal delay={0.08}>
@@ -70,9 +78,13 @@ export default async function AccountDashboardPage() {
         </div>
 
         <RevealGroup className="mt-10 grid grid-cols-3 gap-4" stagger={0.05}>
-          {STATS.map((stat) => (
+          {STATS.map((stat, i) => (
             <RevealItem key={stat.label}>
               <div className="rounded-2xl bg-paper-dim px-5 py-5">
+                <span
+                  className="mb-2.5 block h-1 w-6 rounded-full"
+                  style={{ background: PETAL_COLORS[i % PETAL_COLORS.length] }}
+                />
                 <p className="text-xs font-medium text-muted">{stat.label}</p>
                 <p className="mt-1.5 font-display text-xl font-semibold tracking-tight tabular-nums md:text-2xl">
                   {stat.value}
@@ -90,7 +102,12 @@ export default async function AccountDashboardPage() {
             <Reveal delay={0.18}>
               <div className="mt-8 text-center">
                 <BrandMark className="mx-auto h-14 w-14 text-accent/70" />
-                <p className="mt-4 text-sm text-muted">아직 주문 내역이 없습니다.</p>
+                <p className="mt-4 text-sm text-muted">
+                  아직 주문 내역이 없습니다. 문의를 남기면 견적부터 도와드려요.
+                </p>
+                <OpenChatButton size="md" className="mt-5">
+                  프로젝트 문의하기
+                </OpenChatButton>
               </div>
             </Reveal>
           ) : (

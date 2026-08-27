@@ -42,7 +42,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="pointer-events-auto flex items-center gap-2.5 rounded-full bg-neutral-900 py-2.5 pl-2.5 pr-4 text-sm font-medium text-white shadow-lg"
+              className="pointer-events-auto flex items-center gap-2.5 rounded-[14px] bg-neutral-900 py-2.5 pl-2.5 pr-4 text-sm font-medium text-white shadow-lg"
             >
               <ToneIcon tone={t.tone} />
               {t.message}

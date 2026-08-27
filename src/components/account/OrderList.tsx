@@ -47,7 +47,7 @@ function OrderRow({ order }: { order: OrderWithReview }) {
         <div className="min-w-0">
           <p className="text-xs text-muted">{order.invoiceNumber}</p>
           <p className="mt-0.5 font-medium">{order.title}</p>
-          <p className="mt-0.5 text-sm text-muted">₩{order.amount.toLocaleString("ko-KR")}</p>
+          <p className="mt-0.5 text-sm tabular-nums text-muted">₩{order.amount.toLocaleString("ko-KR")}</p>
         </div>
         <div className="flex items-center gap-3">
           <span
