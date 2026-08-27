@@ -19,7 +19,7 @@ if (!sessionSecret || sessionSecret.length < 32) {
 // secure 쿠키를 켜면 HTTPS가 아닌 배포(LAN IP 접속 등)에서 쿠키가 브라우저에
 // 저장되지 않아 로그인이 계속 풀리는 문제가 생깁니다. 실제 사이트 주소가
 // https://로 시작할 때만 secure를 켭니다.
-const isHttpsSite = (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://");
+const isHttpsSite = (process.env.SITE_URL ?? "").startsWith("https://");
 
 export const sessionOptions: SessionOptions = {
   password: sessionSecret,

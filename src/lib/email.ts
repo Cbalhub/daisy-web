@@ -61,7 +61,7 @@ export async function sendNewMessageNotification(input: {
     return;
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const chatUrl = `${siteUrl}/admin/chats/${input.conversationId}`;
 
   const { error } = await resend.emails.send({
@@ -106,7 +106,7 @@ export async function sendPaymentConfirmedEmail(input: {
 }) {
   if (!resend) return;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const receiptUrl = `${siteUrl}/pay/${input.orderToken}/receipt`;
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
@@ -156,7 +156,7 @@ export async function sendReviewRequestEmail(input: {
 }) {
   if (!resend) return;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const reviewUrl = `${siteUrl}/review/${input.orderToken}`;
 
   const { error } = await resend.emails.send({

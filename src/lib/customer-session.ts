@@ -21,7 +21,7 @@ if (!sessionSecret || sessionSecret.length < 32) {
 // 순수 HTTP 환경(로컬/LAN IP 등)에서도 NODE_ENV를 항상 production으로 고정하므로,
 // NODE_ENV 기준으로 켜면 HTTPS가 아닌 배포에서 쿠키가 저장되지 않아 로그인이 계속
 // 풀리는 문제가 생깁니다.
-const isHttpsSite = (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://");
+const isHttpsSite = (process.env.SITE_URL ?? "").startsWith("https://");
 
 export const customerSessionOptions: SessionOptions = {
   password: sessionSecret,

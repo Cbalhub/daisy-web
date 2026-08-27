@@ -23,7 +23,7 @@ export default async function OrderDetailPage({
 
   if (!order) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const payLink = `${siteUrl}/pay/${order.orderToken}`;
   const hasManualPaidPayment = order.payments.some(
     (p) => p.status === "PAID" && p.pgProvider === "manual"
