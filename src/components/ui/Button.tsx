@@ -8,26 +8,25 @@ type Common = {
   children: React.ReactNode;
 };
 
-// 토스 디자인 시스템의 버튼 스펙을 구조적으로 따릅니다 — 사이즈마다 높이·모서리
-// 반경·라벨 굵기가 함께 스케일되고(XL 56/16px/17px, L 48/14px/17px, M 40/12px/15px,
-// S 32/10px/13px), 눌렀을 때는 scale이 아니라 어두워지는 오버레이 방식,
-// disabled는 부분 회색 처리 대신 전체 노드에 30% opacity를 씁니다. 색 자체는
-// 아직 확정 전이라 기존 accent/paper-dim/error 토큰을 그대로 사용합니다.
+// 사이즈마다 높이·라벨 굵기가 함께 스케일됩니다. 눌렀을 때는 scale이 아니라
+// 어두워지는 오버레이, disabled는 전체 노드 30% opacity. modern-minimal 재디자인에서
+// 모서리 반경을 10px로 낮추고(Linear/Vercel 계열의 절제된 pill), 라벨은 항상 한 줄로
+// 유지합니다(whitespace-nowrap — 좁은 화면에서 두 줄 깨짐 방지).
 const base =
-  "inline-flex items-center justify-center gap-2 font-medium transition-[transform,background-color,color,box-shadow,border-color,filter] duration-200 ease-out active:scale-[0.97] active:brightness-90 active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-30";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[transform,background-color,color,box-shadow,border-color,filter] duration-200 ease-out active:scale-[0.98] active:brightness-95 active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-30";
 
 const variants = {
-  primary: "bg-accent text-white hover:opacity-90",
-  secondary: "bg-paper-dim text-ink hover:opacity-80",
+  primary: "bg-accent text-white shadow-[var(--shadow-e1)] hover:bg-accent-bright",
+  secondary: "border border-line bg-paper text-ink hover:border-accent/30 hover:bg-paper-dim",
   ghost: "text-accent hover:opacity-70",
-  danger: "bg-error text-white hover:opacity-90",
+  danger: "bg-error text-white hover:bg-error/90",
 };
 
 const sizes = {
-  xl: "h-14 rounded-2xl px-6 text-[17px] font-bold",
-  lg: "h-12 rounded-[14px] px-5 text-[17px] font-bold",
-  md: "h-10 rounded-xl px-4 text-[15px] font-semibold",
-  s: "h-8 rounded-[10px] px-3 text-[13px] font-semibold",
+  xl: "h-13 rounded-xl px-6 text-[16px] font-semibold",
+  lg: "h-12 rounded-xl px-5 text-[15px] font-semibold",
+  md: "h-10 rounded-[10px] px-4 text-[14px] font-semibold",
+  s: "h-8 rounded-lg px-3 text-[13px] font-semibold",
 };
 
 export function Button({

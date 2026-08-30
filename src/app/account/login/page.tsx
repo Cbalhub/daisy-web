@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export default function AccountLoginPage() {
   return (
     <section className="pt-20 pb-24 md:pt-28">
-      <Container className="max-w-md">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+      <Container className="max-w-sm">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-3xl">
           로그인
         </h1>
         <p className="mt-3 text-sm text-muted">

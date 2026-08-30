@@ -1,56 +1,38 @@
 import { cn } from "@/lib/utils";
 
-// 포트폴리오가 계속 늘어나도 옆 카드와 색이 겹치지 않도록, 톤다운된 색 12개를
-// 서로 조합해 132가지 그라디언트 풀을 만듭니다(직접 132개를 나열하는 대신
-// 자동 생성 — 색상 톤은 기존 차콜/블루 기조를 유지). 밝은 색끼리 짝지어지면
-// 원형 무늬가 흰 선으로는 잘 안 보여서 그 경우만 어두운 선으로 뒤집습니다.
-const BASE_COLORS = [
-  { hex: "#1d1d1f", light: false }, // 차콜
-  { hex: "#424245", light: false }, // 그래파이트
-  { hex: "#0071e3", light: false }, // 블루 (포인트)
-  { hex: "#0f766e", light: false }, // 틸
-  { hex: "#5b4b8a", light: false }, // 바이올렛
-  { hex: "#a14a5c", light: false }, // 로즈
-  { hex: "#355e46", light: false }, // 포레스트
-  { hex: "#3b5166", light: false }, // 슬레이트 블루
-  { hex: "#b4650f", light: false }, // 앰버
-  { hex: "#e8f2fe", light: true }, // 스카이
-  { hex: "#f5f5f7", light: true }, // 오프화이트
-  { hex: "#e6dcc3", light: true }, // 샌드
-];
-
-const PALETTES = BASE_COLORS.flatMap((from) =>
-  BASE_COLORS.filter((to) => to.hex !== from.hex).map((to) => ({
-    from: from.hex,
-    to: to.hex,
-    stroke: from.light && to.light ? "#1d1d1f" : "#ffffff",
-  }))
-);
-
+// 포트폴리오 이미지가 없을 때 — 화려한 그라데이션 대신, 무채색 UI 와이어프레임 한 장.
+// "이건 소프트웨어다"라는 인상만 조용히 줍니다.
 export function PlaceholderArt({
-  index = 0,
+  label,
   className,
 }: {
   index?: number;
+  label?: string;
   className?: string;
 }) {
-  const { from, to, stroke } = PALETTES[index % PALETTES.length];
   return (
-    <div
-      className={cn("relative overflow-hidden rounded-xl", className)}
-      style={{
-        background: `linear-gradient(135deg, ${from} 0%, ${to} 100%)`,
-      }}
-    >
+    <div className={cn("relative overflow-hidden rounded-xl border border-line bg-paper-dim", className)}>
       <svg
-        className="absolute inset-0 h-full w-full opacity-25"
-        viewBox="0 0 200 200"
+        viewBox="0 0 320 200"
         preserveAspectRatio="xMidYMid slice"
+        className="h-full w-full text-line"
+        aria-hidden
       >
-        <circle cx={40 + index * 30} cy="30" r="70" fill="none" stroke={stroke} strokeWidth="1" />
-        <circle cx="160" cy="150" r="50" fill="none" stroke={stroke} strokeWidth="1" />
-        <line x1="0" y1="200" x2="200" y2="0" stroke={stroke} strokeWidth="0.5" />
+        <rect x="0" y="0" width="320" height="34" fill="var(--color-paper)" />
+        <line x1="0" y1="34" x2="320" y2="34" stroke="currentColor" />
+        <circle cx="18" cy="17" r="4" fill="var(--color-accent)" opacity="0.5" />
+        <rect x="30" y="13" width="70" height="8" rx="2" fill="currentColor" />
+        <rect x="20" y="52" width="120" height="10" rx="2" fill="currentColor" />
+        <rect x="20" y="72" width="180" height="8" rx="2" fill="currentColor" opacity="0.7" />
+        <rect x="20" y="100" width="84" height="60" rx="4" fill="var(--color-paper)" stroke="currentColor" />
+        <rect x="118" y="100" width="84" height="60" rx="4" fill="var(--color-paper)" stroke="currentColor" />
+        <rect x="216" y="100" width="84" height="60" rx="4" fill="var(--color-paper)" stroke="currentColor" />
+        <rect x="30" y="112" width="40" height="6" rx="2" fill="currentColor" />
+        <rect x="30" y="128" width="56" height="14" rx="2" fill="var(--color-accent)" opacity="0.35" />
       </svg>
+      {label && (
+        <span className="absolute bottom-2.5 right-3 text-[11px] font-medium text-muted">{label}</span>
+      )}
     </div>
   );
 }

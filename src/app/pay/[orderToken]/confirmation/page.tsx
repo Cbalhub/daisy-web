@@ -58,15 +58,13 @@ export default async function TransactionConfirmationPage({
   }
 
   return (
-    <div className="w-full max-w-lg bg-paper p-8 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)] print:p-0 print:shadow-none sm:p-10">
+    <div className="w-full max-w-lg rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)] print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-lg font-semibold">
-            Daisy<span className="text-accent">.</span>
-          </p>
+          <p className="font-display text-lg font-semibold tracking-tight">Daisy</p>
           <p className="mt-1 text-xs text-muted">거래확인서 · Transaction Confirmation</p>
         </div>
-        <p className="shrink-0 rounded-full border border-line px-3 py-1 text-xs font-semibold text-ink-soft">
+        <p className="shrink-0 rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft">
           {order.invoiceNumber}
         </p>
       </div>
@@ -113,7 +111,7 @@ export default async function TransactionConfirmationPage({
           비교합니다. 일치하면 그 사이 금액·당사자 정보가 DB에서 임의로 바뀌지
           않았다는 뜻입니다. */}
       <div className="mt-6 rounded-lg border border-line bg-paper-dim p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">무결성 확인</p>
+        <p className="text-xs text-muted">무결성 확인</p>
         {integrityStatus === "verified" && (
           <p className="mt-1.5 text-sm font-medium text-success">
             ✓ 확인됨 — 결제 확인 시점 이후 거래 정보가 변경되지 않았습니다.
@@ -128,7 +126,7 @@ export default async function TransactionConfirmationPage({
           <p className="mt-1.5 text-sm text-muted">이 거래는 무결성 해시가 기록되지 않았습니다.</p>
         )}
         {currentHash && (
-          <p className="mt-2 break-all font-mono text-[11px] text-muted">SHA-256 {currentHash}</p>
+          <p className="mt-2 break-all text-[11px] text-muted">SHA-256 {currentHash}</p>
         )}
       </div>
 

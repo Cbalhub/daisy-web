@@ -48,7 +48,7 @@ export function ConfirmDialog({
           <motion.div
             role="alertdialog"
             aria-modal="true"
-            className="w-full max-w-sm rounded-2xl bg-admin-surface p-6 shadow-[0_8px_16px_-4px_rgba(15,23,42,0.1),0_24px_48px_-12px_rgba(15,23,42,0.25)]"
+            className="w-full max-w-sm rounded-xl border border-admin-border bg-admin-surface p-6 shadow-[var(--shadow-e2)]"
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}

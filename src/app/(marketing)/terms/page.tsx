@@ -120,16 +120,16 @@ const ARTICLES = [
 export default function TermsPage() {
   return (
     <section className="pt-20 pb-24 md:pt-28">
-      <Container className="max-w-3xl">
-        <h1 className="font-display text-3xl font-semibold md:text-4xl">이용약관</h1>
+      <Container className="max-w-2xl">
+        <h1 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">이용약관</h1>
         <p className="mt-4 text-sm text-muted">
           실제 계약 조건과 다르거나 사업 형태가 바뀌는 경우 법률 검토 후 수정해 주세요.
         </p>
 
-        <div className="prose prose-sm mt-10 max-w-none space-y-6 text-sm leading-relaxed text-ink-soft">
+        <div className="mt-10 max-w-none space-y-7 text-sm leading-[1.75] text-ink-soft">
           {ARTICLES.map((article) => (
             <section key={article.title}>
-              <h2 className="font-display text-lg font-semibold text-ink">{article.title}</h2>
+              <h2 className="font-display text-base font-semibold text-ink">{article.title}</h2>
               {typeof article.body[0] === "string" && article.body.length > 1 && article.body.every((line) => typeof line === "string") ? (
                 <div className="space-y-1.5">
                   {article.body.map((line, i) => (

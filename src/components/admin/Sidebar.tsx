@@ -128,7 +128,7 @@ export function Sidebar({
       <div className="flex items-center justify-between border-b border-admin-sidebar-line bg-admin-bg px-4 py-3 text-admin-text md:hidden">
         <span className="flex items-center gap-1.5 font-display text-base font-semibold">
           <DaisyAsterisk variant="color" className="h-5 w-5" />
-          Daisy<span className="text-admin-blue">.</span>
+          Daisy
         </span>
         <button
           onClick={() => setMobileOpen(true)}
@@ -144,7 +144,7 @@ export function Sidebar({
         <div className="flex items-center gap-2 px-5 py-5">
           <DaisyAsterisk variant="color" className="h-6 w-6" />
           <span className="font-display text-lg font-semibold">
-            Daisy<span className="text-admin-blue">.</span>
+            Daisy
           </span>
           <span className="rounded-full bg-admin-bg-soft px-2 py-0.5 text-[10px] font-medium text-admin-sidebar-text">
             Admin
@@ -176,7 +176,7 @@ export function Sidebar({
               <div className="flex items-center justify-between px-5 py-5">
                 <span className="flex items-center gap-2 font-display text-lg font-semibold">
                   <DaisyAsterisk variant="color" className="h-6 w-6" />
-                  Daisy<span className="text-admin-blue">.</span>
+                  Daisy
                 </span>
                 <button
                   onClick={() => setMobileOpen(false)}

@@ -27,6 +27,10 @@
 .DS_Store
 *.pem
 
+# editor / local tooling (may contain personal tokens)
+.vscode/
+.hallmark/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

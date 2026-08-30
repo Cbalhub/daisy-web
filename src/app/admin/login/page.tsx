@@ -44,11 +44,9 @@ function LoginForm() {
       transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
       onSubmit={onSubmit}
       noValidate
-      className="w-full max-w-sm rounded-2xl border border-admin-border bg-admin-surface p-8 shadow-sm"
+      className="w-full max-w-sm rounded-xl border border-admin-border bg-admin-surface p-8 shadow-[var(--shadow-e2)]"
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-admin-blue">
-        Daisy Admin
-      </p>
+      <p className="text-xs font-semibold tracking-wide text-admin-blue">Daisy Admin</p>
       <h1 className="mt-2 text-xl font-semibold text-admin-text">관리자 로그인</h1>
 
       <div className="mt-6 space-y-4">

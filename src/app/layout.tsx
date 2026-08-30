@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { IBM_Plex_Sans_KR, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getBusinessSettings } from "@/lib/settings";
 import { jsonLdScript } from "@/lib/json-ld";
 import { prisma } from "@/lib/prisma";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 
+// 사이트 전체를 Pretendard 하나로 통일합니다 — 제목/본문/숫자 모두. 위계는
+// 굵기(400·600·800)와 크기·자간으로만 만듭니다. (별도 디스플레이/모노 서체 없음)
 const pretendard = localFont({
   src: "../fonts/PretendardVariable.woff2",
   variable: "--font-pretendard",
@@ -16,48 +18,36 @@ const pretendard = localFont({
   display: "swap",
 });
 
-// 브랜드 가이드라인이 지정한 헤드라인 서체 — 한글 글리프를 지원해서(Fraunces와
-// 달리) 실제로 한글 헤드라인에도 적용됩니다. 본문은 계속 Pretendard를 씁니다.
-const plexKr = IBM_Plex_Sans_KR({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-plex-kr",
-  display: "swap",
-});
-
-// 견적번호(QT-2026-001), 타임스탬프, 금액 같은 "기술적 메타데이터"용 서체 —
-// 본문/헤드라인과 시각적으로 분리해서 문서·데이터 화면에 정확한 인상을 줍니다.
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-const SITE_NAME = "Daisy";
+const SITE_TITLE = "Daisy — 제대로 만드는 소프트웨어 개발 파트너";
 const SITE_DESCRIPTION =
-  "Daisy는 업무 자동화 프로그램과 챗봇을 기획부터 운영까지 함께 만드는 소프트웨어 개발 외주 스튜디오입니다.";
+  "카카오톡·텔레그램 챗봇, 업무 자동화 프로그램, 관리자 대시보드를 기획부터 운영까지. 예산에 맞춰 설계하고 대표가 직접 만드는 소프트웨어 개발 외주 스튜디오 Daisy입니다.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://overcook.kr"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
+    default: SITE_TITLE,
     template: "%s | Daisy",
   },
   description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: "/",
     siteName: SITE_NAME,
-    title: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너",
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   // 네이버 서치어드바이저 / 구글 서치 콘솔에서 사이트 소유를 확인할 때 발급되는
   // 코드입니다. 아직 등록 전이라 값이 없으면(.env에 없으면) 태그 자체가 빠져서
@@ -91,33 +81,62 @@ async function OrganizationJsonLd() {
       _count: { rating: true },
     }),
   ]);
-  const organizationJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: settings.businessName || SITE_NAME,
-    description: SITE_DESCRIPTION,
-    url: "https://overcook.kr",
-    logo: "https://overcook.kr/apple-icon",
-    image: "https://overcook.kr/apple-icon",
-    areaServed: "KR",
-    ...(settings.phone ? { telephone: settings.phone } : {}),
-    ...(settings.contactEmail ? { email: settings.contactEmail } : {}),
-    ...(settings.address ? { address: { "@type": "PostalAddress", streetAddress: settings.address } } : {}),
-    ...(ratingAgg._count.rating > 0
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: ratingAgg._avg.rating!.toFixed(1),
-            reviewCount: ratingAgg._count.rating,
-          },
-        }
-      : {}),
-  };
+  const graph = [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      inLanguage: "ko-KR",
+      publisher: { "@id": `${SITE_URL}/#org` },
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": `${SITE_URL}/#org`,
+      name: settings.businessName || SITE_NAME,
+      alternateName: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/apple-icon`,
+      image: `${SITE_URL}/opengraph-image`,
+      areaServed: { "@type": "Country", name: "대한민국" },
+      knowsLanguage: "ko",
+      slogan: "돈 받고 만드는 이상, 제대로 만듭니다",
+      knowsAbout: [
+        "카카오톡 챗봇 개발",
+        "텔레그램 봇 개발",
+        "업무 자동화",
+        "관리자 대시보드 개발",
+        "API 연동",
+        "소프트웨어 개발 외주",
+      ],
+      ...(settings.representativeName
+        ? { founder: { "@type": "Person", name: settings.representativeName } }
+        : {}),
+      ...(settings.phone ? { telephone: settings.phone } : {}),
+      ...(settings.contactEmail ? { email: settings.contactEmail } : {}),
+      ...(settings.address
+        ? { address: { "@type": "PostalAddress", streetAddress: settings.address, addressCountry: "KR" } }
+        : {}),
+      ...(ratingAgg._count.rating > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: ratingAgg._avg.rating!.toFixed(1),
+              reviewCount: ratingAgg._count.rating,
+            },
+          }
+        : {}),
+    },
+  ];
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd) }}
+      dangerouslySetInnerHTML={{
+        __html: jsonLdScript({ "@context": "https://schema.org", "@graph": graph }),
+      }}
     />
   );
 }
@@ -127,9 +146,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={`${pretendard.variable} ${plexKr.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${pretendard.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-paper-dim text-ink">
+      <body className="min-h-full flex flex-col bg-paper text-ink">
         <Suspense fallback={null}>
           <OrganizationJsonLd />
         </Suspense>

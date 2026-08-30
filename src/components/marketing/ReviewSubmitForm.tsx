@@ -40,7 +40,7 @@ export function ReviewSubmitForm({ orderToken }: { orderToken: string }) {
 
   if (done) {
     return (
-      <div className="rounded-2xl bg-paper-dim px-6 py-10 text-center">
+      <div className="rounded-xl border border-line bg-paper-dim px-6 py-10 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent">
           <IconCheck className="h-6 w-6" />
         </div>
@@ -72,7 +72,7 @@ export function ReviewSubmitForm({ orderToken }: { orderToken: string }) {
           placeholder="예: 이커머스 스타트업 대표님, 카페 사장님 — 원하시는 만큼만 밝혀주세요"
           maxLength={100}
           required
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none transition-colors focus:border-accent"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
 
@@ -86,7 +86,7 @@ export function ReviewSubmitForm({ orderToken }: { orderToken: string }) {
           onChange={(e) => setRole(e.target.value)}
           placeholder="예: 마케팅 담당"
           maxLength={50}
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none transition-colors focus:border-accent"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
 
@@ -102,14 +102,14 @@ export function ReviewSubmitForm({ orderToken }: { orderToken: string }) {
           maxLength={1000}
           required
           placeholder="프로젝트를 진행하시면서 느낀 점을 자유롭게 남겨주세요."
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed outline-none transition-colors focus:border-accent"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-ink"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-accent py-3.5 text-sm font-medium text-white transition-opacity duration-200 hover:opacity-90 disabled:opacity-50"
+        className="h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-white transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
       >
         {loading ? "제출 중..." : "후기 제출하기"}
       </button>

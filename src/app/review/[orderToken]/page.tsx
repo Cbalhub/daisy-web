@@ -20,11 +20,9 @@ export default async function ReviewSubmitPage({
   const isReady = order.status === "PAID" && order.progressStage === "DELIVERED";
 
   return (
-    <div className="w-full max-w-lg rounded-2xl bg-paper p-8 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)] sm:p-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-        {order.invoiceNumber}
-      </p>
-      <h1 className="mt-2 font-display text-2xl font-semibold">후기 남기기</h1>
+    <div className="w-full max-w-lg rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)] sm:p-9">
+      <p className="text-xs text-muted">{order.invoiceNumber}</p>
+      <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight">후기 남기기</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         &ldquo;{order.title}&rdquo; 프로젝트는 어떠셨나요? 남겨주신 후기는 확인 후
         사이트에 게시돼요.

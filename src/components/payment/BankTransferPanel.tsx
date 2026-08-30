@@ -76,11 +76,11 @@ export function BankTransferPanel({
 
   return (
     <div>
-      <div className="rounded-2xl bg-paper-dim p-6 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">입금 계좌</p>
+      <div className="rounded-xl border border-line bg-paper-dim p-5 text-center">
+        <p className="text-xs text-muted">입금 계좌</p>
         <button
           onClick={copyAccount}
-          className="mt-3 inline-flex items-center gap-2 text-2xl font-semibold tracking-tight transition-opacity hover:opacity-70"
+          className="mt-2.5 inline-flex items-center gap-2 text-xl font-semibold tracking-tight transition-opacity hover:opacity-70"
         >
           {bankName} {bankAccountNumber}
           {copied ? (
@@ -107,7 +107,7 @@ export function BankTransferPanel({
           onChange={(e) => setDepositorName(e.target.value)}
           placeholder="실제로 입금하실 때 사용할 이름"
           maxLength={40}
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none transition-colors focus:border-accent"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
 
@@ -118,7 +118,7 @@ export function BankTransferPanel({
       <button
         onClick={claimDeposit}
         disabled={loading || !refundConsented}
-        className="mt-4 w-full rounded-full bg-accent py-3.5 text-sm font-medium text-white transition-opacity duration-200 hover:opacity-90 disabled:opacity-50"
+        className="mt-4 h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-white transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
       >
         {loading ? "처리 중..." : "입금 완료했어요"}
       </button>

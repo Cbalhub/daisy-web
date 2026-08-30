@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
-import { Reveal } from "@/components/ui/Reveal";
 
+// modern-minimal 재디자인: 섹션마다 대문자 eyebrow를 붙이지 않습니다(anti-slop).
+// kicker는 옵션으로 남기되 정말 필요한 1~2곳에서만, 헤딩 바로 위에 수직으로 씁니다.
 export function SectionHeading({
   kicker,
   title,
@@ -23,23 +24,13 @@ export function SectionHeading({
       )}
     >
       {kicker && (
-        <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            {kicker}
-          </p>
-        </Reveal>
+        <p className="mb-3 text-xs tracking-tight text-muted">{kicker}</p>
       )}
-      <Reveal delay={0.05}>
-        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-          {title}
-        </h2>
-      </Reveal>
+      <h2 className="font-display text-2xl font-semibold tracking-tight text-balance md:text-3xl">
+        {title}
+      </h2>
       {description && (
-        <Reveal delay={0.1}>
-          <p className="mt-4 text-base leading-relaxed text-muted">
-            {description}
-          </p>
-        </Reveal>
+        <p className="mt-4 text-base leading-relaxed text-muted">{description}</p>
       )}
     </div>
   );

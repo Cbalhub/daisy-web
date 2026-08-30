@@ -1,7 +1,7 @@
-# 오버쿡 (Overcook)
+# Daisy
 
-소프트웨어 개발 외주 스튜디오 오버쿡의 웹사이트입니다. 마케팅 페이지, 실시간
-채팅, 문의, 자체 상품 결제(포트원 연동), 상담 후 발급하는 커스텀 결제 링크,
+소프트웨어 개발 외주 스튜디오 Daisy의 웹사이트입니다. 마케팅 페이지, 실시간
+채팅, 문의, 상담 후 발급하는 커스텀 결제 링크(무통장입금),
 관리자 대시보드(문의/주문/포트폴리오/채팅/방문·이탈 분석)를 포함합니다.
 
 ## 기술 스택
@@ -9,7 +9,8 @@
 - Next.js 16 (App Router) + TypeScript
 - Tailwind CSS v4 + Framer Motion
 - PostgreSQL + Prisma 7 (드라이버 어댑터: `@prisma/adapter-pg`)
-- 결제: 포트원(PortOne) V2 (`@portone/browser-sdk`, `@portone/server-sdk`)
+- 결제: 무통장입금(계좌이체)만. PG/결제대행사(포트원 등) 연동 없음 —
+  고객이 입금 후 입금자명을 알리면 관리자가 실제 입금 내역을 직접 확인해 승인.
 - 관리자 인증: `iron-session` 기반 경량 세션
 - 이메일: Resend (선택)
 - 레이트리밋: Upstash Redis (선택, 미설정 시 in-memory로 대체 — 로컬 개발용)
@@ -32,8 +33,9 @@ cp .env.example .env
 
 - `DATABASE_URL`: PostgreSQL 접속 정보. 로컬은 Docker(`docker run -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres`) 또는 [Neon](https://neon.tech)/[Supabase](https://supabase.com) 같은 무료 클라우드 Postgres를 사용하세요.
 - `SESSION_SECRET`: `openssl rand -base64 32`로 생성한 32자 이상의 무작위 문자열.
-- `PORTONE_API_SECRET`, `PORTONE_WEBHOOK_SECRET`, `NEXT_PUBLIC_PORTONE_STORE_ID`, `NEXT_PUBLIC_PORTONE_CHANNEL_KEY`: 포트원 가맹점 가입 후 [관리자 콘솔 > 연동 정보](https://admin.portone.io/integration-v2/manage/channel)에서 발급받습니다. 가입 전에는 포트원 테스트 채널로 결제 플로우를 데모할 수 있습니다.
-- `RESEND_API_KEY`, `CONTACT_NOTIFY_EMAIL`: 문의 접수 시 이메일 알림을 받으려면 설정하세요. 비워두면 알림 발송만 조용히 건너뜁니다.
+- `FIELD_ENCRYPTION_KEY`: 채팅 내용·이름·연락처 암호화 키 (`openssl rand -base64 32`).
+- `RESEND_API_KEY`, `ADMIN_NOTIFY_EMAIL`: 문의 접수 시 이메일 알림을 받으려면 설정하세요. 비워두면 알림 발송만 조용히 건너뜁니다.
+- 입금 계좌 정보는 `.env`가 아니라 관리자 페이지(`/admin/settings`)에서 관리합니다.
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: 프로덕션 배포 시 반드시 설정하세요(서버리스 다중 인스턴스에서는 in-memory 레이트리밋이 동작하지 않습니다).
 
 ### 3. 데이터베이스 마이그레이션 및 관리자 계정 생성
@@ -68,30 +70,25 @@ npm run dev
 
 ## 결제 플로우 요약
 
-두 가지 결제 경로가 있습니다.
+**상담 후 커스텀 결제** (`/admin/orders/new` → 결제 링크 발급 → `/pay/[orderToken]`):
+외주 특성상 실제 계약은 상담 후 협의된 금액으로 관리자가 주문을 생성하고, 고객에게
+전용 결제 링크를 전달합니다. 고정가 상품 즉시결제 경로는 없습니다.
 
-1. **자체 상품 즉시결제** (`/pricing` → `/checkout/[productId]` → `/pay/[token]`): 고정가 패키지를 고객이 바로 결제합니다. 상품/금액은 `src/lib/products.ts`가 유일한 소스입니다.
-2. **상담 후 커스텀 결제** (`/admin/orders/new` → 결제 링크 발급 → `/pay/[token]`): 외주 특성상 대부분의 실제 계약은 상담 후 협의된 금액으로 관리자가 주문을 생성하고, 고객에게 전용 결제 링크를 전달하는 방식입니다.
-
-두 경로 모두 `src/lib/payment-service.ts`의 동일한 `reconcilePayment()`를 거칩니다.
-클라이언트가 보낸 결제 성공 신호는 트리거로만 쓰이고, 실제 승인 여부·금액은
-항상 포트원 서버 API를 다시 조회해 확인한 뒤 원자적으로 DB 상태를 전환합니다.
-포트원 웹훅이 최종 소스 오브 트루스로 동일 로직을 재확인합니다.
+무통장입금 확인은 `src/lib/payment-service.ts`를 거칩니다. 고객이 `/pay/[orderToken]`
+에서 입금자명을 남기면 주문이 `PAYMENT_CLAIMED` 상태가 되고, 관리자가 실제 입금
+내역을 확인한 뒤 `confirm-payment`로 승인합니다. 이때 거래 사실의 무결성 해시를
+저장해, 거래확인서(`/pay/[orderToken]/confirmation`)에서 사후 변조 여부를 검증할 수
+있습니다. 중복 클릭·중복 승인은 상태 기반 원자적 업데이트로 막습니다.
 
 ## 알아두어야 할 것 (실제 운영 전 필수)
 
-- **사업자 정보**: `src/components/layout/Footer.tsx`와 `/terms`, `/privacy`,
-  `/refund-policy` 페이지의 `[대표자명]`, `[000-00-00000]` 등 대괄호 placeholder를
-  실제 상호/대표자/사업자등록번호/통신판매업신고번호/주소로 교체해야 합니다
-  (전자상거래법상 필수 표기 사항).
-- **포트원 가맹 심사**: 실제 결제를 받으려면 사업자 등록 후 포트원 가맹점
-  심사를 통과해야 합니다. 승인 전에는 테스트 채널로만 결제 플로우를
-  검증할 수 있습니다.
-- **콘텐츠**: `src/lib/content.ts`(서비스/포트폴리오 소개), `src/lib/products.ts`
-  (자체 상품 가격)는 전부 샘플 데이터입니다. 실제 내용으로 교체하세요.
-- **CSP의 결제창 도메인**: `next.config.ts`의 CSP는 포트원 CDN/API 도메인만
-  허용합니다. 실제 계약한 PG사가 같은 페이지 iframe으로 결제창을 띄우는
-  방식이라면 해당 PG 도메인을 `frame-src`에 추가해야 합니다.
+- **사업자 정보**: `/admin/settings`에서 상호/대표자/사업자등록번호/통신판매업
+  신고번호/주소/입금 계좌를 채워야 합니다 (전자상거래법상 필수 표기 사항).
+  Footer와 `/terms`·`/privacy`·`/refund-policy`가 이 값을 읽어 표시합니다.
+- **약관·개인정보·환불정책**: `/terms`, `src/lib/privacyPolicy.ts`,
+  `src/lib/refundPolicy.ts`는 표준 템플릿입니다. 법률 검토 후 확정하세요.
+- **콘텐츠**: `src/lib/content.ts`(서비스 소개, FAQ)는 샘플입니다. 포트폴리오·후기는
+  `/admin`에서 DB로 관리합니다.
 - **레이트리밋**: 프로덕션에는 Upstash Redis를 반드시 연결하세요.
 
 ## 배포

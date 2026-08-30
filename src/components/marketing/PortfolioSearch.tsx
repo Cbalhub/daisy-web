@@ -17,8 +17,8 @@ const gridVariants = {
   visible: { transition: { staggerChildren: 0.05 } },
 };
 const cardVariants = {
-  hidden: { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, bounce: 0, duration: 0.4 } },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, bounce: 0, duration: 0.35 } },
 };
 
 export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
@@ -37,10 +37,10 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
 
   return (
     <div>
-      <div className="relative mt-16 max-w-sm">
+      <div className="relative mt-12 max-w-sm">
         <svg
           viewBox="0 0 24 24"
-          className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-muted"
+          className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-muted"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
@@ -55,13 +55,13 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="프로젝트, 기능으로 검색"
-          className="w-full rounded-full bg-paper py-2.5 pr-4 pl-10 text-sm text-ink shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)] placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="w-full rounded-lg border border-line bg-paper py-2.5 pr-4 pl-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none"
         />
       </div>
 
       {filtered.length === 0 ? (
         <div className="mt-16 text-center">
-          <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
+          <DaisyAsterisk variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
           <p className="mt-4 text-sm text-muted">
             &ldquo;{query}&rdquo;에 해당하는 프로젝트를 찾지 못했습니다.
           </p>
@@ -73,7 +73,7 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
           animate="visible"
           variants={gridVariants}
           className={cn(
-            "mt-10 grid gap-x-6 gap-y-14",
+            "mt-10 grid gap-5",
             filtered.length === 1
               ? "mx-auto max-w-sm"
               : filtered.length === 2
@@ -81,9 +81,9 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
                 : "sm:grid-cols-2 lg:grid-cols-3"
           )}
         >
-          {filtered.map((item, i) => (
+          {filtered.map((item) => (
             <motion.div key={item.slug} variants={cardVariants}>
-              <PortfolioCard item={item} index={i} />
+              <PortfolioCard item={item} />
             </motion.div>
           ))}
         </motion.div>
@@ -92,11 +92,14 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
   );
 }
 
-function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) {
+function PortfolioCard({ item }: { item: PortfolioItem }) {
   return (
-    <Link href={`/portfolio/${item.slug}`} className="group block">
+    <Link
+      href={`/portfolio/${item.slug}`}
+      className="group block transition-transform duration-300 ease-out hover:-translate-y-1"
+    >
       {item.images[0] ? (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-line shadow-[var(--shadow-e1)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-e2)]">
           <Image
             src={item.images[0]}
             alt={item.title}
@@ -106,29 +109,27 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
           />
         </div>
       ) : (
-        <PlaceholderArt index={index} className="aspect-[4/3]" />
+        <PlaceholderArt
+          label={item.category}
+          className="aspect-[16/10] shadow-[var(--shadow-e1)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-e2)]"
+        />
       )}
-      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-accent">
-        {item.category}
-        {item.publishedAt ? ` · ${item.publishedAt.getFullYear()}` : ""}
-      </p>
-      <h2 className="mt-1 font-display text-lg font-semibold transition-colors group-hover:text-accent">
-        {item.title}
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{item.summary}</p>
+      <div className="mt-4 flex items-baseline justify-between gap-4">
+        <h2 className="font-display text-base font-semibold transition-colors group-hover:text-accent">
+          {item.title}
+        </h2>
+        <span className="shrink-0 text-xs text-muted">
+          {item.category}
+          {item.publishedAt ? ` · ${item.publishedAt.getFullYear()}` : ""}
+        </span>
+      </div>
+      <p className="mt-1 line-clamp-1 text-sm text-muted">{item.summary}</p>
       {(item.duration || item.cost) && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {item.duration && (
-            <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold text-accent">
-              기간 {item.duration}
-            </span>
-          )}
-          {item.cost && (
-            <span className="rounded-full bg-paper-dim px-2.5 py-1 text-[11px] font-semibold text-ink-soft">
-              비용 {item.cost}
-            </span>
-          )}
-        </div>
+        <p className="mt-2 text-xs text-ink-soft">
+          {[item.duration && `기간 ${item.duration}`, item.cost && `비용 ${item.cost}`]
+            .filter(Boolean)
+            .join("   ")}
+        </p>
       )}
     </Link>
   );

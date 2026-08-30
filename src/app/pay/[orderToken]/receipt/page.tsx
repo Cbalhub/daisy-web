@@ -29,21 +29,17 @@ export default async function ReceiptPage({
   const settings = await getBusinessSettings();
 
   return (
-    <div className="w-full max-w-lg rounded-2xl bg-paper p-8 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)] print:p-0 print:shadow-none sm:p-10">
+    <div className="w-full max-w-lg rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)] print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-lg font-semibold">
-            Daisy<span className="text-accent">.</span>
-          </p>
+          <p className="font-display text-lg font-semibold tracking-tight">Daisy</p>
           <p className="mt-1 text-xs text-muted">
             {settings.businessName}
             {settings.representativeName ? ` · 대표 ${settings.representativeName}` : ""}
             {settings.businessRegNo ? ` · 사업자등록번호 ${settings.businessRegNo}` : ""}
           </p>
         </div>
-        <p className="shrink-0 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
-          영수증
-        </p>
+        <p className="shrink-0 text-xs text-muted">영수증</p>
       </div>
 
       <div className="mt-8 border-t border-line pt-6">

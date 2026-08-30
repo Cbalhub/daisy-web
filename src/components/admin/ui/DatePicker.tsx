@@ -119,7 +119,7 @@ export function DatePicker({
       </button>
 
       {open && (
-        <div className="absolute left-0 top-[calc(100%+6px)] z-30 w-72 rounded-xl border border-admin-border bg-admin-surface p-4 shadow-[0_4px_8px_rgba(15,23,42,0.06),0_24px_48px_-16px_rgba(15,23,42,0.22)]">
+        <div className="absolute left-0 top-[calc(100%+6px)] z-30 w-72 rounded-xl border border-admin-border bg-admin-surface p-4 shadow-[var(--shadow-e2)]">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-admin-text">
               {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월

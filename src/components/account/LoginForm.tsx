@@ -53,7 +53,7 @@ export function LoginForm() {
           type="email"
           required
           placeholder="you@company.com"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
       <div>
@@ -63,7 +63,7 @@ export function LoginForm() {
           type="password"
           required
           placeholder="••••••••"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
 

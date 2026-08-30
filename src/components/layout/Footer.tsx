@@ -1,89 +1,80 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { SERVICES } from "@/lib/content";
 import { getBusinessSettings } from "@/lib/settings";
 import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
-const COLUMNS = [
-  {
-    title: "서비스",
-    links: [
-      ...SERVICES.map((s) => ({ href: `/services#${s.slug}`, label: s.title })),
-      { href: "/reviews", label: "고객 후기" },
-    ],
-  },
-  {
-    title: "회사",
-    links: [
-      { href: "/portfolio", label: "포트폴리오" },
-      { href: "/faq", label: "자주 묻는 질문" },
-      { href: "/contact", label: "문의하기" },
-    ],
-  },
-  {
-    title: "정책",
-    links: [
-      { href: "/terms", label: "이용약관" },
-      { href: "/privacy", label: "개인정보처리방침" },
-      { href: "/refund-policy", label: "환불 정책" },
-    ],
-  },
+const PRIMARY_LINKS = [
+  { href: "/services", label: "서비스" },
+  { href: "/portfolio", label: "포트폴리오" },
+  { href: "/reviews", label: "후기" },
+  { href: "/faq", label: "자주 묻는 질문" },
+  { href: "/contact", label: "문의하기" },
+];
+
+const LEGAL_LINKS = [
+  { href: "/terms", label: "이용약관" },
+  { href: "/privacy", label: "개인정보처리방침" },
+  { href: "/refund-policy", label: "환불 정책" },
 ];
 
 export async function Footer() {
   const settings = await getBusinessSettings();
 
   return (
-    <footer className="mt-32 bg-ink text-paper">
-      <Container className="py-16">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
-          <div className="col-span-2">
-            <div className="flex items-center gap-2">
-              <DaisyAsterisk variant="color-inverse" className="h-7 w-7" />
-              <p className="font-display text-2xl font-semibold">Daisy</p>
-            </div>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">
-              아이디어가 완성될 때까지, 끝까지 함께 키우는 개발 파트너.
-            </p>
-          </div>
-
-          {COLUMNS.map((col) => (
-            <div key={col.title}>
-              <p className="text-sm font-semibold text-paper/90">{col.title}</p>
-              <ul className="mt-4 space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-paper/60 transition-colors hover:text-paper"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    <footer className="border-t border-line bg-paper">
+      <Container className="py-14">
+        {/* 마스트헤드 — 큰 워드마크 + 한 줄 태그라인 */}
+        <div className="flex items-center gap-2.5">
+          <DaisyAsterisk variant="color" className="h-6 w-6" />
+          <p className="font-display text-xl font-semibold tracking-tight">Daisy</p>
         </div>
+        <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
+          업무 자동화·챗봇·외주 개발을 기획부터 운영까지. 대표가 직접 진행합니다.
+        </p>
+
+        {/* 링크 — 4열 사이트맵 대신 한 줄로 */}
+        <nav className="mt-8 flex flex-wrap gap-x-5 gap-y-2.5 text-sm">
+          {PRIMARY_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="whitespace-nowrap text-ink-soft transition-colors hover:text-ink"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <span className="text-line" aria-hidden>
+            ·
+          </span>
+          {LEGAL_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="whitespace-nowrap text-muted transition-colors hover:text-ink"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
         {/* 전자상거래법상 필수 표기 사항 — /admin/settings 에서 관리 */}
-        <div className="mt-16 border-t border-paper/10 pt-8 text-xs leading-relaxed text-paper/40">
+        <div className="mt-10 border-t border-line pt-6 text-[11px] leading-relaxed text-muted">
           <p>
             상호명: {settings.businessName}
             {settings.representativeName && ` · 대표: ${settings.representativeName}`}
             {settings.businessRegNo && ` · 사업자등록번호: ${settings.businessRegNo}`}
           </p>
-          <p>
+          <p className="mt-1">
             {settings.mailOrderRegNo && `통신판매업신고번호: ${settings.mailOrderRegNo} · `}
             {settings.address && `주소: ${settings.address} · `}
             이메일:{" "}
-            <a href={`mailto:${settings.contactEmail}`} className="hover:text-paper/70">
+            <a href={`mailto:${settings.contactEmail}`} className="hover:text-ink">
               {settings.contactEmail}
             </a>
             {settings.phone && ` · 대표전화: ${settings.phone}`}
             {settings.businessHours && ` · 영업시간: ${settings.businessHours}`}
           </p>
-          <p className="mt-4">© {new Date().getFullYear()} Daisy. All rights reserved.</p>
+          <p className="mt-3">© {new Date().getFullYear()} Daisy. All rights reserved.</p>
         </div>
       </Container>
     </footer>

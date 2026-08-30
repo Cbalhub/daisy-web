@@ -36,8 +36,8 @@ export async function POST(req: NextRequest) {
     const customer = await createCustomer({
       email: parsed.data.email,
       password: parsed.data.password,
-      name: parsed.data.name || undefined,
-      phone: parsed.data.phone || undefined,
+      name: parsed.data.name,
+      phone: parsed.data.phone,
     });
 
     await prisma.auditLog.create({

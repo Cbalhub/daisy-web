@@ -1,44 +1,58 @@
 @import "tailwindcss";
 
+/* Hallmark · genre: modern-minimal · macrostructure: Workbench · nav: N5 floating pill · footer: Ft1 mast-headed
+ * pre-emit critique: P5 H4 E4 S4 R5 V4
+ * "Restrained Studio" — agr.studio 톤. 잉크+페이퍼 무채색이 기본, 파랑 액센트 하나를
+ * 아껴 씀. 장식(3D 아이콘·색 블록·그라데이션 광원) 없음. 시각적 무게는 타이포·여백·
+ * 실제 제품 목업 하나·진짜 포트폴리오 이미지에서만 나옵니다. */
+
 :root {
-  /* 이 사이트는 다크모드를 별도로 지원하지 않는 고정 라이트 테마입니다.
-     명시하지 않으면 OS가 다크모드일 때 체크박스·스크롤바 같은 네이티브
-     컨트롤만 브라우저가 임의로 어둡게 렌더링해 어색해 보입니다. */
   color-scheme: light;
 
-  /* DAISY 브랜드 색 체계 — 기본은 Ink+Paper 무채색, "꽃 액센트"는 UI 전면에
-     깔지 않고 로고·성장 애니메이션·성공 순간 같은 "브랜드 모먼트"에만 강하게
-     씁니다. 일상적인 버튼/링크는 6색 중 Blue를 대표 UI 컬러로 쓰되, 브리프의
-     원색(#64B5F6)은 흰 배경 텍스트 대비가 2.2:1로 너무 낮아 같은 색조에서
-     대비를 확보한 값(#1565C0, 약 5.8:1)을 실제 UI 토큰으로 쓰고, 원색은
-     장식/일러스트 전용 --color-petal-* 토큰으로 따로 둡니다. */
-  --color-ink: #17191c; /* Ink */
-  --color-ink-soft: #55585c;
-  --color-paper: #ffffff; /* White — 카드 등 elevated 표면 */
-  --color-paper-dim: #f7f7f3; /* Paper — 페이지 기본 배경 */
-  --color-line: #e4e3dd;
-  --color-muted: #86868a;
-  --color-accent: #1565c0; /* Daisy Blue의 대비 안전 버전 — 일상 UI 액션 컬러 */
-  --color-accent-soft: #e6f0fb;
-  --color-yellow: #ffd24d; /* Daisy Yellow — 장식/일러스트 전용 */
-  --color-periwinkle: #a78bfa; /* Daisy Purple — 장식/일러스트 전용 */
-  --color-success: #0e8074; /* Daisy Mint(#4dd0c1)의 대비 안전 버전 */
+  --color-ink: #16171a; /* 거의 검정 — 본문/헤드라인 */
+  --color-ink-soft: #494c53;
+  --color-paper: #ffffff; /* 페이지 기본 배경 */
+  --color-paper-dim: #f6f6f7; /* 아주 옅은 뉴트럴 그레이 — 교차 섹션 정도로만 */
+  --color-tint: #f6f6f7;
+  --color-line: #e7e7e9; /* 헤어라인 */
+  --color-muted: #6b6d75;
+  --color-accent: #1a5fd0; /* Daisy Blue — 텍스트/버튼 대비 안전. 링크·CTA·소수 강조에만 */
+  --color-accent-bright: #2166de;
+  --color-accent-soft: #e9eefb;
+
+  /* 브랜드 원색 — 로고에서만. UI/섹션에는 쓰지 않음. */
+  --hue-1-ink: #1a5fd0;
+  --hue-1-soft: #e9eefb;
+  --hue-2-ink: #6d3fd4;
+  --hue-2-soft: #efe9fd;
+  --hue-3-ink: #0e8f7e;
+  --hue-3-soft: #ddf3ef;
+  --hue-4-ink: #b45f06;
+  --hue-4-soft: #fdeedb;
+
+  /* 입체감을 주는 다층 그림자 — 얇은 접촉 그림자 + 중간 + 넓고 옅은 앰비언트를
+     겹쳐, 크기만 키운 그림자보다 "만든 티"가 나게. Tailwind 기본 --shadow-* 와
+     이름이 겹치지 않도록 --shadow-e* / --shadow-float. */
+  --shadow-e1: 0 1px 1px rgba(20, 30, 55, 0.05), 0 2px 5px -1px rgba(20, 30, 55, 0.08);
+  --shadow-e2: 0 1px 2px rgba(20, 30, 55, 0.06), 0 6px 12px -3px rgba(20, 30, 55, 0.08),
+    0 18px 36px -10px rgba(20, 30, 55, 0.14);
+  --shadow-float: 0 2px 4px rgba(23, 37, 84, 0.06), 0 10px 20px -6px rgba(23, 37, 84, 0.12),
+    0 32px 64px -16px rgba(23, 37, 84, 0.22);
+
+  --color-success: #0e8074;
   --color-success-soft: #e1f6f2;
-  --color-warning: #a85d0a; /* Daisy Orange(#ffb74d)의 대비 안전 버전 */
+  --color-warning: #a85d0a;
   --color-warning-soft: #fdf0e0;
-  --color-error: #c0392b; /* 브리프 팔레트엔 빨강이 없어 같은 톤으로 보강 */
+  --color-error: #c0392b;
   --color-error-soft: #fbe9e7;
-  /* 화면 전반엔 안 쓰고 데이지 애스터리스크·성장 애니메이션의 꽃잎 색으로만
-     쓰는 순수 브랜드 원색 6가지 — 텍스트/버튼 대비 기준을 적용하지 않는
-     장식 전용 토큰입니다. */
   --color-petal-yellow: #ffd24d;
   --color-petal-pink: #ff8dba;
   --color-petal-purple: #a78bfa;
   --color-petal-blue: #64b5f6;
   --color-petal-mint: #4dd0c1;
   --color-petal-orange: #ffb74d;
-  --color-info: #1565c0;
-  --color-info-soft: #e6f0fb;
+  --color-info: #1a63d8;
+  --color-info-soft: #e4edfd;
   --color-labs: #a78bfa;
   --color-labs-soft: #f1ecfe;
 
@@ -46,22 +60,23 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
-  /* 관리자 대시보드 전용 팔레트 — 마케팅 사이트와 동일한 DAISY 톤으로 통일 */
+  /* 관리자 대시보드 — 마케팅 사이트와 같은 쿨 뉴트럴 + 파랑으로 통일.
+     다만 관리자는 운영 도구라 조밀하고 차분하게(헤드라인 굵기·모션 절제). */
   --color-admin-bg: #ffffff;
-  --color-admin-bg-soft: #f7f7f3;
-  --color-admin-sidebar-line: #e4e3dd;
-  --color-admin-sidebar-text: #86868a;
-  --color-admin-content: #f7f7f3;
+  --color-admin-bg-soft: #f6f6f7;
+  --color-admin-sidebar-line: #e7e7e9;
+  --color-admin-sidebar-text: #6b6d75;
+  --color-admin-content: #f6f6f7;
   --color-admin-surface: #ffffff;
-  --color-admin-border: #e4e3dd;
-  --color-admin-text: #17191c;
-  --color-admin-muted: #55585c;
-  --color-admin-blue: #1565c0;
-  --color-admin-blue-soft: #e6f0fb;
+  --color-admin-border: #e7e7e9;
+  --color-admin-text: #16171a;
+  --color-admin-muted: #494c53;
+  --color-admin-blue: #1a5fd0;
+  --color-admin-blue-soft: #e9eefb;
   --color-admin-green: #0e8074;
-  --color-admin-green-soft: #e1f6f2;
-  --color-admin-amber: #a85d0a;
-  --color-admin-amber-soft: #fdf0e0;
+  --color-admin-green-soft: #ddf3ef;
+  --color-admin-amber: #b45f06;
+  --color-admin-amber-soft: #fdeedb;
   --color-admin-red: #c0392b;
   --color-admin-red-soft: #fbe9e7;
 }
@@ -71,12 +86,20 @@
   --color-ink-soft: var(--color-ink-soft);
   --color-paper: var(--color-paper);
   --color-paper-dim: var(--color-paper-dim);
+  --color-tint: var(--color-tint);
   --color-line: var(--color-line);
   --color-muted: var(--color-muted);
   --color-accent: var(--color-accent);
+  --color-accent-bright: var(--color-accent-bright);
   --color-accent-soft: var(--color-accent-soft);
-  --color-yellow: var(--color-yellow);
-  --color-periwinkle: var(--color-periwinkle);
+  --color-hue-1-ink: var(--hue-1-ink);
+  --color-hue-1-soft: var(--hue-1-soft);
+  --color-hue-2-ink: var(--hue-2-ink);
+  --color-hue-2-soft: var(--hue-2-soft);
+  --color-hue-3-ink: var(--hue-3-ink);
+  --color-hue-3-soft: var(--hue-3-soft);
+  --color-hue-4-ink: var(--hue-4-ink);
+  --color-hue-4-soft: var(--hue-4-soft);
   --color-success: var(--color-success);
   --color-success-soft: var(--color-success-soft);
   --color-warning: var(--color-warning);
@@ -94,11 +117,14 @@
   --color-petal-mint: var(--color-petal-mint);
   --color-petal-orange: var(--color-petal-orange);
 
-  --font-sans: var(--font-pretendard), "Pretendard", -apple-system, sans-serif;
-  --font-display: var(--font-plex-kr), var(--font-pretendard), "Pretendard", -apple-system, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+  /* 사이트 전체 Pretendard 단일. 진짜 등폭이 필요한 곳(문서 해시)만 OS 기본 등폭.
+     제목용 자간/굵기 튜닝은 아래 .font-display 유틸리티에서 처리합니다. */
+  --font-sans: var(--font-pretendard), "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", monospace;
 
   --container-content: 72rem;
+
+  --shadow-float: var(--shadow-float);
 
   --color-admin-bg: var(--color-admin-bg);
   --color-admin-bg-soft: var(--color-admin-bg-soft);
@@ -126,11 +152,15 @@
 
   html {
     scroll-behavior: smooth;
+    /* 어떤 폭에서도 가로 스크롤이 생기지 않도록. hidden이 아니라 clip —
+       position: sticky 자식(내비게이션)과 3D 목업이 깨지지 않습니다. */
+    overflow-x: clip;
   }
 
   body {
     font-family: var(--font-sans);
     font-feature-settings: "case" 1, "ss01" 1;
+    overflow-x: clip;
     /* 한글 헤드라인이 단어 중간(예: "구매"의 "구"/"매")에서 줄바꿈되는 것을 방지 */
     word-break: keep-all;
     overflow-wrap: break-word;
@@ -138,7 +168,19 @@
 
   ::selection {
     background: var(--color-accent);
-    color: var(--color-paper);
+    color: #fff;
+  }
+
+  /* 전체 배경에 아주 옅은 노이즈 — flat한 느낌을 줄여줍니다. 고정 레이어라
+     스크롤해도 결이 살아 있고, 클릭은 통과시킵니다. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -157,24 +199,7 @@
 }
 
 @layer utilities {
-  /* 히어로의 픽셀 냄비 마스코트가 살짝 떠 있는 듯 보이도록 아주 느리게 위아래로 움직입니다. */
-  @keyframes overcook-float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-6px);
-    }
-  }
-  .animate-float {
-    animation: overcook-float 3.4s ease-in-out infinite;
-  }
-
-  /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. Framer Motion이
-     같은 요소의 transform을 인라인 스타일로 계속 덮어써서 CSS 애니메이션과
-     충돌하는 것을 피하려고, 이 클래스는 Reveal 계열과 겹치지 않는 별도
-     래퍼 요소에만 붙입니다. */
+  /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. */
   @keyframes overcook-scroll-x {
     from {
       transform: translateX(0);
@@ -190,18 +215,115 @@
     animation-play-state: paused;
   }
 
+  /* 자족형 마퀴 — 콘텐츠를 2번 이어 붙이고 -50% 이동. hover 시 정지. */
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 38s) linear infinite;
+  }
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-mask:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* 제목용 — 서체는 본문과 같은 Pretendard지만 자간을 좁히고 굵기에 힘을 줍니다
+     (Tailwind preflight가 heading weight를 inherit로 리셋하므로 하한을 명시). */
   .font-display {
-    font-family: var(--font-display);
-    /* 노션 스타일 미니멀리즘 — 폰트를 화려하게 꾸미는 대신 각 사용처에서
-       font-medium/semibold/bold로 굵기 차이만 줘서 위계를 만듭니다. 기본값은
-       semibold 정도로 두고(Tailwind preflight가 heading font-weight를
-       inherit로 리셋하므로 값을 아예 안 주면 얇아져 버립니다), 자간도
-       과하게 좁히지 않습니다. 더 강조하고 싶은 곳은 font-bold를 따로 얹으세요. */
-    letter-spacing: -0.01em;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    letter-spacing: -0.024em;
+    font-weight: 700;
+  }
+  h1.font-display {
+    letter-spacing: -0.035em;
+  }
+
+  /* 히어로의 3D 제품 목업 — 살짝 기울인 채 아주 느리게 위아래로 떠다닙니다.
+     prefers-reduced-motion 에서는 위 미디어쿼리가 자동으로 멈춥니다(기준 위치). */
+  @keyframes float-a {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0.001deg); }
+    50% { transform: translate3d(0, -16px, 0) rotate(0.001deg); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-3deg); }
+    50% { transform: translate3d(0, 14px, 0) rotate(-3deg); }
+  }
+  @keyframes float-c {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(3deg); }
+    50% { transform: translate3d(0, -12px, 0) rotate(3deg); }
+  }
+  .float-a { animation: float-a 6s var(--ease-in-out) infinite; }
+  .float-b { animation: float-b 7.5s var(--ease-in-out) infinite; }
+  .float-c { animation: float-c 6.8s var(--ease-in-out) infinite; }
+
+  /* 히어로 제품 목업 무대 — lg 이상 + 마우스 환경에서만 3D로 기울입니다.
+     모바일/터치에서는 아무 변형 없이 평평하게 놓입니다. */
+  .showcase-stack {
+    --rx: 7deg;
+    --ry: -15deg;
+  }
+  @media (min-width: 64rem) and (hover: hover) and (pointer: fine) {
+    .showcase-stack {
+      transform-style: preserve-3d;
+      transform: perspective(1700px) rotateX(var(--rx)) rotateY(var(--ry));
+      transition: transform 0.5s var(--ease-out);
+    }
+    .showcase-layer { transform: translateZ(var(--z, 0));  }
+  }
+
+  /* 히어로 뒤 옅은 블루 광원 */
+  .hero-glow {
+    background: radial-gradient(
+      60% 55% at 70% 30%,
+      color-mix(in srgb, var(--color-accent-bright) 16%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  /* 기술적인 배경 점격자 (아주 옅게, 가장자리로 페이드) */
+  .dot-grid {
+    background-image: radial-gradient(var(--color-line) 1.1px, transparent 1.1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(70% 70% at 50% 45%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(70% 70% at 50% 45%, #000 0%, transparent 78%);
   }
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* 제품 목업에 살짝 원근감을 줍니다. lg 이상에서만, 아주 약하게(글자 가독성 유지). */
+  .tilt-scene {
+    perspective: 1600px;
+  }
+  @media (min-width: 64rem) {
+    .tilt-l {
+      transform: rotateY(7deg) rotateX(3deg);
+    }
+    .tilt-r {
+      transform: rotateY(-7deg) rotateX(3deg);
+    }
+  }
+
+  /* 위에서 빛이 드는 듯한 아주 옅은 표면 그라데이션 — 무대(stage)용. */
+  .surface-lit {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-paper) 55%, transparent),
+      transparent 60%
+    );
   }
 }

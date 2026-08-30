@@ -54,7 +54,7 @@ export function EventBannerCard({
 }) {
   if (imageUrl) {
     return (
-      <div className="overflow-hidden rounded-3xl bg-paper shadow-[0_4px_8px_rgba(15,23,42,0.06),0_24px_48px_-16px_rgba(15,23,42,0.22)]">
+      <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
         <div className="relative aspect-square w-full">
           <Image src={imageUrl} alt={title || "이벤트"} fill className="object-cover" />
         </div>
@@ -68,15 +68,10 @@ export function EventBannerCard({
   const tone = STYLE_MAP[style];
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl px-8 pt-12 pb-9 text-center shadow-[0_4px_8px_rgba(15,23,42,0.06),0_24px_48px_-16px_rgba(15,23,42,0.22)] ${tone.card}`}>
-      <div
-        aria-hidden
-        className={`pointer-events-none absolute -top-24 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full blur-3xl ${tone.glow}`}
-      />
-
+    <div className={`relative overflow-hidden rounded-2xl px-8 pt-11 pb-9 text-center shadow-[var(--shadow-e2)] ${tone.card}`}>
       {/* 큰 원형 배지가 시선을 가장 먼저 붙잡고, 그 위에 살짝 걸친 브랜드 심볼이
           "우리가 만든" 느낌을 더합니다. */}
-      <div className={`relative mx-auto flex h-32 w-32 items-center justify-center rounded-full border-2 ${tone.ring}`}>
+      <div className={`relative mx-auto flex h-28 w-28 items-center justify-center rounded-full border-2 ${tone.ring}`}>
         <DaisyAsterisk
           variant="mono"
           className="absolute -top-4 -right-2 h-9 w-9 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]"

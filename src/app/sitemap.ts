@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
-
-const BASE_URL = "https://overcook.kr";
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 const STATIC_ROUTES = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },

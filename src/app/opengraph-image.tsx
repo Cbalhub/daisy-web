@@ -3,19 +3,24 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 export const runtime = "nodejs";
-export const alt = "Daisy — 아이디어에서 완성까지 자라나는 개발 파트너";
+export const alt = "Daisy — 제대로 만드는 소프트웨어 개발 파트너";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage() {
-  // next/og(satori)는 woff2를 지원하지 않으므로, 사이트 본문에 쓰는 가변 폰트 대신
-  // 정적 굵기(otf)를 제공하는 pretendard 패키지의 파일을 사용합니다.
-  const fontData = await readFile(
-    path.join(
-      process.cwd(),
-      "node_modules/pretendard/dist/public/static/Pretendard-Bold.otf"
-    )
-  );
+  // next/og(satori)는 woff2를 지원하지 않으므로, 본문용 가변 폰트 대신
+  // pretendard 패키지의 정적 굵기(otf)를 씁니다.
+  const [bold, extraBold] = await Promise.all([
+    readFile(
+      path.join(process.cwd(), "node_modules/pretendard/dist/public/static/Pretendard-Bold.otf")
+    ),
+    readFile(
+      path.join(
+        process.cwd(),
+        "node_modules/pretendard/dist/public/static/Pretendard-ExtraBold.otf"
+      )
+    ),
+  ]);
 
   return new ImageResponse(
     (
@@ -26,35 +31,38 @@ export default async function OgImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "80px",
-          background: "#1d1d1f",
+          padding: "90px",
+          background: "#16171a",
           color: "#ffffff",
           fontFamily: "Pretendard",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", fontSize: 32, fontWeight: 700 }}>
-          Daisy<span style={{ color: "#3182f6" }}>.</span>
+        <div style={{ display: "flex", alignItems: "center", fontSize: 30, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
+          Daisy
         </div>
         <div
           style={{
             display: "flex",
-            marginTop: 40,
-            fontSize: 64,
-            fontWeight: 700,
-            lineHeight: 1.25,
-            maxWidth: 920,
+            marginTop: 32,
+            fontSize: 76,
+            fontWeight: 800,
+            letterSpacing: "-0.035em",
+            lineHeight: 1.12,
           }}
         >
-          아이디어가 다 자라기 전엔 내보내지 않습니다.
+          돈 받고 만드는 이상, 제대로 만듭니다
         </div>
-        <div style={{ display: "flex", marginTop: 28, fontSize: 26, color: "rgba(255,255,255,0.6)" }}>
-          업무 자동화 · 챗봇 개발 외주 — Daisy
+        <div style={{ display: "flex", marginTop: 30, fontSize: 26, color: "rgba(255,255,255,0.55)" }}>
+          소프트웨어 개발 외주 · 챗봇 · 업무 자동화
         </div>
       </div>
     ),
     {
       ...size,
-      fonts: [{ name: "Pretendard", data: fontData, style: "normal", weight: 700 }],
+      fonts: [
+        { name: "Pretendard", data: bold, style: "normal", weight: 700 },
+        { name: "Pretendard", data: extraBold, style: "normal", weight: 800 },
+      ],
     }
   );
 }

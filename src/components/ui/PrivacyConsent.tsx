@@ -49,7 +49,7 @@ export function PrivacyConsent({ name = "privacyConsent" }: { name?: string }) {
           setScrolledToEnd(false);
           setOpen(true);
         }}
-        className="flex w-full items-center gap-3 rounded-xl border border-line px-4 py-3 text-left text-sm transition-colors hover:border-ink"
+        className="flex w-full items-center gap-3 rounded-lg border border-line px-3.5 py-3 text-left text-sm transition-colors hover:border-ink/30"
       >
         <span
           className={cn(
@@ -92,10 +92,10 @@ export function PrivacyConsent({ name = "privacyConsent" }: { name?: string }) {
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="flex max-h-[80vh] w-full max-w-lg flex-col rounded-2xl bg-paper shadow-2xl"
+              className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-line bg-paper shadow-[var(--shadow-e2)]"
             >
               <div className="border-b border-line px-6 py-5">
-                <h2 className="font-display text-lg">개인정보 수집 및 이용 동의</h2>
+                <h2 className="font-display text-lg font-semibold tracking-tight">개인정보 수집 및 이용 동의</h2>
                 <p className="mt-1 text-xs text-muted">
                   아래 내용을 끝까지 확인해야 동의할 수 있습니다.
                 </p>
@@ -128,7 +128,7 @@ export function PrivacyConsent({ name = "privacyConsent" }: { name?: string }) {
                   type="button"
                   onClick={confirm}
                   disabled={!scrolledToEnd}
-                  className="w-full rounded-full bg-ink py-2.5 text-sm font-medium text-paper transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-11 w-full rounded-[10px] bg-ink text-sm font-semibold text-paper transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {scrolledToEnd ? "동의하고 닫기" : "끝까지 읽어주세요"}
                 </button>

@@ -23,11 +23,9 @@ export default async function CheckoutPage({
   const settings = isPayable ? await getBusinessSettings() : null;
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-paper p-8 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-        {order.invoiceNumber}
-      </p>
-      <h1 className="mt-2 font-display text-2xl font-semibold">{order.title}</h1>
+    <div className="w-full max-w-md rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)]">
+      <p className="text-xs text-muted">{order.invoiceNumber}</p>
+      <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight">{order.title}</h1>
       {order.description && (
         <p className="mt-2 text-sm leading-relaxed text-muted">{order.description}</p>
       )}

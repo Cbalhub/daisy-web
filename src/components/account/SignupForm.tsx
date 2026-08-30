@@ -17,8 +17,16 @@ export function SignupForm() {
 
     const data = Object.fromEntries(new FormData(e.currentTarget).entries());
 
+    if (String(data.name ?? "").trim().length < 2) {
+      toast("실명을 입력해 주세요.", "error");
+      return;
+    }
     if (!isValidEmail(String(data.email ?? ""))) {
       toast("올바른 이메일 주소를 입력해 주세요.", "error");
+      return;
+    }
+    if (!/^[0-9+\-\s()]{9,}$/.test(String(data.phone ?? "").trim())) {
+      toast("연락처를 정확히 입력해 주세요.", "error");
       return;
     }
     if (String(data.password ?? "").length < 8) {
@@ -55,11 +63,15 @@ export function SignupForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-5">
       <div>
-        <label className="text-sm font-medium text-ink-soft">이름 (선택)</label>
+        <label className="text-sm font-medium text-ink-soft">
+          이름 <span className="text-muted">(실명)</span>
+        </label>
         <input
           name="name"
-          placeholder="홍길동"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          required
+          minLength={2}
+          placeholder="계약·정산에 쓰이는 실명"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
       <div>
@@ -69,15 +81,18 @@ export function SignupForm() {
           type="email"
           required
           placeholder="you@company.com"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-ink-soft">연락처 (선택)</label>
+        <label className="text-sm font-medium text-ink-soft">연락처</label>
         <input
           name="phone"
+          type="tel"
+          required
+          inputMode="tel"
           placeholder="010-0000-0000"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
       <div>
@@ -88,7 +103,7 @@ export function SignupForm() {
           required
           minLength={8}
           placeholder="8자 이상"
-          className="mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
 

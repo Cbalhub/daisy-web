@@ -50,24 +50,22 @@ export function Navbar() {
     <header className="sticky top-0 z-50 px-3 pt-3 md:px-6 md:pt-4">
       <div
         className={cn(
-          "mx-auto flex max-w-[68rem] items-center justify-between rounded-3xl px-5 py-3 backdrop-blur-md transition-shadow duration-300 md:px-7",
-          scrolled
-            ? "border border-line bg-paper/90 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_32px_-20px_rgba(15,23,42,0.25)]"
-            : "border border-transparent bg-paper/70"
+          "mx-auto flex max-w-[64rem] items-center justify-between rounded-2xl border border-line bg-paper/85 px-4 py-2.5 backdrop-blur-md transition-shadow duration-200 md:px-5",
+          scrolled ? "shadow-[var(--shadow-e2)]" : "shadow-[var(--shadow-e1)]"
         )}
       >
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <DaisyAsterisk variant="color" className="h-6 w-6" />
-          <span className="font-display text-xl font-bold tracking-tight text-ink">Daisy</span>
+        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Daisy 홈">
+          <DaisyAsterisk variant="color" className="h-5 w-5" />
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">Daisy</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium text-ink-soft transition-colors hover:text-ink",
+                "whitespace-nowrap text-sm text-ink-soft transition-colors hover:text-ink",
                 pathname === link.href && "text-ink"
               )}
             >
@@ -76,40 +74,31 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-5 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
           <Link
             href="/account"
-            className="text-sm font-medium text-ink-soft transition-colors hover:text-ink"
+            className="whitespace-nowrap text-sm text-ink-soft transition-colors hover:text-ink"
           >
             {loggedIn ? "마이페이지" : "로그인"}
           </Link>
           <button
             type="button"
             onClick={openChatWidget}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-accent px-5 text-[15px] font-semibold text-white transition-[transform,opacity,filter] duration-200 ease-out hover:opacity-90 active:scale-[0.97] active:brightness-90 active:duration-100"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-4 text-sm font-semibold text-white transition-[transform,background-color] duration-200 ease-out hover:bg-accent-bright active:scale-[0.98] active:duration-100"
           >
             프로젝트 문의
           </button>
         </div>
 
         <button
-          className="flex h-9 w-9 flex-col items-center justify-center gap-1.5 md:hidden"
+          className="-mr-1 flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label="메뉴 열기"
+          aria-label="메뉴"
           aria-expanded={open}
         >
-          <motion.span
-            animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }}
-            className="h-px w-6 bg-ink"
-          />
-          <motion.span
-            animate={{ opacity: open ? 0 : 1 }}
-            className="h-px w-6 bg-ink"
-          />
-          <motion.span
-            animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }}
-            className="h-px w-6 bg-ink"
-          />
+          <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
+          <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
+          <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
         </button>
       </div>
 
@@ -119,29 +108,29 @@ export function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            className="mx-auto mt-2 max-w-[68rem] overflow-hidden rounded-2xl border border-line bg-paper shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_32px_-20px_rgba(15,23,42,0.25)] md:hidden"
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+            className="mx-auto mt-2 max-w-[64rem] overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e1)] md:hidden"
           >
-            <div className="flex flex-col gap-1 px-6 py-4">
+            <div className="flex flex-col p-2">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="py-2.5 text-base font-medium text-ink-soft hover:text-ink"
+                  className="flex min-h-11 items-center rounded-lg px-3 text-[15px] text-ink-soft transition-colors hover:bg-paper-dim hover:text-ink"
                 >
                   {link.label}
                 </Link>
               ))}
               <Link
                 href="/account"
-                className="py-2.5 text-base font-medium text-ink-soft hover:text-ink"
+                className="flex min-h-11 items-center rounded-lg px-3 text-[15px] text-ink-soft transition-colors hover:bg-paper-dim hover:text-ink"
               >
                 {loggedIn ? "마이페이지" : "로그인"}
               </Link>
               <button
                 type="button"
                 onClick={openChatWidget}
-                className="py-2.5 text-left text-base font-medium text-accent"
+                className="mt-1 flex min-h-11 items-center rounded-lg bg-accent px-3 text-left text-[15px] font-semibold text-white"
               >
                 프로젝트 문의
               </button>

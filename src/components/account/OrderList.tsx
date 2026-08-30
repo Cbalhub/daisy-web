@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { ORDER_STATUS_LABEL, PROJECT_STAGE_LABEL, PROJECT_STAGE_ORDER } from "@/lib/admin/status";
 import type { Order, ProjectStage } from "@prisma/client";
 
@@ -12,7 +11,7 @@ type OrderWithReview = Order & { review: { id: string } | null };
 
 const TONE_TEXT: Record<string, string> = {
   neutral: "bg-paper-dim text-muted",
-  blue: "bg-paper-dim text-ink-soft",
+  blue: "bg-accent-soft text-accent",
   green: "bg-success-soft text-success",
   amber: "bg-warning-soft text-warning",
   red: "bg-error-soft text-error",
@@ -20,15 +19,11 @@ const TONE_TEXT: Record<string, string> = {
 
 export function OrderList({ orders }: { orders: OrderWithReview[] }) {
   return (
-    <RevealGroup
-      as="ul"
-      className="mt-5 divide-y divide-line overflow-hidden rounded-2xl bg-paper shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]"
-      stagger={0.06}
-    >
+    <ul className="mt-5 divide-y divide-line overflow-hidden rounded-xl border border-line">
       {orders.map((order) => (
         <OrderRow key={order.id} order={order} />
       ))}
-    </RevealGroup>
+    </ul>
   );
 }
 
@@ -39,7 +34,7 @@ function OrderRow({ order }: { order: OrderWithReview }) {
   const expandable = order.status === "PAID";
 
   return (
-    <RevealItem as="li">
+    <li>
       <div
         className={cn("flex flex-wrap items-center justify-between gap-3 p-5", expandable && "cursor-pointer")}
         onClick={() => expandable && setOpen((v) => !v)}
@@ -52,7 +47,7 @@ function OrderRow({ order }: { order: OrderWithReview }) {
         <div className="flex items-center gap-3">
           <span
             className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium",
+              "rounded-md px-2 py-0.5 text-xs font-medium",
               // 결제가 끝난 뒤에는 "결제 완료"보다 실제 작업이 어디까지 왔는지가
               // 더 중요한 정보라, 배지 자체를 진행 단계로 바꿔서 보여줍니다.
               expandable
@@ -126,7 +121,7 @@ function OrderRow({ order }: { order: OrderWithReview }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </RevealItem>
+    </li>
   );
 }
 

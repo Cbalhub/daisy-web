@@ -601,9 +601,9 @@ function ConversationTabs({
             exit={{ opacity: 0, scale: 0.97, y: -6 }}
             transition={{ type: "spring", bounce: 0, duration: 0.25 }}
             style={{ transformOrigin: "top" }}
-            className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-2xl bg-paper shadow-[0_4px_8px_rgba(15,23,42,0.06),0_24px_48px_-16px_rgba(15,23,42,0.22)]"
+            className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-line bg-paper shadow-[var(--shadow-e2)]"
           >
-            <p className="px-4 pt-3 text-[11px] font-medium uppercase tracking-wide text-muted">
+            <p className="px-4 pt-3 text-[11px] text-muted">
               내 대화 {conversations.length}개
             </p>
             <ul className="max-h-72 overflow-y-auto py-1">
@@ -701,7 +701,7 @@ function PaymentRequestCard({ order }: { order: OrderSummary }) {
   const payable = order.status === "DRAFT" || order.status === "PENDING";
   const tone = ORDER_STATUS_TONE[order.status] ?? "neutral";
   return (
-    <div className="relative w-72 max-w-full overflow-hidden rounded-2xl bg-paper-dim shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
+    <div className="relative w-72 max-w-full overflow-hidden rounded-xl border border-line bg-paper-dim shadow-[var(--shadow-e1)]">
       <div className="px-5 pt-4 pb-4">
         <div className="flex items-center justify-between gap-3">
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted">
@@ -729,7 +729,7 @@ function PaymentRequestCard({ order }: { order: OrderSummary }) {
           <div className="p-3 pt-4">
             <Link
               href={`/pay/${order.orderToken}`}
-              className="block rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-[transform,opacity] active:scale-[0.98] hover:opacity-90"
+              className="block rounded-[10px] bg-accent py-3 text-center text-sm font-semibold text-white transition-[transform,background-color] ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100"
             >
               결제하기
             </Link>
@@ -787,7 +787,7 @@ function AttachmentBubble({
 function ProgressUpdateCard({ order, note }: { order: OrderSummary; note: string }) {
   const stageText = PROJECT_STAGE_TEXT[order.progressStage] ?? order.progressStage;
   return (
-    <div className="w-72 max-w-full rounded-2xl bg-paper-dim px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.16)]">
+    <div className="w-72 max-w-full rounded-xl border border-line bg-paper-dim px-5 py-4 shadow-[var(--shadow-e1)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-ink">{order.title}</p>

@@ -1,15 +1,23 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
+// modern-minimal 재디자인: 페이지는 "이미 조판된" 상태로 나타나야 합니다. 전 구간
+// 스크롤 페이드는 걷어내고(→ anti-slop), 이 컴포넌트는 히어로의 1회성 등장 정도에만
+// 씁니다. 이동 폭도 8px로 줄여 거의 눈치채지 못할 만큼 절제했습니다.
 const variants: Variants = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 0, y: 8 },
   visible: (delay: number = 0) => ({
     opacity: 1,
     y: 0,
-    // 애플 스타일 기본 스프링: 오버슈트 없는 critically-damped — 자연스럽지만 튀지 않음
-    transition: { type: "spring", bounce: 0, duration: 0.5, delay },
+    transition: { type: "spring", bounce: 0, duration: 0.4, delay },
   }),
+};
+
+// prefers-reduced-motion 이면 이동 없이 즉시 표시합니다.
+const staticVariants: Variants = {
+  hidden: { opacity: 1, y: 0 },
+  visible: { opacity: 1, y: 0 },
 };
 
 export function Reveal({
@@ -23,6 +31,7 @@ export function Reveal({
   className?: string;
   as?: "div" | "span";
 }) {
+  const reduce = useReducedMotion();
   const MotionTag = as === "span" ? motion.span : motion.div;
   return (
     <MotionTag
@@ -31,7 +40,7 @@ export function Reveal({
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
       custom={delay}
-      variants={variants}
+      variants={reduce ? staticVariants : variants}
     >
       {children}
     </MotionTag>
