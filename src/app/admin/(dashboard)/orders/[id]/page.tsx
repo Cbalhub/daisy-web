@@ -6,6 +6,7 @@ import { CopyLinkButton } from "@/components/admin/CopyLinkButton";
 import { RefundPanel } from "@/components/admin/RefundPanel";
 import { ConfirmPaymentButton } from "@/components/admin/ConfirmPaymentButton";
 import { CancelOrderButton } from "@/components/admin/CancelOrderButton";
+import { ContractPanel } from "@/components/admin/ContractPanel";
 import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL, PROJECT_STAGE_LABEL } from "@/lib/admin/status";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,10 @@ export default async function OrderDetailPage({
   const { id } = await params;
   const order = await prisma.order.findUnique({
     where: { id },
-    include: { payments: { orderBy: { createdAt: "desc" } } },
+    include: {
+      payments: { orderBy: { createdAt: "desc" } },
+      contracts: { orderBy: { createdAt: "desc" } },
+    },
   });
 
   if (!order) notFound();
@@ -103,6 +107,26 @@ export default async function OrderDetailPage({
               견적서 보기
             </a>
           </div>
+        </AdminCard>
+      </div>
+
+      <div className="px-8 pt-4">
+        <AdminCard>
+          <ContractPanel
+            orderId={order.id}
+            siteUrl={siteUrl}
+            defaultAmount={order.amount}
+            defaultClientBizNo={order.businessRegNo ?? ""}
+            contracts={order.contracts.map((c) => ({
+              id: c.id,
+              token: c.token,
+              status: c.status,
+              amount: c.amount,
+              sentAt: c.sentAt?.toISOString() ?? null,
+              signedAt: c.signedAt?.toISOString() ?? null,
+              signedName: c.signedName,
+            }))}
+          />
         </AdminCard>
       </div>
 
