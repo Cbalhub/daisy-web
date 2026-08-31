@@ -95,6 +95,12 @@ export function SignupForm() {
           className="mt-1.5 w-full rounded-lg border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-ink"
         />
       </div>
+
+      <p className="rounded-lg border border-line bg-paper-dim px-3.5 py-3 text-xs leading-relaxed text-muted">
+        이름·이메일·연락처는 견적서, 계약서, 영수증, 환불 등 법적 통지에 그대로 사용됩니다. 실제 정보가
+        아니면 서류를 받지 못하거나 분쟁 시 불이익이 있을 수 있습니다.
+      </p>
+
       <div>
         <label className="text-sm font-medium text-ink-soft">비밀번호</label>
         <input
