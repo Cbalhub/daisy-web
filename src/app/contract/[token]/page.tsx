@@ -101,7 +101,8 @@ export default async function ContractPage({
           <h2 className="text-base font-semibold text-ink">전자서명</h2>
           <p className="mt-1 text-sm text-muted">
             위 계약 내용을 확인하셨다면 아래에 서명해 주세요. 서명하면 계약이 체결되며, 이후에도 이
-            페이지에서 서명본을 다시 볼 수 있습니다.
+            페이지에서 서명본을 다시 볼 수 있습니다. 갑(발주자)의 상호·성명·연락처가 실제와 다르면
+            서명하지 마시고 담당자에게 알려주세요.
           </p>
           <SignForm token={contract.token} />
         </div>
