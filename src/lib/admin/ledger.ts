@@ -65,10 +65,16 @@ export async function getLedgerEntries(
       include: { payment: { include: { order: { select: orderSelect } } } },
       orderBy: { cancelledAt: "asc" },
     }),
-    prisma.manualLedgerEntry.findMany({
-      where: { occurredAt: { gte: start, lt: end } },
-      orderBy: { occurredAt: "asc" },
-    }),
+    // 배포 직후처럼 DB에 아직 ManualLedgerEntry 테이블이 없어도 장부가 죽지 않도록.
+    prisma.manualLedgerEntry
+      .findMany({
+        where: { occurredAt: { gte: start, lt: end } },
+        orderBy: { occurredAt: "asc" },
+      })
+      .catch((err) => {
+        console.error("[ledger] manualLedgerEntry 조회 실패 (스키마 미적용?):", err);
+        return [] as Awaited<ReturnType<typeof prisma.manualLedgerEntry.findMany>>;
+      }),
   ]);
 
   const typeOf = (businessRegNo: string | null): CustomerType =>
