@@ -28,9 +28,9 @@ const architects = localFont({
   display: "swap",
 });
 
-const SITE_TITLE = "MOVD — 제대로 만드는 소프트웨어 개발 파트너";
+const SITE_TITLE = "MOVD — 챗봇·자동화·관리자 도구 개발 외주";
 const SITE_DESCRIPTION =
-  "카카오톡·텔레그램 챗봇, 업무 자동화 프로그램, 관리자 대시보드를 기획부터 운영까지. 예산에 맞춰 설계하고 대표가 직접 만드는 소프트웨어 개발 외주 스튜디오 MOVD입니다.";
+  "카카오톡·텔레그램 챗봇, 업무 자동화, 관리자 대시보드를 만듭니다. 예산 먼저 듣고 그 안에서 설계하며, 상담부터 배포까지 대표가 직접 하는 소프트웨어 개발 외주 MOVD.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

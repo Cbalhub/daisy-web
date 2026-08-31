@@ -7,7 +7,7 @@ import { OpenChatButton } from "@/components/chat/OpenChatButton";
 export function CtaBand({
   title,
   description,
-  cta = "프로젝트 문의하기",
+  cta = "프로젝트 문의",
   children,
 }: {
   title: React.ReactNode;

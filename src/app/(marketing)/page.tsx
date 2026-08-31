@@ -28,7 +28,7 @@ const CAPABILITIES = [
   {
     title: "카카오톡 · 텔레그램 챗봇",
     description:
-      "상담·주문 접수·예약 알림까지, 채널에 맞춘 시나리오로 자동응대 챗봇을 처음부터 설계하고 만듭니다.",
+      "상담, 주문 접수, 예약 알림까지 챗봇이 받게 합니다. 시나리오부터 같이 짜서 처음부터 만듭니다.",
     visual: <ChatbotFlow />,
   },
   {
@@ -52,28 +52,28 @@ const CAPABILITIES = [
   {
     title: "외부 API · 웹훅 연동",
     description:
-      "여러 서비스와 시스템을 하나로 연결해 흩어진 업무를 자동으로 이어줍니다. 이벤트가 생기면 알아서 다음 단계로.",
+      "여러 서비스를 하나로 잇습니다. 한쪽에서 일이 생기면 다른 쪽이 알아서 다음 걸 처리하게.",
     visual: <WebhookFlow />,
   },
 ];
 
 const WHY_US = [
   {
-    title: "예산에 맞춰 설계합니다",
+    title: "예산부터 물어봅니다",
     description:
-      "정해진 견적을 먼저 들이미는 대신, 예산을 먼저 여쭤보고 그 안에서 가장 효과적인 범위를 제안해요.",
+      "견적서를 먼저 들이밀지 않아요. 예산을 듣고, 그 안에서 뭘 할 수 있는지 정리해 드립니다.",
   },
   {
-    title: "대표가 처음부터 끝까지",
-    description: "상담부터 기획, 개발, 배포까지 담당자가 바뀌지 않고 대표가 직접 진행해요.",
+    title: "대표가 끝까지 합니다",
+    description: "상담, 개발, 배포까지 담당자가 안 바뀝니다. 중간에 말이 새지 않아요.",
   },
   {
-    title: "출시 후에도 책임집니다",
-    description: "납품하고 끝이 아니라, 버그·장애 대응까지 계속 함께해요.",
+    title: "납품 후에도 봅니다",
+    description: "버그 나면 고치고, 장애 나면 대응합니다. 끝나고 연락 끊기지 않아요.",
   },
   {
-    title: "진행 상황을 투명하게",
-    description: "채팅과 마이페이지에서 지금 어느 단계인지 바로 확인할 수 있어요.",
+    title: "지금 어느 단계인지 보입니다",
+    description: "채팅이랑 마이페이지에서 진행 상황을 바로 확인할 수 있어요.",
   },
 ];
 
@@ -94,42 +94,35 @@ export default async function HomePage() {
   return (
     <>
       {/* 히어로 */}
-      <section className="relative overflow-hidden pt-16 pb-16 md:pt-24 md:pb-24">
-        <Mark
-          variant="mono"
-          className="pointer-events-none absolute -left-28 -top-24 h-[22rem] w-[22rem] text-accent/[0.045]"
-        />
-        <Container>
-          <div className="relative grid items-center gap-x-10 gap-y-14 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="max-w-xl">
-              <p className="text-[15px] font-semibold text-accent">
-                소프트웨어 개발 외주 · 챗봇 · 업무 자동화
+      <section className="border-b border-line py-14 md:py-20">
+        <Container className="md:px-0">
+          <div className="grid items-stretch gap-y-10 lg:grid-cols-[minmax(0,24rem)_1fr]">
+            <div className="flex flex-col px-6 md:pl-10 lg:border-r lg:border-line lg:pr-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                소프트웨어 개발 외주
               </p>
-              <h1 className="mt-4 font-display text-[2rem] leading-[1.1] font-extrabold tracking-tight text-balance sm:text-[2.8rem] md:text-[3.5rem]">
-                돈 받고 만드는 이상,
+              <h1 className="mt-4 font-display text-[2rem] leading-[1.14] font-extrabold tracking-tight text-balance sm:text-[2.4rem]">
+                카톡 봇, 자동화, 관리자 페이지.
                 <br />
-                제대로 만듭니다
+                대표가 직접 만듭니다.
               </h1>
-              <p className="mt-6 max-w-md text-base leading-relaxed text-ink-soft md:text-lg">
-                카카오톡 챗봇, 업무 자동화 프로그램, 관리자 도구를 기획부터 운영까지 —
-                대표가 직접 만드는 개발 파트너입니다.
+              <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink-soft">
+                이 사이트의 채팅·결제·관리자 도구도 전부 저희가 만들었어요.
               </p>
-              <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <OpenChatButton>프로젝트 문의하기</OpenChatButton>
+              <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-8">
+                <OpenChatButton>프로젝트 문의</OpenChatButton>
                 <Link
-                  href="/services"
-                  className="text-sm font-semibold text-ink transition-opacity hover:opacity-60"
+                  href="/portfolio"
+                  className="text-sm font-semibold text-ink underline-offset-4 hover:underline"
                 >
-                  서비스 살펴보기 &rarr;
+                  포트폴리오 &rarr;
                 </Link>
               </div>
-              <p className="mt-4 flex items-center gap-2 text-xs text-muted">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                문의 주시면 보통 하루 안에 답변드려요
-              </p>
             </div>
 
-            <HeroShowcase />
+            <div className="px-6 md:px-10 lg:pl-10">
+              <HeroShowcase />
+            </div>
           </div>
         </Container>
       </section>
@@ -141,12 +134,12 @@ export default async function HomePage() {
       <section className="border-b border-line py-20 md:py-28">
         <Container>
           <div className="max-w-lg">
-            <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-[2rem]">
-              빠르기만 한 외주가 아니라, 끝까지 책임지는 파트너
+            <h2 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
+              뭘 만드나
             </h2>
             <Link
               href="/services"
-              className="mt-4 inline-block text-sm font-semibold text-accent transition-opacity hover:opacity-70"
+              className="mt-4 inline-block text-sm font-semibold text-ink underline-offset-4 hover:underline"
             >
               서비스 자세히 &rarr;
             </Link>
@@ -190,12 +183,11 @@ export default async function HomePage() {
         <Container>
           <div className="grid gap-x-14 gap-y-12 lg:grid-cols-2">
             <div>
-              <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-[2rem]">
-                정해진 견적서보다, 예산을 먼저 봅니다
+              <h2 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
+                왜 MOVD인가
               </h2>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
-                외주를 처음 맡기는 분도 부담 없이 시작할 수 있게, 범위와 일정을 예산에
-                맞춰 설계합니다.
+                외주 처음 맡겨보는 분들이 많아요. 그래서 이렇게 합니다.
               </p>
               <ul className="mt-8 divide-y divide-line border-t border-line">
                 {WHY_US.map((item) => (
@@ -209,8 +201,7 @@ export default async function HomePage() {
             <div className="lg:pt-4">
               <ProgressTrackerMock />
               <p className="mt-3 text-xs leading-relaxed text-muted">
-                결제한 프로젝트는 마이페이지에서 이렇게 지금 어느 단계인지, 다음이 뭔지
-                바로 볼 수 있어요.
+                결제한 프로젝트는 마이페이지에서 지금 어느 단계인지, 다음이 뭔지 이렇게 보입니다.
               </p>
             </div>
           </div>
@@ -220,8 +211,8 @@ export default async function HomePage() {
       {/* 진행 과정 */}
       <section className="border-t border-line py-20 md:py-28">
         <Container>
-          <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-[2rem]">
-            문의부터 유지보수까지, 여섯 단계로
+          <h2 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
+            일하는 순서
           </h2>
           <ProcessStepper steps={PROCESS_STEPS} />
         </Container>
@@ -288,8 +279,8 @@ export default async function HomePage() {
         <section className="border-t border-line py-20 md:py-28">
           <Container>
             <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-[2rem]">
-                함께한 분들의 이야기
+              <h2 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
+                받은 후기
               </h2>
               <Link
                 href="/reviews"
@@ -340,15 +331,15 @@ export default async function HomePage() {
       {/* CTA */}
       <section className="border-t border-line py-20 text-center md:py-28">
         <Container>
-          <Mark variant="brand" className="mx-auto mb-6 h-8 w-8 text-accent" />
-          <h2 className="mx-auto max-w-xl font-display text-2xl font-extrabold tracking-tight text-balance md:text-3xl">
-            다음 프로젝트, MOVD와 함께 시작해볼까요?
+          <Mark variant="brand" className="mx-auto mb-6 h-9 w-9" />
+          <h2 className="mx-auto max-w-xl font-display text-2xl font-extrabold tracking-tight md:text-3xl">
+            만들고 싶은 거 있으세요?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted">
-            채팅 한 번이면 충분합니다. 보통 하루 안에 답변드리고, 견적부터 도와드려요.
+            채팅으로 상황만 알려 주시면 됩니다. 보통 하루 안에 답 드리고, 견적부터 같이 봅니다.
           </p>
           <div className="mt-8 flex justify-center">
-            <OpenChatButton>프로젝트 문의하기</OpenChatButton>
+            <OpenChatButton>프로젝트 문의</OpenChatButton>
           </div>
         </Container>
       </section>

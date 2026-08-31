@@ -22,17 +22,17 @@ export default async function PortfolioPage() {
   return (
     <section className="pt-20 pb-24 md:pt-28">
       <Container>
-        <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">
-          함께 만든 프로젝트들
+        <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">
+          지금까지 만든 것들
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-          업무 자동화, 챗봇, 관리자 도구까지 — 실제로 납품한 작업의 일부입니다.
+          업무 자동화, 챗봇, 관리자 도구. 실제로 납품한 작업들입니다.
         </p>
 
         {items.length === 0 ? (
           <div className="mt-16 text-center">
-            <Mark variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
-            <p className="mt-4 text-sm text-muted">곧 새로운 프로젝트로 찾아뵙겠습니다.</p>
+            <Mark variant="mono" className="mx-auto h-12 w-12 text-muted/50" />
+            <p className="mt-4 text-sm text-muted">아직 올린 작업이 없어요.</p>
           </div>
         ) : (
           <PortfolioSearch items={items} />

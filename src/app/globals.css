@@ -191,6 +191,12 @@
 }
 
 @layer utilities {
+  /* 히어로 쇼케이스 등장 — 살짝 아래에서 페이드인 (1회). */
+  @keyframes fadeup {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. */
   @keyframes overcook-scroll-x {
     from {
