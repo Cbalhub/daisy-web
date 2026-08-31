@@ -114,7 +114,11 @@ export async function sendContractRequestEmail(input: {
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
   const { error } = await resend.emails.send({
-    from: "MOVD 웹사이트 <notify@overcook.kr>",
+    // TODO: overcook.kr 도메인을 Resend에서 인증하면 "MOVD 웹사이트 <notify@overcook.kr>"로
+    // 되돌리세요. 그 전까지는 미인증 도메인 발송이 막혀 있어, Resend 계정 소유자(대표님)
+    // 이메일로만 보낼 수 있는 sandbox 발신자를 씁니다. 다른 고객에게 보낼 땐 발송이 실패하고,
+    // 계약서 라우트가 emailFailed 로 응답해 관리자 패널에서 링크를 직접 복사하도록 안내합니다.
+    from: "MOVD 웹사이트 <onboarding@resend.dev>",
     to: input.customerEmail,
     subject: `[MOVD] 용역계약서 확인 및 서명 요청 — ${input.orderTitle}`,
     text: [
