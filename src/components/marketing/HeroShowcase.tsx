@@ -26,7 +26,9 @@ export function HeroShowcase() {
   const [i, setI] = useState(0);
   const [held, setHeld] = useState(false);
   const iRef = useRef(0);
-  iRef.current = i;
+  useEffect(() => {
+    iRef.current = i;
+  }, [i]);
 
   function scrollTo(idx: number) {
     const track = trackRef.current;
