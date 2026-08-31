@@ -97,6 +97,57 @@ export async function sendNewMessageNotification(input: {
  * payment-service.ts의 applyPaidResult에서, 입금자명 불일치로 자동 환불되는 케이스를
  * 제외하고 정상적으로 결제완료 처리된 경우에만 호출됩니다.
  */
+/**
+ * 관리자가 주문에서 용역계약서를 발행하면, 고객에게 서명 링크를 보냅니다.
+ */
+export async function sendContractRequestEmail(input: {
+  customerEmail: string;
+  customerName: string;
+  orderTitle: string;
+  amount: number;
+  token: string;
+}) {
+  if (!resend) return;
+
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const url = `${siteUrl}/contract/${input.token}`;
+  const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
+
+  const { error } = await resend.emails.send({
+    from: "MOVD 웹사이트 <notify@overcook.kr>",
+    to: input.customerEmail,
+    subject: `[MOVD] 용역계약서 확인 및 서명 요청 — ${input.orderTitle}`,
+    text: [
+      `${input.customerName} 님, 용역계약서를 보내드립니다.`,
+      "",
+      `프로젝트: ${input.orderTitle}`,
+      `계약 금액: ${amountText} (부가세 별도)`,
+      "",
+      `아래 링크에서 내용을 확인하고 서명해 주세요:`,
+      url,
+    ].join("\n"),
+    html: emailShell(`
+      <p style="margin:0 0 4px;font-size:13px;color:${BRAND.muted};">용역계약서</p>
+      <h1 style="margin:0 0 16px;font-size:20px;color:${BRAND.ink};">${escapeHtml(input.customerName)} 님, 계약서를 확인해 주세요</h1>
+      <table role="presentation" width="100%" style="background:#f5f5f7;border-radius:12px;">
+        <tr>
+          <td style="padding:16px 18px;">
+            <p style="margin:0;font-size:13px;color:${BRAND.muted};">${escapeHtml(input.orderTitle)}</p>
+            <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:${BRAND.ink};">${amountText}</p>
+            <p style="margin:2px 0 0;font-size:12px;color:${BRAND.muted};">부가세 별도</p>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">
+        링크에서 계약 내용을 확인하고 서명하시면 계약이 체결됩니다. 서명본은 링크에서 다시 볼 수 있어요.
+      </p>
+      ${emailButton(url, "계약서 확인하고 서명하기")}
+    `),
+  });
+
+  if (error) throw new Error(`resend 발송 실패: ${error.message}`);
+}
+
 export async function sendPaymentConfirmedEmail(input: {
   customerEmail: string;
   customerName: string;

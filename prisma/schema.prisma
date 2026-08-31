@@ -19,6 +19,7 @@ model AdminUser {
   refunds            Refund[]
   auditLogs          AuditLog[]
   manualLedgerEntries ManualLedgerEntry[] @relation("ManualLedgerCreatedBy")
+  contracts          Contract[]          @relation("ContractCreatedBy")
 }
 
 // ---------- 고객 계정 ----------
@@ -209,6 +210,7 @@ model Order {
 
   payments     Payment[]
   chatMessages ChatMessage[]
+  contracts    Contract[]
   // 프로젝트당 후기는 하나만 — 이미 남겼으면 다시 못 남기게 하는 제약을
   // 애플리케이션 코드가 아니라 DB 차원에서도 보장합니다.
   review       Review?
@@ -332,6 +334,56 @@ model ManualLedgerEntry {
   updatedAt          DateTime         @updatedAt
 
   @@index([occurredAt])
+}
+
+// ---------- 용역계약서 (온라인 서명) ----------
+enum ContractStatus {
+  DRAFT // 관리자 작성 중
+  SENT // 고객에게 링크 발송, 서명 대기
+  SIGNED // 고객 서명 완료
+  VOID // 취소·무효
+}
+
+model Contract {
+  id      String         @id @default(cuid())
+  token   String         @unique @default(cuid()) // /contract/[token]
+  orderId String
+  order   Order          @relation(fields: [orderId], references: [id])
+  status  ContractStatus @default(DRAFT)
+
+  // 계약 조건 (관리자 입력)
+  scope          String // 용역 범위 (여러 줄)
+  amount         Int // KRW (주문에서 복사)
+  startDate      DateTime? // 착수 예정일
+  endDate        DateTime? // 납품 예정일
+  warrantyMonths Int       @default(1) // 무상 하자보수 개월
+  paymentTerms   String? // 지급 조건
+  specialTerms   String? // 특약
+
+  // 발주자(갑) 스냅샷
+  clientName  String
+  clientPhone String?
+  clientEmail String
+  clientBizNo String?
+
+  // 수급자(을) 스냅샷 — 발송 시점의 BusinessSettings 값 { name, repName, bizNo, address, phone, email }
+  companySnapshot Json
+
+  // 서명 (고객)
+  signatureDataUrl String? // PNG data URI
+  signedName       String? // 고객이 타이핑한 확인 이름
+  signedAt         DateTime?
+  signedIp         String?
+  signedUserAgent  String?
+  contentHash      String? // 서명 시점 사실의 SHA-256 (위변조 확인용)
+
+  sentAt      DateTime?
+  createdById String?
+  createdBy   AdminUser? @relation("ContractCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([orderId])
 }
 
 model AuditLog {
