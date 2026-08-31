@@ -109,15 +109,16 @@ export function PrivacyConsent({ name = "privacyConsent" }: { name?: string }) {
                 {PRIVACY_POLICY_SECTIONS.map((section) => (
                   <div key={section.title}>
                     <h3 className="font-semibold text-ink">{section.title}</h3>
-                    {section.body.length > 1 ? (
-                      <ul className="mt-1.5 list-disc space-y-1 pl-5">
-                        {section.body.map((line) => (
-                          <li key={line}>{line}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="mt-1.5">{section.body[0]}</p>
-                    )}
+                    <div className="mt-1.5 space-y-1">
+                      {section.body.map((line, i) => {
+                        const indented = line.startsWith("  ");
+                        return (
+                          <p key={i} className={indented ? "pl-4" : undefined}>
+                            {indented ? line.trim() : line}
+                          </p>
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
                 <p className="pt-2 text-center text-xs text-muted">— 끝 —</p>
