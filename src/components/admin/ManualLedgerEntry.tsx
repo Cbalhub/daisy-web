@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
+import { AdminSelect } from "@/components/admin/ui/Select";
 
 const inputCls =
   "w-full rounded-lg border border-admin-border bg-admin-content px-3 py-2 text-sm outline-none focus:border-admin-blue";
@@ -85,13 +86,17 @@ export function AddLedgerEntry() {
           결제일
           <input type="date" name="occurredAt" required defaultValue={todayLocal()} className={`mt-1.5 ${inputCls}`} />
         </label>
-        <label className="text-xs font-medium text-admin-muted">
+        <div className="text-xs font-medium text-admin-muted">
           구분
-          <select name="kind" defaultValue="REVENUE" className={`mt-1.5 ${inputCls}`}>
-            <option value="REVENUE">결제(수입)</option>
-            <option value="REFUND">환불</option>
-          </select>
-        </label>
+          <AdminSelect
+            name="kind"
+            defaultValue="REVENUE"
+            options={[
+              { value: "REVENUE", label: "결제(수입)" },
+              { value: "REFUND", label: "환불" },
+            ]}
+          />
+        </div>
         <label className="text-xs font-medium text-admin-muted">
           발주처 / 고객명
           <input name="customerName" required maxLength={100} className={`mt-1.5 ${inputCls}`} />
@@ -122,16 +127,21 @@ export function AddLedgerEntry() {
           연락처
           <input name="phone" maxLength={30} className={`mt-1.5 ${inputCls} tabular-nums`} />
         </label>
-        <label className="text-xs font-medium text-admin-muted">
+        <div className="text-xs font-medium text-admin-muted">
           증빙 수단
-          <select name="proofType" defaultValue="" className={`mt-1.5 ${inputCls}`}>
-            <option value="">선택 안 함</option>
-            <option value="TAX_INVOICE">세금계산서</option>
-            <option value="CASH_RECEIPT">현금영수증</option>
-            <option value="TRANSFER_RECORD">계좌이체 내역</option>
-            <option value="NONE">없음</option>
-          </select>
-        </label>
+          <AdminSelect
+            name="proofType"
+            defaultValue=""
+            placeholder="선택 안 함"
+            options={[
+              { value: "", label: "선택 안 함" },
+              { value: "TAX_INVOICE", label: "세금계산서" },
+              { value: "CASH_RECEIPT", label: "현금영수증" },
+              { value: "TRANSFER_RECORD", label: "계좌이체 내역" },
+              { value: "NONE", label: "없음" },
+            ]}
+          />
+        </div>
         <label className="text-xs font-medium text-admin-muted sm:col-span-2">
           비고
           <input name="memo" maxLength={1000} className={`mt-1.5 ${inputCls}`} />
