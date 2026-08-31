@@ -30,7 +30,7 @@ export default function RefundPolicyPage() {
           ))}
         </div>
 
-        <p className="mt-12 text-xs text-muted">최종 수정일: 2026년 8월 18일</p>
+        <p className="mt-12 text-xs text-muted">최종 수정일: 2026년 9월 1일</p>
       </Container>
     </section>
   );
