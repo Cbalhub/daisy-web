@@ -32,7 +32,7 @@ export default async function ReceiptPage({
     <div className="w-full max-w-lg rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)] print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-lg font-semibold tracking-tight">Daisy</p>
+          <p className="font-display text-lg font-semibold tracking-tight">MOVD</p>
           <p className="mt-1 text-xs text-muted">
             {settings.businessName}
             {settings.representativeName ? ` · 대표 ${settings.representativeName}` : ""}
@@ -68,7 +68,7 @@ export default async function ReceiptPage({
       </div>
 
       <p className="mt-8 text-center text-xs leading-relaxed text-muted">
-        본 영수증은 Daisy 웹사이트에서 자동 발급되었습니다.
+        본 영수증은 MOVD 웹사이트에서 자동 발급되었습니다.
         <br />
         문의: {settings.contactEmail}
       </p>

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatWidget } from "@/components/chat/openChat";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 const NAV_LINKS = [
   { href: "/services", label: "서비스" },
@@ -54,10 +54,7 @@ export function Navbar() {
           scrolled ? "shadow-[var(--shadow-e2)]" : "shadow-[var(--shadow-e1)]"
         )}
       >
-        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Daisy 홈">
-          <DaisyAsterisk variant="color" className="h-5 w-5" />
-          <span className="font-display text-lg font-semibold tracking-tight text-ink">Daisy</span>
-        </Link>
+        <Wordmark className="text-[22px]" />
 
         <nav className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((link) => (

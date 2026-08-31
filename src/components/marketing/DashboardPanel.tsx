@@ -1,4 +1,4 @@
-// Daisy가 실제로 만들어 쓰는 관리자 대시보드의 UI 언어를 정적으로 재현한 패널.
+// MOVD가 실제로 만들어 쓰는 관리자 대시보드의 UI 언어를 정적으로 재현한 패널.
 // 가짜 브라우저 창틀·신호등 없이 제품 UI 그 자체만. 무채색 + 블루 포인트 하나.
 // 숫자는 예시임이 드러나는 절제된 값만 씁니다.
 
@@ -98,7 +98,7 @@ export function DashboardPanel({ caption = false }: { caption?: boolean }) {
       </div>
       {caption && (
         <figcaption className="mt-3 text-center text-xs text-muted">
-          Daisy가 직접 만들어 쓰는 관리자 도구입니다. 이 사이트의 결제·정산도 여기서 돌아갑니다.
+          MOVD가 직접 만들어 쓰는 관리자 도구입니다. 이 사이트의 결제·정산도 여기서 돌아갑니다.
         </figcaption>
       )}
     </figure>

@@ -9,8 +9,8 @@ import { jsonLdScript } from "@/lib/json-ld";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
-// 사이트 전체를 Pretendard 하나로 통일합니다 — 제목/본문/숫자 모두. 위계는
-// 굵기(400·600·800)와 크기·자간으로만 만듭니다. (별도 디스플레이/모노 서체 없음)
+// 사이트 본문·UI 는 Pretendard 하나 — 제목/본문/숫자 모두. 위계는 굵기(400·600·800)와
+// 크기·자간으로만. 등폭이 필요한 곳(문서 해시 등)만 OS 기본 등폭.
 const pretendard = localFont({
   src: "../fonts/PretendardVariable.woff2",
   variable: "--font-pretendard",
@@ -18,15 +18,25 @@ const pretendard = localFont({
   display: "swap",
 });
 
-const SITE_TITLE = "Daisy — 제대로 만드는 소프트웨어 개발 파트너";
+// 로고 워드마크 "MOVD" 전용 손글씨 — 그 외 어디에도 쓰지 않습니다. 라틴 서브셋만
+// 담긴 13KB woff2 (Architects Daughter, OFL). 단일 굵기라 굵기는 워드마크 쪽에서
+// -webkit-text-stroke 로 살짝 불립니다.
+const architects = localFont({
+  src: "../fonts/ArchitectsDaughter-Latin.woff2",
+  variable: "--font-architects",
+  weight: "400",
+  display: "swap",
+});
+
+const SITE_TITLE = "MOVD — 챗봇·자동화·관리자 도구 개발 외주";
 const SITE_DESCRIPTION =
-  "카카오톡·텔레그램 챗봇, 업무 자동화 프로그램, 관리자 대시보드를 기획부터 운영까지. 예산에 맞춰 설계하고 대표가 직접 만드는 소프트웨어 개발 외주 스튜디오 Daisy입니다.";
+  "카카오톡·텔레그램 챗봇, 업무 자동화, 관리자 대시보드를 만듭니다. 예산 먼저 듣고 그 안에서 설계하며, 상담부터 배포까지 대표가 직접 하는 소프트웨어 개발 외주 MOVD.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: "%s | Daisy",
+    template: "%s | MOVD",
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -146,9 +156,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={`${pretendard.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${architects.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        {/* 로고·마크에 손그림 느낌을 주는 왜곡 필터 — feTurbulence 로 만든 노이즈를
+            변위맵으로 써서 깔끔한 도형/글자의 가장자리를 살짝 흔듭니다. */}
+        <svg width="0" height="0" className="absolute" aria-hidden focusable="false">
+          <filter id="rough">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
         <Suspense fallback={null}>
           <OrganizationJsonLd />
         </Suspense>

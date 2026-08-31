@@ -26,7 +26,7 @@ const SERVICES_JSON_LD = {
       name: service.title,
       description: service.description,
       url: absoluteUrl(`/services#${service.slug}`),
-      provider: { "@type": "ProfessionalService", name: "Daisy" },
+      provider: { "@type": "ProfessionalService", name: "MOVD" },
       areaServed: "KR",
     },
   })),
@@ -42,12 +42,11 @@ export default function ServicesPage() {
 
       <section className="pt-20 pb-16 md:pt-28">
         <Container>
-          <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">
-            기획부터 운영까지, 하나의 팀으로
+          <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">
+            뭘 하나
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-            프로젝트 규모와 목적에 맞춰 필요한 부분만 선택하거나, 처음부터 끝까지
-            전체 과정을 맡길 수 있습니다.
+            필요한 것만 골라도 되고, 처음부터 끝까지 다 맡겨도 됩니다.
           </p>
         </Container>
       </section>
@@ -88,10 +87,10 @@ export default function ServicesPage() {
         </Container>
       </section>
 
-      <section className="border-t border-line bg-paper-dim py-20 md:py-28">
+      <section className="border-t border-line py-20 md:py-28">
         <Container>
-          <h2 className="max-w-lg font-display text-2xl font-extrabold tracking-tight text-balance md:text-[2rem]">
-            일하는 방식
+          <h2 className="max-w-lg font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
+            일하는 순서
           </h2>
           <ProcessStepper steps={PROCESS_STEPS} />
         </Container>
@@ -100,13 +99,13 @@ export default function ServicesPage() {
       <section className="py-20 md:py-28">
         <Container>
           <CtaBand
-            title="어떤 서비스가 필요한지 아직 모르셔도 괜찮아요"
-            description="상황을 알려주시면 가장 적합한 방향을 함께 찾아드립니다."
-            cta="상담 시작하기"
+            title="뭐가 필요한지 몰라도 됩니다"
+            description="상황만 말씀해 주시면 방법은 같이 찾습니다."
+            cta="채팅으로 물어보기"
           >
             <Link
               href="/faq"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition-opacity hover:opacity-70"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink underline-offset-4 hover:underline"
             >
               자주 묻는 질문
               <ArrowRight className="h-4 w-4" strokeWidth={2} />

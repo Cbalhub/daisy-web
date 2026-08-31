@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 export const runtime = "nodejs";
-export const alt = "Daisy — 제대로 만드는 소프트웨어 개발 파트너";
+export const alt = "MOVD — 제대로 만드는 소프트웨어 개발 파트너";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -32,27 +32,28 @@ export default async function OgImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "90px",
-          background: "#16171a",
-          color: "#ffffff",
+          background: "#fafafa",
+          color: "#191919",
           fontFamily: "Pretendard",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", fontSize: 30, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
-          Daisy
+        <div style={{ display: "flex", alignItems: "center", fontSize: 30, fontWeight: 800, letterSpacing: "0.02em", color: "#7a2e3e" }}>
+          MOVD
         </div>
         <div
           style={{
             display: "flex",
-            marginTop: 32,
-            fontSize: 76,
+            marginTop: 30,
+            fontSize: 64,
             fontWeight: 800,
             letterSpacing: "-0.035em",
-            lineHeight: 1.12,
+            lineHeight: 1.15,
           }}
         >
           돈 받고 만드는 이상, 제대로 만듭니다
         </div>
-        <div style={{ display: "flex", marginTop: 30, fontSize: 26, color: "rgba(255,255,255,0.55)" }}>
+        <div style={{ display: "flex", width: 96, height: 2, background: "#191919", marginTop: 34 }} />
+        <div style={{ display: "flex", marginTop: 22, fontSize: 26, color: "#5c5c5c" }}>
           소프트웨어 개발 외주 · 챗봇 · 업무 자동화
         </div>
       </div>

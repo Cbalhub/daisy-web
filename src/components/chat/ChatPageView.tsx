@@ -6,7 +6,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { IconPaymentCard } from "@/components/ui/icons";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 
 type OrderSummary = {
   id: string;
@@ -45,7 +45,7 @@ type ConversationSummary = {
   unreadCount: number;
 };
 
-const ORIGINAL_TITLE = "채팅 | Daisy";
+const ORIGINAL_TITLE = "채팅 | MOVD";
 
 const ORDER_STATUS_TEXT: Record<string, string> = {
   DRAFT: "결제 대기",
@@ -145,7 +145,7 @@ export function ChatPageView({
 
       const hasNewAdminReply = incoming.some((m) => m.sender === "ADMIN");
       if (hasNewAdminReply && document.hidden) {
-        document.title = "💬 새 메시지 | Daisy";
+        document.title = "💬 새 메시지 | MOVD";
       }
     });
 
@@ -348,7 +348,7 @@ export function ChatPageView({
             >
               {visibleMessages.length === 0 && (
                 <div className="mt-10 text-center">
-                  <DaisyAsterisk variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
+                  <Mark variant="mono" className="mx-auto h-14 w-14 text-accent/70" />
                   <p className="mt-4 text-sm text-muted">
                     {isDraft
                       ? `"${draftTitle}" 프로젝트에 대해 궁금한 점을 남겨주세요.`

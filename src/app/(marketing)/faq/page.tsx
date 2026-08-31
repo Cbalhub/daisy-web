@@ -36,12 +36,11 @@ export default async function FaqPage() {
       />
       <section className="pt-20 pb-16 md:pt-28">
         <Container>
-          <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">
+          <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">
             자주 묻는 질문
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-            상담 전에 궁금하실 만한 것들을 미리 정리했어요. 여기 없는 내용은 채팅으로
-            편하게 물어봐 주세요.
+            상담 전에 궁금할 만한 것들 정리했어요. 여기 없는 건 채팅으로 물어봐 주세요.
           </p>
 
           <div className="mt-12 max-w-2xl">
@@ -53,17 +52,17 @@ export default async function FaqPage() {
       <section className="pb-24">
         <Container>
           <CtaBand
-            title="더 궁금한 점이 있으신가요?"
+            title="더 궁금한 거 있으세요?"
             description={
               settings.businessHours
-                ? `여기 없는 내용은 채팅으로 편하게 물어봐 주세요. 상담 가능 시간: ${settings.businessHours}`
-                : "여기 없는 내용은 채팅으로 편하게 물어봐 주세요. 확인 후 바로 답변드려요."
+                ? `여기 없는 건 채팅으로 물어봐 주세요. 상담 가능 시간: ${settings.businessHours}`
+                : "여기 없는 건 채팅으로 물어봐 주세요. 확인하고 바로 답 드려요."
             }
-            cta="지금 상담하기"
+            cta="채팅으로 물어보기"
           >
             <Link
               href="/refund-policy"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition-opacity hover:opacity-70"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink underline-offset-4 hover:underline"
             >
               환불 정책 보기
               <ArrowRight className="h-4 w-4" strokeWidth={2} />

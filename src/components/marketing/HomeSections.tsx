@@ -1,5 +1,4 @@
 import { Container } from "@/components/ui/Container";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
 
 /* ── 4. "이런 걸 만들었어요" 마퀴 ────────────────────────────── */
 
@@ -21,17 +20,12 @@ const WORK_TYPES = [
 export function WorkTypeMarquee() {
   const row = [...WORK_TYPES, ...WORK_TYPES];
   return (
-    <div className="border-y border-line bg-paper-dim py-5">
-      <p className="mb-3 text-center text-xs font-medium text-muted">
-        지금까지 이런 것들을 만들었어요
-      </p>
+    <div className="border-y border-line py-4">
       <div className="marquee-mask overflow-hidden">
-        <div className="marquee-track gap-3">
+        <div className="marquee-track">
           {row.map((t, i) => (
-            <span
-              key={i}
-              className="whitespace-nowrap rounded-full border border-line bg-paper px-4 py-1.5 text-sm font-medium text-ink-soft"
-            >
+            <span key={i} className="flex items-center whitespace-nowrap text-sm text-ink-soft">
+              <span className="mx-6 h-1 w-1 shrink-0 rounded-full bg-muted" aria-hidden />
               {t}
             </span>
           ))}
@@ -41,22 +35,18 @@ export function WorkTypeMarquee() {
   );
 }
 
-/* ── 1+2+3. 다크 매니페스토 (오버사이즈 타이포 + 애스터리스크) ── */
+/* ── 1+2+3. 매니페스토 (오버사이즈 타이포, 위아래 줄) ── */
 
 export function Manifesto() {
   return (
-    <section className="relative overflow-hidden bg-ink py-24 text-paper md:py-32">
-      <DaisyAsterisk
-        variant="mono"
-        className="pointer-events-none absolute -right-14 -top-14 h-72 w-72 text-white/[0.05] md:h-96 md:w-96"
-      />
+    <section className="border-y border-line py-24 md:py-32">
       <Container>
-        <p className="relative font-display text-[1.9rem] font-extrabold leading-[1.25] tracking-tight text-balance md:text-[2.9rem] md:leading-[1.18]">
+        <p className="font-display text-[2rem] font-extrabold leading-[1.2] tracking-tight text-balance md:text-[3.2rem] md:leading-[1.14]">
           &ldquo;그 예산으로 되나요?&rdquo;
           <br />
-          <span className="text-paper/50">되게 만드는 게 저희 일입니다.</span>
+          <span className="text-muted">되게 만드는 게 저희 일입니다.</span>
         </p>
-        <p className="relative mt-7 max-w-lg text-sm leading-relaxed text-paper/60 md:text-[15px]">
+        <p className="mt-8 max-w-lg text-[15px] leading-relaxed text-ink-soft">
           정해진 견적서를 들이밀기 전에, 예산부터 듣고 그 안에서 방법을 찾습니다.
         </p>
       </Container>
@@ -81,7 +71,7 @@ export function FounderNote() {
               뭔가 새더라고요. 그게 싫어서 이렇게 해요.&rdquo;
             </p>
             <p className="mt-5 text-sm text-muted">
-              <span className="font-semibold text-ink">황준성</span> · Daisy 대표
+              <span className="font-semibold text-ink">황준성</span> · MOVD 대표
             </p>
           </div>
         </div>

@@ -287,7 +287,7 @@ export default async function PortfolioDetailPage({
         )}
 
         <div className="mt-16">
-          <CtaBand title="비슷한 프로젝트를 계획 중이신가요?" />
+          <CtaBand title="비슷한 거 만들고 싶으세요?" />
         </div>
       </Container>
     </section>

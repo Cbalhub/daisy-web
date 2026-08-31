@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { getBusinessSettings } from "@/lib/settings";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 const PRIMARY_LINKS = [
   { href: "/services", label: "서비스" },
@@ -24,12 +24,9 @@ export async function Footer() {
     <footer className="border-t border-line bg-paper">
       <Container className="py-14">
         {/* 마스트헤드 — 큰 워드마크 + 한 줄 태그라인 */}
-        <div className="flex items-center gap-2.5">
-          <DaisyAsterisk variant="color" className="h-6 w-6" />
-          <p className="font-display text-xl font-semibold tracking-tight">Daisy</p>
-        </div>
+        <Wordmark href={null} className="text-[27px]" />
         <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
-          업무 자동화·챗봇·외주 개발을 기획부터 운영까지. 대표가 직접 진행합니다.
+          업무 자동화, 챗봇, 외주 개발. 상담부터 배포까지 대표가 직접 합니다.
         </p>
 
         {/* 링크 — 4열 사이트맵 대신 한 줄로 */}
@@ -74,7 +71,7 @@ export async function Footer() {
             {settings.phone && ` · 대표전화: ${settings.phone}`}
             {settings.businessHours && ` · 영업시간: ${settings.businessHours}`}
           </p>
-          <p className="mt-3">© {new Date().getFullYear()} Daisy. All rights reserved.</p>
+          <p className="mt-3">© {new Date().getFullYear()} MOVD. All rights reserved.</p>
         </div>
       </Container>
     </footer>

@@ -54,7 +54,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
       >
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div style={{ display: "flex", fontSize: 30, fontWeight: 700 }}>
-            Daisy<span style={{ color: "#3182f6" }}>.</span>
+            MOVD<span style={{ color: "#3182f6" }}>.</span>
           </div>
           <div style={{ display: "flex", fontSize: 20, color: "#6e6e73" }}>{issuedAt}</div>
         </div>
