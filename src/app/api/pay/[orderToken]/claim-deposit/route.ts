@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { postDepositClaimNotice, getOrCreateDefaultConversation } from "@/lib/chat";
 import { isSameOrigin } from "@/lib/csrf";
 import { limitPaymentAttempt } from "@/lib/ratelimit";
+import { sendSlackText } from "@/lib/slack";
 
 export const runtime = "nodejs";
 
@@ -58,6 +59,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ord
       body: `"${order.title}" 건 ₩${order.amount.toLocaleString("ko-KR")} 입금했어요 (입금자명: ${depositorName}). 확인 부탁드려요.`,
     }).catch((err) => console.error("deposit claim notice failed", err));
   }
+
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  await sendSlackText(
+    `💰 입금했다고 알려왔어요 — ${order.title}\n₩${order.amount.toLocaleString("ko-KR")} · 입금자명 ${depositorName}`,
+    { url: `${siteUrl}/admin/orders/${order.id}`, urlLabel: "입금 확인하기" }
+  );
 
   return NextResponse.json({ ok: true });
 }

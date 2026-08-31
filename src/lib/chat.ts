@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { sendNewMessageNotification } from "@/lib/email";
+import { sendSlackText } from "@/lib/slack";
 import { encryptFieldTagged, decryptFieldTagged } from "@/lib/crypto";
 
 // 채팅 메시지 본문은 검색/필터링 대상이 아니라서(이름·연락처와 달리) 부분 일치
@@ -103,11 +104,19 @@ async function notifyAdminOfNewMessage(
     select: { name: true, email: true },
   });
   const customerLabel = customer?.name || customer?.email || "고객";
-  await sendNewMessageNotification({
-    customerName: conversationTitle ? `${customerLabel} · ${conversationTitle}` : customerLabel,
-    preview: preview.slice(0, 200),
-    conversationId,
-  });
+  const who = conversationTitle ? `${customerLabel} · ${conversationTitle}` : customerLabel;
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  await Promise.allSettled([
+    sendNewMessageNotification({
+      customerName: who,
+      preview: preview.slice(0, 200),
+      conversationId,
+    }),
+    sendSlackText(`💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`, {
+      url: `${siteUrl}/admin/chats/${conversationId}`,
+      urlLabel: "채팅 열기",
+    }),
+  ]);
 }
 
 export async function postCustomerMessage(input: {

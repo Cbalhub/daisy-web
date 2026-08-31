@@ -74,6 +74,24 @@ export function hashContractFacts(f: ContractFacts): string {
   return createHash("sha256").update(canonical, "utf8").digest("hex");
 }
 
+/**
+ * 사람이 읽는 계약서 번호 — 계약 id 로부터 결정적으로 생성합니다(예: MOVD-202609-3F1A).
+ * 주문번호를 그대로 쓰지 않는 이유: 주문번호는 견적/영수증용 식별자이고, 예전
+ * 주문은 접두어가 옛 브랜드(OC-)라 계약서에 그대로 노출하면 어색합니다.
+ * 표시 전용이며 무결성 해시에는 들어가지 않습니다.
+ */
+export function contractDisplayNumber(id: string, createdAt: Date): string {
+  const ym = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+  })
+    .format(createdAt)
+    .replace("-", "");
+  const code = createHash("sha256").update(id).digest("hex").slice(0, 4).toUpperCase();
+  return `MOVD-${ym}-${code}`;
+}
+
 // ── 계약서 조항 렌더 ──────────────────────────────────────────
 
 const KRW = (n: number) => `₩${n.toLocaleString("ko-KR")}`;

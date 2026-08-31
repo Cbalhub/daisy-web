@@ -111,7 +111,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
           <div
             style={{
               display: "flex",
-              padding: "24px 4px",
+              padding: "24px 4px 8px",
               justifyContent: "space-between",
               alignItems: "center",
               marginTop: 8,
@@ -121,6 +121,9 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
             <div style={{ display: "flex", fontSize: 32, fontWeight: 700, color: "#191919" }}>
               {won(order.amount)}
             </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 4px", fontSize: 15, color: "#8c8c8c" }}>
+            부가가치세 별도
           </div>
         </div>
 

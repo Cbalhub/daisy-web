@@ -1,10 +1,10 @@
 import type { ContractSection, CompanySnapshot } from "@/lib/contract";
+import { formatSeoulDateTime } from "@/lib/utils";
 
-const DATE = new Intl.DateTimeFormat("ko-KR", { dateStyle: "long" });
-const DATETIME = new Intl.DateTimeFormat("ko-KR", { dateStyle: "long", timeStyle: "short" });
+const DATE = new Intl.DateTimeFormat("ko-KR", { dateStyle: "long", timeZone: "Asia/Seoul" });
 
 export type ContractView = {
-  invoiceNumber: string;
+  contractNumber: string;
   status: "DRAFT" | "SENT" | "SIGNED" | "VOID";
   amount: number;
   company: CompanySnapshot;
@@ -16,6 +16,7 @@ export type ContractView = {
   signatureDataUrl: string | null;
   createdAt: string;
   sentAt: string | null;
+  integrity: "verified" | "mismatch" | "unavailable";
 };
 
 /**
@@ -38,7 +39,7 @@ export function ContractDocument({
         <div>
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">소프트웨어 개발 용역계약서</h1>
           <p className="mt-1.5 text-xs text-muted">
-            계약서 번호 {view.invoiceNumber} · 발행일 {DATE.format(new Date(issuedAt))}
+            계약 번호 {view.contractNumber} · 발행일 {DATE.format(new Date(issuedAt))}
           </p>
         </div>
         <span
@@ -139,10 +140,22 @@ export function ContractDocument({
       {signed && (
         <section className="mt-6 break-inside-avoid rounded-lg border border-line bg-paper-dim p-4 text-xs text-muted">
           <p className="font-medium text-ink-soft">전자서명 정보</p>
+
+          {view.integrity === "verified" && (
+            <p className="mt-1.5 text-sm font-medium text-success">
+              ✓ 확인됨 — 서명 이후 계약 내용이 변경되지 않았습니다.
+            </p>
+          )}
+          {view.integrity === "mismatch" && (
+            <p className="mt-1.5 text-sm font-medium text-error">
+              ⚠ 불일치 — 서명 이후 이 계약의 내용이 변경된 것으로 보입니다. 발행처에 문의해 주세요.
+            </p>
+          )}
+
           <dl className="mt-2 space-y-1">
             <Fact label="서명자">{view.signedName}</Fact>
             <Fact label="서명 시각">
-              {view.signedAt ? DATETIME.format(new Date(view.signedAt)) : "-"}
+              {view.signedAt ? formatSeoulDateTime(new Date(view.signedAt)) : "-"}
             </Fact>
             {view.signedIp && <Fact label="접속 IP">{view.signedIp}</Fact>}
             {view.contentHash && (

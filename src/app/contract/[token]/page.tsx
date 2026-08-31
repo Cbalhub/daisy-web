@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { buildContractSections, type CompanySnapshot } from "@/lib/contract";
+import {
+  buildContractSections,
+  contractDisplayNumber,
+  hashContractFacts,
+  type CompanySnapshot,
+} from "@/lib/contract";
 import { ContractDocument, type ContractView } from "@/components/contract/ContractDocument";
 import { SignForm } from "@/components/contract/SignForm";
 import { PrintButton } from "@/components/payment/PrintButton";
@@ -35,8 +40,31 @@ export default async function ContractPage({
     company,
   });
 
+  // 서명본이면 저장된 해시를 지금 값으로 다시 계산해 비교합니다 — 일치하면 서명
+  // 이후 금액·범위·서명이 바뀌지 않았다는 뜻(거래확인서와 같은 원리).
+  let integrity: ContractView["integrity"] = "unavailable";
+  if (contract.status === "SIGNED" && contract.contentHash && contract.signedAt) {
+    const recomputed = hashContractFacts({
+      contractId: contract.id,
+      orderInvoiceNumber: contract.order.invoiceNumber,
+      clientName: contract.clientName,
+      clientEmail: contract.clientEmail,
+      companyName: company.name,
+      companyBizNo: company.bizNo,
+      amount: contract.amount,
+      scope: contract.scope,
+      warrantyMonths: contract.warrantyMonths,
+      startDate: contract.startDate?.toISOString() ?? "",
+      endDate: contract.endDate?.toISOString() ?? "",
+      signedName: contract.signedName ?? "",
+      signedAt: contract.signedAt.toISOString(),
+      signatureDataUrl: contract.signatureDataUrl ?? "",
+    });
+    integrity = recomputed === contract.contentHash ? "verified" : "mismatch";
+  }
+
   const view: ContractView = {
-    invoiceNumber: contract.order.invoiceNumber,
+    contractNumber: contractDisplayNumber(contract.id, contract.createdAt),
     status: contract.status,
     amount: contract.amount,
     company,
@@ -53,6 +81,7 @@ export default async function ContractPage({
     signatureDataUrl: contract.signatureDataUrl,
     createdAt: contract.createdAt.toISOString(),
     sentAt: contract.sentAt?.toISOString() ?? null,
+    integrity,
   };
 
   return (
