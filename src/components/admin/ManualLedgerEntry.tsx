@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
 import { AdminSelect } from "@/components/admin/ui/Select";
+import { DatePicker } from "@/components/admin/ui/DatePicker";
 
 const inputCls =
   "w-full rounded-lg border border-admin-border bg-admin-content px-3 py-2 text-sm outline-none focus:border-admin-blue";
@@ -20,6 +21,7 @@ export function AddLedgerEntry() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [date, setDate] = useState(todayLocal());
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,7 +29,7 @@ export function AddLedgerEntry() {
     const fd = new FormData(e.currentTarget);
     const amountRaw = String(fd.get("amount") ?? "").replace(/[,\s]/g, "");
     const payload = {
-      occurredAt: String(fd.get("occurredAt") ?? ""),
+      occurredAt: date,
       kind: String(fd.get("kind") ?? "REVENUE"),
       title: String(fd.get("title") ?? "").trim(),
       detail: String(fd.get("detail") ?? "").trim(),
@@ -82,10 +84,12 @@ export function AddLedgerEntry() {
       </p>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <label className="text-xs font-medium text-admin-muted">
+        <div className="text-xs font-medium text-admin-muted">
           결제일
-          <input type="date" name="occurredAt" required defaultValue={todayLocal()} className={`mt-1.5 ${inputCls}`} />
-        </label>
+          <div className="mt-1.5 [&>div>button:first-child]:w-full [&>div>button:first-child]:justify-start [&>div>button:first-child]:bg-admin-content">
+            <DatePicker value={date} onChange={setDate} />
+          </div>
+        </div>
         <div className="text-xs font-medium text-admin-muted">
           구분
           <AdminSelect
