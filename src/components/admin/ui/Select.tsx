@@ -11,16 +11,24 @@ export function AdminSelect({
   options,
   defaultValue = "",
   placeholder = "선택",
+  onChange,
 }: {
   name: string;
   options: Option[];
   defaultValue?: string;
   placeholder?: string;
+  onChange?: (value: string) => void;
 }) {
   const [value, setValue] = useState(defaultValue);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = options.find((o) => o.value === value);
+
+  function pick(v: string) {
+    setValue(v);
+    setOpen(false);
+    onChange?.(v);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -68,10 +76,7 @@ export function AdminSelect({
                 type="button"
                 role="option"
                 aria-selected={o.value === value}
-                onClick={() => {
-                  setValue(o.value);
-                  setOpen(false);
-                }}
+                onClick={() => pick(o.value)}
                 className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-sm text-admin-text transition-colors hover:bg-admin-content ${
                   o.value === value ? "font-medium" : ""
                 }`}

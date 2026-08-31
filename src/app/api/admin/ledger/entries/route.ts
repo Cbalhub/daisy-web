@@ -24,8 +24,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { occurredAt, kind, title, detail, customerName, amount, businessRegNo, phone, proofType, memo } =
-    parsed.data;
+  const {
+    occurredAt,
+    kind,
+    title,
+    detail,
+    customerName,
+    amount,
+    businessRegNo,
+    phone,
+    proofType,
+    expenseCategory,
+    taxInvoiceIssuedAt,
+    memo,
+  } = parsed.data;
 
   const entry = await prisma.$transaction(async (tx) => {
     const created = await tx.manualLedgerEntry.create({
@@ -39,6 +51,8 @@ export async function POST(req: NextRequest) {
         businessRegNo: businessRegNo || null,
         phone: phone || null,
         proofType: proofType || null,
+        expenseCategory: kind === "EXPENSE" && expenseCategory ? expenseCategory : null,
+        taxInvoiceIssuedAt: taxInvoiceIssuedAt ? new Date(taxInvoiceIssuedAt) : null,
         memo: memo || null,
         createdById: session.adminId,
       },

@@ -292,6 +292,7 @@ model QuickReply {
 enum LedgerKind {
   REVENUE // 결제(수입)
   REFUND // 환불
+  EXPENSE // 지출(경비)
 }
 
 enum ProofType {
@@ -301,22 +302,34 @@ enum ProofType {
   NONE // 없음
 }
 
+enum ExpenseCategory {
+  SERVER // 서버·인프라
+  DOMAIN // 도메인
+  SUBCONTRACT // 재하청·외주
+  TAX // 세금·공과금
+  SOFTWARE // 소프트웨어·툴
+  MARKETING // 광고·마케팅
+  ETC // 기타
+}
+
 model ManualLedgerEntry {
-  id            String     @id @default(cuid())
-  occurredAt    DateTime // 실제로 돈이 오간 날
-  kind          LedgerKind @default(REVENUE)
-  title         String // 외주 프로젝트명
-  detail        String? // 상세 기능
-  customerName  String
-  amount        Int // KRW, 항상 양수 (부호는 kind 로 결정)
-  businessRegNo String?
-  phone         String?
-  proofType     ProofType? // 증빙 수단
-  memo          String? // 비고
-  createdById   String?
-  createdBy     AdminUser? @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id                 String           @id @default(cuid())
+  occurredAt         DateTime // 실제로 돈이 오간 날
+  kind               LedgerKind       @default(REVENUE)
+  title              String // 외주 프로젝트명 / 지출 항목
+  detail             String? // 상세 기능
+  customerName       String // 발주처·고객명 / 지급처
+  amount             Int // KRW, 항상 양수 (부호는 kind 로 결정)
+  businessRegNo      String?
+  phone              String?
+  proofType          ProofType? // 증빙 수단
+  expenseCategory    ExpenseCategory? // 지출일 때 경비 항목
+  taxInvoiceIssuedAt DateTime? // 세금계산서 발행일
+  memo               String? // 비고
+  createdById        String?
+  createdBy          AdminUser?       @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   @@index([occurredAt])
 }

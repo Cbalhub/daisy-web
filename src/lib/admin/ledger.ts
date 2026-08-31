@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import type { ProjectStage, ProofType } from "@prisma/client";
-import { PROOF_TYPE_LABEL } from "@/lib/admin/status";
+import type { ProjectStage, ProofType, ExpenseCategory } from "@prisma/client";
+import { PROOF_TYPE_LABEL, EXPENSE_CATEGORY_LABEL } from "@/lib/admin/status";
 
 export type CustomerType = "INDIVIDUAL" | "BUSINESS";
 
@@ -16,10 +16,10 @@ export type LedgerEntry = {
   source: "auto" | "manual";
   manualId: string | null; // manual 항목의 원본 id (삭제용). auto 면 null
   date: Date;
-  type: "REVENUE" | "REFUND";
+  type: "REVENUE" | "REFUND" | "EXPENSE";
   title: string;
   customerName: string;
-  amount: number; // REFUND는 음수로 반환
+  amount: number; // REFUND·EXPENSE는 음수로 반환
   // 사업자등록번호를 입력받은 주문이면 사업자, 안 받았으면 개인으로 분류합니다 —
   // 세금계산서(사업자용)/현금영수증(개인용) 중 뭘 준비해야 할지 장부에서 바로 구분되도록.
   customerType: CustomerType;
@@ -27,25 +27,13 @@ export type LedgerEntry = {
   businessRegNo: string | null;
   phone: string | null;
   proofType: ProofType | null; // 증빙 수단 (manual 만)
+  expenseCategory: ExpenseCategory | null; // 경비 항목 (지출일 때만)
+  taxInvoiceIssuedAt: Date | null; // 세금계산서 발행일 (manual 만)
   memo: string | null; // 비고 (manual 만)
   progressStage: ProjectStage | null; // manual 항목엔 없음
 };
 
-export type DailyTotal = { revenue: number; refund: number };
-
-/**
- * 특정 월의 매출/환불 내역을 날짜별로 집계합니다. year/month는 1-based 월(1~12)입니다.
- * 달력 탐색용 얇은 래퍼 — 실제 조회는 getLedgerEntries가 합니다.
- */
-export async function getMonthlyLedger(
-  year: number,
-  month: number,
-  customerType?: CustomerType
-) {
-  const start = new Date(year, month - 1, 1);
-  const end = new Date(year, month, 1);
-  return getLedgerEntries(start, end, customerType);
-}
+export type DailyTotal = { revenue: number; refund: number; expense: number };
 
 /**
  * start(포함) ~ end(미포함) 구간의 매출/환불 내역을 날짜별로 집계합니다.
@@ -101,6 +89,8 @@ export async function getLedgerEntries(
       businessRegNo: p.order.businessRegNo,
       phone: p.order.customerPhone,
       proofType: null,
+      expenseCategory: null,
+      taxInvoiceIssuedAt: null,
       memo: null,
       progressStage: p.order.progressStage,
     })),
@@ -118,6 +108,8 @@ export async function getLedgerEntries(
       businessRegNo: r.payment.order.businessRegNo,
       phone: r.payment.order.customerPhone,
       proofType: null,
+      expenseCategory: null,
+      taxInvoiceIssuedAt: null,
       memo: null,
       progressStage: r.payment.order.progressStage,
     })),
@@ -126,15 +118,17 @@ export async function getLedgerEntries(
       source: "manual" as const,
       manualId: e.id,
       date: e.occurredAt,
-      type: e.kind === "REFUND" ? ("REFUND" as const) : ("REVENUE" as const),
+      type: e.kind, // "REVENUE" | "REFUND" | "EXPENSE"
       title: e.title,
       customerName: e.customerName,
-      amount: e.kind === "REFUND" ? -e.amount : e.amount,
+      amount: e.kind === "REVENUE" ? e.amount : -e.amount,
       customerType: typeOf(e.businessRegNo),
       detail: e.detail,
       businessRegNo: e.businessRegNo,
       phone: e.phone,
       proofType: e.proofType,
+      expenseCategory: e.expenseCategory,
+      taxInvoiceIssuedAt: e.taxInvoiceIssuedAt,
       memo: e.memo,
       progressStage: null,
     })),
@@ -147,20 +141,28 @@ export async function getLedgerEntries(
   const daily = new Map<number, DailyTotal>();
   for (const entry of entries) {
     const day = entry.date.getDate();
-    const current = daily.get(day) ?? { revenue: 0, refund: 0 };
+    const current = daily.get(day) ?? { revenue: 0, refund: 0, expense: 0 };
     if (entry.type === "REVENUE") current.revenue += entry.amount;
-    else current.refund += Math.abs(entry.amount);
+    else if (entry.type === "REFUND") current.refund += Math.abs(entry.amount);
+    else current.expense += Math.abs(entry.amount);
     daily.set(day, current);
   }
 
-  const totalRevenue = entries
-    .filter((e) => e.type === "REVENUE")
-    .reduce((sum, e) => sum + e.amount, 0);
-  const totalRefund = entries
-    .filter((e) => e.type === "REFUND")
-    .reduce((sum, e) => sum + Math.abs(e.amount), 0);
+  const sumAbs = (t: LedgerEntry["type"]) =>
+    entries.filter((e) => e.type === t).reduce((sum, e) => sum + Math.abs(e.amount), 0);
 
-  return { entries, daily, totalRevenue, totalRefund, netRevenue: totalRevenue - totalRefund };
+  const totalRevenue = sumAbs("REVENUE");
+  const totalRefund = sumAbs("REFUND");
+  const totalExpense = sumAbs("EXPENSE");
+
+  return {
+    entries,
+    daily,
+    totalRevenue,
+    totalRefund,
+    totalExpense,
+    netProfit: totalRevenue - totalRefund - totalExpense,
+  };
 }
 
 // CSV 필드에 쉼표·큰따옴표·줄바꿈이 있으면 큰따옴표로 감싸고 내부 큰따옴표는 2개로
@@ -179,24 +181,26 @@ function csvField(value: string | number): string {
  * 엑셀에서 한글이 깨지지 않도록 UTF-8 BOM을 앞에 붙입니다.
  */
 export function buildLedgerCsv(entries: LedgerEntry[]): string {
-  const header = ["결제일", "구분", "외주 프로젝트명", "발주처/고객명", "유형", "사업자등록번호", "연락처", "증빙 수단", "비고", "금액(KRW)"].join(",");
+  const kindLabel = { REVENUE: "결제", REFUND: "환불", EXPENSE: "지출" } as const;
+  const dateOnly = new Intl.DateTimeFormat("ko-KR", { dateStyle: "short" });
+  const header = [
+    "결제일", "구분", "항목명", "발주처/고객/지급처", "유형", "경비 항목",
+    "사업자등록번호", "연락처", "증빙 수단", "세금계산서 발행일", "비고", "금액(KRW)",
+  ].join(",");
   const rows = entries.map((e) =>
     [
-      csvField(
-        new Intl.DateTimeFormat("ko-KR", {
-          dateStyle: "short",
-          timeStyle: "short",
-        }).format(e.date)
-      ),
-      csvField(e.type === "REVENUE" ? "결제" : "환불"),
+      csvField(new Intl.DateTimeFormat("ko-KR", { dateStyle: "short", timeStyle: "short" }).format(e.date)),
+      csvField(kindLabel[e.type]),
       csvField(e.title),
       csvField(e.customerName),
       csvField(CUSTOMER_TYPE_LABEL[e.customerType]),
+      csvField(e.expenseCategory ? EXPENSE_CATEGORY_LABEL[e.expenseCategory].label : ""),
       csvField(e.businessRegNo ?? ""),
       csvField(e.phone ?? ""),
       csvField(e.proofType ? PROOF_TYPE_LABEL[e.proofType].label : ""),
+      csvField(e.taxInvoiceIssuedAt ? dateOnly.format(e.taxInvoiceIssuedAt) : ""),
       csvField(e.memo ?? ""),
-      csvField(e.amount),
+      csvField(e.type === "REVENUE" ? e.amount : -Math.abs(e.amount)),
     ].join(",")
   );
   return "﻿" + [header, ...rows].join("\r\n");

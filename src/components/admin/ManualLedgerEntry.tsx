@@ -22,6 +22,10 @@ export function AddLedgerEntry() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [date, setDate] = useState(todayLocal());
+  const [kind, setKind] = useState("REVENUE");
+  const [taxDate, setTaxDate] = useState("");
+
+  const isExpense = kind === "EXPENSE";
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,6 +42,8 @@ export function AddLedgerEntry() {
       businessRegNo: String(fd.get("businessRegNo") ?? "").trim(),
       phone: String(fd.get("phone") ?? "").trim(),
       proofType: String(fd.get("proofType") ?? ""),
+      expenseCategory: String(fd.get("expenseCategory") ?? ""),
+      taxInvoiceIssuedAt: taxDate,
       memo: String(fd.get("memo") ?? "").trim(),
     };
 
@@ -95,20 +101,41 @@ export function AddLedgerEntry() {
           <AdminSelect
             name="kind"
             defaultValue="REVENUE"
+            onChange={setKind}
             options={[
               { value: "REVENUE", label: "결제(수입)" },
               { value: "REFUND", label: "환불" },
+              { value: "EXPENSE", label: "지출(경비)" },
             ]}
           />
         </div>
         <label className="text-xs font-medium text-admin-muted">
-          발주처 / 고객명
+          {isExpense ? "지급처" : "발주처 / 고객명"}
           <input name="customerName" required maxLength={100} className={`mt-1.5 ${inputCls}`} />
         </label>
         <label className="text-xs font-medium text-admin-muted">
-          외주 프로젝트명
+          {isExpense ? "지출 항목명" : "외주 프로젝트명"}
           <input name="title" required maxLength={200} className={`mt-1.5 ${inputCls}`} />
         </label>
+        {isExpense && (
+          <div className="text-xs font-medium text-admin-muted">
+            경비 항목
+            <AdminSelect
+              name="expenseCategory"
+              defaultValue=""
+              placeholder="선택"
+              options={[
+                { value: "SERVER", label: "서버·인프라" },
+                { value: "DOMAIN", label: "도메인" },
+                { value: "SUBCONTRACT", label: "재하청·외주" },
+                { value: "TAX", label: "세금·공과금" },
+                { value: "SOFTWARE", label: "소프트웨어·툴" },
+                { value: "MARKETING", label: "광고·마케팅" },
+                { value: "ETC", label: "기타" },
+              ]}
+            />
+          </div>
+        )}
         <label className="text-xs font-medium text-admin-muted sm:col-span-2">
           상세 기능
           <input name="detail" maxLength={1000} className={`mt-1.5 ${inputCls}`} />
@@ -145,6 +172,12 @@ export function AddLedgerEntry() {
               { value: "NONE", label: "없음" },
             ]}
           />
+        </div>
+        <div className="text-xs font-medium text-admin-muted">
+          세금계산서 발행일 <span className="font-normal">(선택)</span>
+          <div className="mt-1.5 [&>div>button:first-child]:w-full [&>div>button:first-child]:justify-start [&>div>button:first-child]:bg-admin-content">
+            <DatePicker value={taxDate} onChange={setTaxDate} placeholder="미발행" />
+          </div>
         </div>
         <label className="text-xs font-medium text-admin-muted sm:col-span-2">
           비고
