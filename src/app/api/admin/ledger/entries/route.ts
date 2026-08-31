@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { occurredAt, kind, title, detail, customerName, amount, businessRegNo, phone, memo } =
+  const { occurredAt, kind, title, detail, customerName, amount, businessRegNo, phone, proofType, memo } =
     parsed.data;
 
   const entry = await prisma.$transaction(async (tx) => {
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
         amount,
         businessRegNo: businessRegNo || null,
         phone: phone || null,
+        proofType: proofType || null,
         memo: memo || null,
         createdById: session.adminId,
       },

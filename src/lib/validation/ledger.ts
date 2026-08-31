@@ -19,6 +19,10 @@ export const manualLedgerEntrySchema = z.object({
     .max(1_000_000_000, "금액이 너무 큽니다."),
   businessRegNo: z.string().trim().max(20).optional().or(z.literal("")),
   phone: z.string().trim().max(30).optional().or(z.literal("")),
+  proofType: z
+    .enum(["TAX_INVOICE", "CASH_RECEIPT", "TRANSFER_RECORD", "NONE"])
+    .optional()
+    .or(z.literal("")),
   memo: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 

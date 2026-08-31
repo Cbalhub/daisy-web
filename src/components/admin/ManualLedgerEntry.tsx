@@ -34,6 +34,7 @@ export function AddLedgerEntry() {
       amount: Number(amountRaw),
       businessRegNo: String(fd.get("businessRegNo") ?? "").trim(),
       phone: String(fd.get("phone") ?? "").trim(),
+      proofType: String(fd.get("proofType") ?? ""),
       memo: String(fd.get("memo") ?? "").trim(),
     };
 
@@ -122,6 +123,16 @@ export function AddLedgerEntry() {
           <input name="phone" maxLength={30} className={`mt-1.5 ${inputCls} tabular-nums`} />
         </label>
         <label className="text-xs font-medium text-admin-muted">
+          증빙 수단
+          <select name="proofType" defaultValue="" className={`mt-1.5 ${inputCls}`}>
+            <option value="">선택 안 함</option>
+            <option value="TAX_INVOICE">세금계산서</option>
+            <option value="CASH_RECEIPT">현금영수증</option>
+            <option value="TRANSFER_RECORD">계좌이체 내역</option>
+            <option value="NONE">없음</option>
+          </select>
+        </label>
+        <label className="text-xs font-medium text-admin-muted sm:col-span-2">
           비고
           <input name="memo" maxLength={1000} className={`mt-1.5 ${inputCls}`} />
         </label>

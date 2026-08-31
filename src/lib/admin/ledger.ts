@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import type { ProjectStage } from "@prisma/client";
+import type { ProjectStage, ProofType } from "@prisma/client";
+import { PROOF_TYPE_LABEL } from "@/lib/admin/status";
 
 export type CustomerType = "INDIVIDUAL" | "BUSINESS";
 
@@ -25,6 +26,7 @@ export type LedgerEntry = {
   detail: string | null; // 상세 기능
   businessRegNo: string | null;
   phone: string | null;
+  proofType: ProofType | null; // 증빙 수단 (manual 만)
   memo: string | null; // 비고 (manual 만)
   progressStage: ProjectStage | null; // manual 항목엔 없음
 };
@@ -98,6 +100,7 @@ export async function getLedgerEntries(
       detail: p.order.description,
       businessRegNo: p.order.businessRegNo,
       phone: p.order.customerPhone,
+      proofType: null,
       memo: null,
       progressStage: p.order.progressStage,
     })),
@@ -114,6 +117,7 @@ export async function getLedgerEntries(
       detail: r.payment.order.description,
       businessRegNo: r.payment.order.businessRegNo,
       phone: r.payment.order.customerPhone,
+      proofType: null,
       memo: null,
       progressStage: r.payment.order.progressStage,
     })),
@@ -130,6 +134,7 @@ export async function getLedgerEntries(
       detail: e.detail,
       businessRegNo: e.businessRegNo,
       phone: e.phone,
+      proofType: e.proofType,
       memo: e.memo,
       progressStage: null,
     })),
@@ -174,7 +179,7 @@ function csvField(value: string | number): string {
  * 엑셀에서 한글이 깨지지 않도록 UTF-8 BOM을 앞에 붙입니다.
  */
 export function buildLedgerCsv(entries: LedgerEntry[]): string {
-  const header = ["결제일", "구분", "외주 프로젝트명", "발주처/고객명", "유형", "사업자등록번호", "연락처", "비고", "금액(KRW)"].join(",");
+  const header = ["결제일", "구분", "외주 프로젝트명", "발주처/고객명", "유형", "사업자등록번호", "연락처", "증빙 수단", "비고", "금액(KRW)"].join(",");
   const rows = entries.map((e) =>
     [
       csvField(
@@ -189,6 +194,7 @@ export function buildLedgerCsv(entries: LedgerEntry[]): string {
       csvField(CUSTOMER_TYPE_LABEL[e.customerType]),
       csvField(e.businessRegNo ?? ""),
       csvField(e.phone ?? ""),
+      csvField(e.proofType ? PROOF_TYPE_LABEL[e.proofType].label : ""),
       csvField(e.memo ?? ""),
       csvField(e.amount),
     ].join(",")

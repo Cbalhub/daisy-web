@@ -1,6 +1,13 @@
-import type { InquiryStatus, OrderStatus, PaymentStatus, ProjectStage } from "@prisma/client";
+import type { InquiryStatus, OrderStatus, PaymentStatus, ProjectStage, ProofType } from "@prisma/client";
 
 type Tone = "neutral" | "blue" | "green" | "amber" | "red";
+
+export const PROOF_TYPE_LABEL: Record<ProofType, { label: string; tone: Tone }> = {
+  TAX_INVOICE: { label: "세금계산서", tone: "blue" },
+  CASH_RECEIPT: { label: "현금영수증", tone: "green" },
+  TRANSFER_RECORD: { label: "계좌이체 내역", tone: "amber" },
+  NONE: { label: "없음", tone: "neutral" },
+};
 
 export const PROJECT_STAGE_LABEL: Record<ProjectStage, { label: string; tone: Tone }> = {
   RECEIVED: { label: "작업 시작", tone: "neutral" },

@@ -294,6 +294,13 @@ enum LedgerKind {
   REFUND // 환불
 }
 
+enum ProofType {
+  TAX_INVOICE // 세금계산서
+  CASH_RECEIPT // 현금영수증
+  TRANSFER_RECORD // 계좌이체 내역
+  NONE // 없음
+}
+
 model ManualLedgerEntry {
   id            String     @id @default(cuid())
   occurredAt    DateTime // 실제로 돈이 오간 날
@@ -304,6 +311,7 @@ model ManualLedgerEntry {
   amount        Int // KRW, 항상 양수 (부호는 kind 로 결정)
   businessRegNo String?
   phone         String?
+  proofType     ProofType? // 증빙 수단
   memo          String? // 비고
   createdById   String?
   createdBy     AdminUser? @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])

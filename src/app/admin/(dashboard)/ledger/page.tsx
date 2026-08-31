@@ -5,7 +5,7 @@ import { Segmented } from "@/components/admin/ui/Segmented";
 import { DateRangeFilter } from "@/components/admin/ui/DateRangeFilter";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDownload } from "@/components/admin/icons";
-import { PROJECT_STAGE_LABEL } from "@/lib/admin/status";
+import { PROJECT_STAGE_LABEL, PROOF_TYPE_LABEL } from "@/lib/admin/status";
 import { AddLedgerEntry, DeleteManualEntry } from "@/components/admin/ManualLedgerEntry";
 import {
   getMonthlyLedger,
@@ -193,7 +193,7 @@ export default async function AdminLedgerPage({
           </AdminCard>
         ) : (
           <div className="mt-4 overflow-x-auto rounded-xl border border-admin-border bg-admin-surface">
-            <table className="w-full min-w-[80rem] border-collapse text-[13px] text-admin-text">
+            <table className="w-full min-w-[88rem] border-collapse text-[13px] text-admin-text">
               <thead>
                 <tr className="border-b border-admin-border text-admin-muted">
                   <Th kind="date" label="결제일" />
@@ -207,6 +207,7 @@ export default async function AdminLedgerPage({
                   <Th kind="select" label="유형" />
                   <Th kind="text" label="사업자등록번호" />
                   <Th kind="text" label="연락처" />
+                  <Th kind="select" label="증빙 수단" />
                   <Th kind="text" label="비고" />
                   <th className="w-8" />
                 </tr>
@@ -261,6 +262,15 @@ export default async function AdminLedgerPage({
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
                         {e.phone || "–"}
+                      </td>
+                      <td className="px-3 py-2">
+                        {e.proofType ? (
+                          <Pill tone={PROOF_TYPE_LABEL[e.proofType].tone}>
+                            {PROOF_TYPE_LABEL[e.proofType].label}
+                          </Pill>
+                        ) : (
+                          <span className="text-admin-muted">–</span>
+                        )}
                       </td>
                       <td className="max-w-[14rem] truncate px-3 py-2 text-admin-muted">
                         {e.memo || "–"}
