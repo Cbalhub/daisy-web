@@ -134,7 +134,7 @@ export default async function AdminLedgerPage({
             <p className="text-xs font-medium text-admin-muted">
               {isCustomRange ? "기간 내 매출" : "이번 달 매출"}
             </p>
-            <p className="mt-2 text-2xl font-semibold text-admin-blue">{amountText(totalRevenue)}</p>
+            <p className="mt-1.5 text-xl font-semibold text-admin-blue">{amountText(totalRevenue)}</p>
           </AdminCard>
         </RevealItem>
         <RevealItem>
@@ -142,7 +142,7 @@ export default async function AdminLedgerPage({
             <p className="text-xs font-medium text-admin-muted">
               {isCustomRange ? "기간 내 환불" : "이번 달 환불"}
             </p>
-            <p className="mt-2 text-2xl font-semibold text-admin-red">
+            <p className="mt-1.5 text-xl font-semibold text-admin-red">
               {totalRefund > 0 ? `-${amountText(totalRefund)}` : amountText(0)}
             </p>
           </AdminCard>
@@ -150,20 +150,32 @@ export default async function AdminLedgerPage({
         <RevealItem>
           <AdminCard>
             <p className="text-xs font-medium text-admin-muted">순매출</p>
-            <p className="mt-2 text-2xl font-semibold text-admin-text">{amountText(netRevenue)}</p>
+            <p className="mt-1.5 text-xl font-semibold text-admin-text">{amountText(netRevenue)}</p>
           </AdminCard>
         </RevealItem>
       </RevealGroup>
 
-      <div className="px-8 pt-4">
-        <AdminCard className="p-0">
-          {days.length === 0 ? (
+      <div className="px-8 pt-5">
+        {days.length === 0 ? (
+          <AdminCard className="p-0">
             <AdminEmptyState
               icon={<IconCalendar className="h-6 w-6" />}
-              title="이번 달 거래 내역이 없습니다."
+              title={isCustomRange ? "이 기간 거래 내역이 없습니다." : "이번 달 거래 내역이 없습니다."}
             />
-          ) : (
-            <RevealGroup as="div" className="divide-y divide-admin-border" stagger={0.04}>
+          </AdminCard>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-admin-border bg-admin-surface">
+            <table className="w-full min-w-[52rem] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left text-[11px] font-medium uppercase tracking-wider text-admin-muted">
+                  <th className="w-20 px-4 py-2.5 font-medium">시각</th>
+                  <th className="px-4 py-2.5 font-medium">내용</th>
+                  <th className="px-4 py-2.5 font-medium">고객</th>
+                  <th className="w-24 px-4 py-2.5 font-medium">유형</th>
+                  <th className="w-20 px-4 py-2.5 font-medium">구분</th>
+                  <th className="w-40 px-4 py-2.5 text-right font-medium">금액</th>
+                </tr>
+              </thead>
               {days.map((group) => {
                 const dayRevenue = group.entries
                   .filter((e) => e.type === "REVENUE")
@@ -174,60 +186,79 @@ export default async function AdminLedgerPage({
                 const isToday = group.date.toDateString() === today.toDateString();
 
                 return (
-                  <RevealItem key={group.date.toDateString()} as="div">
-                    <div className="flex items-center justify-between gap-4 bg-admin-content px-5 py-2.5">
-                      <p className="flex items-center gap-2 text-xs font-semibold text-admin-muted">
+                  <tbody key={group.date.toDateString()} className="border-b border-admin-border last:border-0">
+                    <tr className="bg-admin-content/70">
+                      <td colSpan={5} className="px-4 py-2 text-xs font-semibold text-admin-muted">
                         {DAY_HEADER_FORMAT.format(group.date)}
                         {isToday && (
-                          <span className="rounded-full bg-admin-blue px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                          <span className="ml-1.5 rounded bg-admin-blue px-1.5 py-0.5 text-[10px] font-semibold text-admin-bg">
                             오늘
                           </span>
                         )}
-                      </p>
-                      <p className="flex items-center gap-2 text-xs font-semibold tabular-nums">
-                        {dayRevenue > 0 && <span className="text-admin-blue">+{amountText(dayRevenue)}</span>}
-                        {dayRefund > 0 && <span className="text-admin-red">-{amountText(dayRefund)}</span>}
-                      </p>
-                    </div>
-                    <ul className="divide-y divide-admin-border">
-                      {[...group.entries].reverse().map((entry) => (
-                        <li key={entry.id} className="flex items-center justify-between gap-4 px-5 py-3.5">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-admin-text">{entry.title}</p>
-                            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-admin-muted">
-                              <span className="truncate">
-                                {entry.customerName} · {TIME_FORMAT.format(entry.date)}
-                              </span>
-                              <span
-                                className={
-                                  entry.customerType === "BUSINESS"
-                                    ? "shrink-0 rounded-full bg-admin-blue-soft px-1.5 py-0.5 text-[10px] font-medium text-admin-blue"
-                                    : "shrink-0 rounded-full bg-admin-bg-soft px-1.5 py-0.5 text-[10px] font-medium text-admin-muted"
-                                }
-                              >
-                                {CUSTOMER_TYPE_LABEL[entry.customerType]}
-                              </span>
-                            </p>
-                          </div>
-                          <p
+                        <span className="ml-2 font-normal text-admin-muted/70">
+                          {group.entries.length}건
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-right text-xs font-semibold tabular-nums">
+                        {dayRevenue > 0 && <span className="text-admin-text">+{amountText(dayRevenue)}</span>}
+                        {dayRefund > 0 && <span className="ml-2 text-admin-red">-{amountText(dayRefund)}</span>}
+                      </td>
+                    </tr>
+                    {[...group.entries].reverse().map((entry) => (
+                      <tr
+                        key={entry.id}
+                        className="border-t border-admin-border/50 transition-colors hover:bg-admin-content/50"
+                      >
+                        <td className="whitespace-nowrap px-4 py-2.5 text-xs text-admin-muted tabular-nums">
+                          {TIME_FORMAT.format(entry.date)}
+                        </td>
+                        <td className="max-w-0 truncate px-4 py-2.5 font-medium text-admin-text">
+                          {entry.title}
+                        </td>
+                        <td className="max-w-0 truncate px-4 py-2.5 text-admin-muted">
+                          {entry.customerName}
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <span
                             className={
-                              entry.type === "REVENUE"
-                                ? "shrink-0 text-sm font-semibold text-admin-blue"
-                                : "shrink-0 text-sm font-semibold text-admin-red"
+                              "inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium " +
+                              (entry.customerType === "BUSINESS"
+                                ? "bg-admin-blue-soft text-admin-blue"
+                                : "bg-admin-bg-soft text-admin-muted")
                             }
                           >
-                            {entry.type === "REVENUE" ? "+" : ""}
-                            {amountText(entry.amount)}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </RevealItem>
+                            {CUSTOMER_TYPE_LABEL[entry.customerType]}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <span
+                            className={
+                              "inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium " +
+                              (entry.type === "REVENUE"
+                                ? "bg-admin-bg-soft text-admin-text"
+                                : "bg-admin-red-soft text-admin-red")
+                            }
+                          >
+                            {entry.type === "REVENUE" ? "수입" : "환불"}
+                          </span>
+                        </td>
+                        <td
+                          className={
+                            "px-4 py-2.5 text-right font-semibold tabular-nums " +
+                            (entry.type === "REVENUE" ? "text-admin-text" : "text-admin-red")
+                          }
+                        >
+                          {entry.type === "REVENUE" ? "+" : ""}
+                          {amountText(entry.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 );
               })}
-            </RevealGroup>
-          )}
-        </AdminCard>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
