@@ -24,7 +24,7 @@ export async function Footer() {
     <footer className="border-t border-line bg-paper">
       <Container className="py-14">
         {/* 마스트헤드 — 큰 워드마크 + 한 줄 태그라인 */}
-        <Wordmark href={null} className="text-[20px]" />
+        <Wordmark href={null} className="text-[27px]" />
         <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
           업무 자동화·챗봇·외주 개발을 기획부터 운영까지. 대표가 직접 진행합니다.
         </p>

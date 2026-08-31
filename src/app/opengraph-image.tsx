@@ -32,18 +32,18 @@ export default async function OgImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "90px",
-          background: "#232c1d",
-          color: "#faf5ea",
+          background: "#fafafa",
+          color: "#191919",
           fontFamily: "Pretendard",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", fontSize: 30, fontWeight: 800, letterSpacing: "0.02em", color: "#9cc08f" }}>
+        <div style={{ display: "flex", alignItems: "center", fontSize: 30, fontWeight: 800, letterSpacing: "0.02em", color: "#7a2e3e" }}>
           MOVD
         </div>
         <div
           style={{
             display: "flex",
-            marginTop: 32,
+            marginTop: 30,
             fontSize: 64,
             fontWeight: 800,
             letterSpacing: "-0.035em",
@@ -52,7 +52,8 @@ export default async function OgImage() {
         >
           돈 받고 만드는 이상, 제대로 만듭니다
         </div>
-        <div style={{ display: "flex", marginTop: 30, fontSize: 26, color: "rgba(250,245,234,0.55)" }}>
+        <div style={{ display: "flex", width: 96, height: 2, background: "#191919", marginTop: 34 }} />
+        <div style={{ display: "flex", marginTop: 22, fontSize: 26, color: "#5c5c5c" }}>
           소프트웨어 개발 외주 · 챗봇 · 업무 자동화
         </div>
       </div>

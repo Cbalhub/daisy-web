@@ -54,7 +54,7 @@ export function Navbar() {
           scrolled ? "shadow-[var(--shadow-e2)]" : "shadow-[var(--shadow-e1)]"
         )}
       >
-        <Wordmark className="text-[17px]" />
+        <Wordmark className="text-[22px]" />
 
         <nav className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((link) => (

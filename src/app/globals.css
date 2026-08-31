@@ -2,25 +2,26 @@
 
 /* Hallmark · genre: modern-minimal · macrostructure: Workbench · nav: N5 floating pill · footer: Ft1 mast-headed
  * pre-emit critique: P5 H4 E4 S4 R5 V4
- * "Warm Studio" — 웜 오프화이트 페이퍼 + 은은한 종이 질감, 세이지 그린 액센트 하나.
- * 무채색 대신 따뜻한 뉴트럴. 시각적 무게는 타이포·여백·실제 제품 목업·포트폴리오
- * 이미지에서. 토마토색은 로고 워드마크(MOVD의 O 애스터리스크)에서만. */
+ * "Achromatic" — 거의 흰 무채색 바탕 + 검정 텍스트, 회색 계조. 색은 로고(MOVD의 O)의
+ * 버건디 한 점뿐. 종이질감·글로우 없음. 섹션은 배경 밴드가 아니라 헤어라인 줄로 나눕니다.
+ * 시각적 무게는 타이포·여백·정렬·줄에서. */
 
 :root {
   color-scheme: light;
 
-  --color-ink: #211d17; /* 따뜻한 near-black — 본문/헤드라인 */
-  --color-ink-soft: #574f43;
-  --color-paper: #f5f4ef; /* 웜 오프화이트 — 페이지 기본 배경 */
-  --color-paper-dim: #ebe8de; /* 조금 더 깊은 톤 — 교차 섹션·밴드·트레이 */
-  --color-tint: #ebe8de;
-  --color-line: #ded9cb; /* 웜 헤어라인 */
-  --color-muted: #78715f;
-  --color-accent: #3f5d3a; /* 세이지 그린 — 크림 위 대비 ~6.5:1. 링크·CTA·강조·차트 (UI 색은 이 한 갈래) */
-  --color-accent-bright: #4a6d43; /* hover 시 살짝 밝게 */
-  --color-accent-deep: #26331f; /* 매니페스토·강한 대비·버튼 pressed */
-  --color-accent-soft: #e7ece2; /* 세이지 틴트 칩·선택된 행 배경 */
-  --color-mark: #5b9fd0; /* 로고 전용 — MOVD 워드마크 O 안 애스터리스크(하늘색). UI/섹션에는 안 씀 */
+  --color-ink: #191919; /* 거의 검정 — 본문/헤드라인 */
+  --color-ink-soft: #5c5c5c;
+  --color-paper: #fafafa; /* 거의 흰 무채색 — 페이지 기본 배경 */
+  --color-paper-dim: #f2f2f2; /* 아주 옅은 회색 — 카드·트레이·선택 영역 */
+  --color-tint: #f2f2f2;
+  --color-line: #dedede; /* 헤어라인 — 섹션 구분 줄에 씀 */
+  --color-muted: #8c8c8c;
+  --color-accent: #191919; /* 무채색 — 링크·버튼·강조는 전부 검정 계열 */
+  --color-accent-bright: #000000; /* hover 시 더 진하게 */
+  --color-accent-deep: #000000; /* pressed */
+  --color-accent-soft: #ededed; /* 선택된 행·틴트 칩 배경 (옅은 회색) */
+  --color-mark: #7a2e3e; /* 로고 전용 — MOVD 워드마크 O(꽉 채운 버건디 원). 사이트 유일한 색. UI엔 안 씀 */
+  --color-mark-2: #5b9fd0; /* 로고 전용 — O 안 애스터리스크(하늘색). UI엔 안 씀 */
 
   /* 로고 전용 — UI/섹션에는 안 씀 */
   --hue-1-ink: #bf4a2b;
@@ -32,19 +33,17 @@
   --hue-4-ink: #b45f06;
   --hue-4-soft: #fdeedb;
 
-  /* 다층 그림자 — 따뜻한 갈색 기운으로 (크림 배경에 회색 그림자는 탁해 보임) */
-  --shadow-e1: 0 1px 1px rgba(58, 42, 22, 0.06), 0 2px 5px -1px rgba(58, 42, 22, 0.09);
-  --shadow-e2: 0 1px 2px rgba(58, 42, 22, 0.07), 0 6px 12px -3px rgba(58, 42, 22, 0.09),
-    0 18px 36px -10px rgba(58, 42, 22, 0.15);
-  --shadow-float: 0 2px 4px rgba(58, 42, 22, 0.07), 0 10px 20px -6px rgba(58, 42, 22, 0.13),
-    0 32px 64px -16px rgba(58, 42, 22, 0.22);
+  /* 그림자 — 무채색 디자인이라 최소한으로. 정의는 주로 보더로 줍니다. */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-e2: 0 1px 2px rgba(0, 0, 0, 0.05), 0 6px 16px -4px rgba(0, 0, 0, 0.1);
+  --shadow-float: 0 2px 6px rgba(0, 0, 0, 0.06), 0 16px 40px -12px rgba(0, 0, 0, 0.16);
 
-  --color-success: #0e8074;
-  --color-success-soft: #e1f6f2;
-  --color-warning: #a85d0a;
-  --color-warning-soft: #fdf0e0;
-  --color-error: #c0392b;
-  --color-error-soft: #fbe9e7;
+  --color-success: #2f7d4f;
+  --color-success-soft: #e7f1ea;
+  --color-warning: #8a5d15;
+  --color-warning-soft: #f4ece0;
+  --color-error: #b3352a;
+  --color-error-soft: #f6e7e5;
   --color-petal-yellow: #ffd24d;
   --color-petal-pink: #ff8dba;
   --color-petal-purple: #a78bfa;
@@ -71,8 +70,8 @@
   --color-admin-border: #e7e7e9;
   --color-admin-text: #16171a;
   --color-admin-muted: #494c53;
-  --color-admin-blue: #3f5d3a; /* 관리자도 사이트와 같은 세이지로 통일 (토큰 이름만 blue) */
-  --color-admin-blue-soft: #e7ece2;
+  --color-admin-blue: #1f1f1f; /* 관리자도 무채색 — 주요 액션은 검정 (토큰 이름만 blue) */
+  --color-admin-blue-soft: #ededed;
   --color-admin-green: #0e8074;
   --color-admin-green-soft: #ddf3ef;
   --color-admin-amber: #b45f06;
@@ -94,6 +93,7 @@
   --color-accent-deep: var(--color-accent-deep);
   --color-accent-soft: var(--color-accent-soft);
   --color-mark: var(--color-mark);
+  --color-mark-2: var(--color-mark-2);
   --color-hue-1-ink: var(--hue-1-ink);
   --color-hue-1-soft: var(--hue-1-soft);
   --color-hue-2-ink: var(--hue-2-ink);
@@ -171,32 +171,8 @@
   }
 
   ::selection {
-    background: var(--color-accent);
-    color: #fff;
-  }
-
-  /* 종이 질감 — 배경 위에 곱하기(multiply)로 얹어 종이 섬유·얼룩처럼 보이게.
-     고운 그레인(::after) + 거친 섬유 얼룩(::before) 2겹. 고정 레이어라 스크롤해도
-     결이 살아 있고, 클릭은 통과시킵니다. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.6;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.40  0 0 0 0 0.32  0 0 0 0 0.20  0 0 0 0.11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-    pointer-events: none;
-    opacity: 0.5;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.09' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.38  0 0 0 0 0.30  0 0 0 0 0.18  0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+    background: var(--color-ink);
+    color: var(--color-paper);
   }
 
   @media (prefers-reduced-motion: reduce) {

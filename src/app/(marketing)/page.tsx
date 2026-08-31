@@ -169,7 +169,7 @@ export default async function HomePage() {
                   </div>
                   <div
                     className={cn(
-                      "rounded-3xl border border-line bg-paper-dim p-5 shadow-[inset_0_2px_10px_rgba(20,30,55,0.05)] sm:p-9 md:order-2",
+                      "rounded-xl border border-line bg-paper-dim p-5 sm:p-9 md:order-2",
                       i % 2 === 1 && "md:order-1"
                     )}
                   >
@@ -186,7 +186,7 @@ export default async function HomePage() {
       <Manifesto />
 
       {/* 왜 MOVD */}
-      <section className="border-t border-line bg-paper-dim py-20 md:py-28">
+      <section className="border-t border-line py-20 md:py-28">
         <Container>
           <div className="grid gap-x-14 gap-y-12 lg:grid-cols-2">
             <div>

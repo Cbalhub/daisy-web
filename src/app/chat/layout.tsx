@@ -7,7 +7,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex h-dvh flex-col bg-paper">
       <header className="shrink-0 border-b border-line px-6 py-4">
-        <Wordmark className="text-[17px]" />
+        <Wordmark className="text-[21px]" />
       </header>
       <main className="min-h-0 flex-1">{children}</main>
     </div>
