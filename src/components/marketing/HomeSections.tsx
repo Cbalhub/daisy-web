@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/Container";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 
 /* ── 4. "이런 걸 만들었어요" 마퀴 ────────────────────────────── */
 
@@ -46,7 +46,7 @@ export function WorkTypeMarquee() {
 export function Manifesto() {
   return (
     <section className="relative overflow-hidden bg-ink py-24 text-paper md:py-32">
-      <DaisyAsterisk
+      <Mark
         variant="mono"
         className="pointer-events-none absolute -right-14 -top-14 h-72 w-72 text-white/[0.05] md:h-96 md:w-96"
       />
@@ -81,7 +81,7 @@ export function FounderNote() {
               뭔가 새더라고요. 그게 싫어서 이렇게 해요.&rdquo;
             </p>
             <p className="mt-5 text-sm text-muted">
-              <span className="font-semibold text-ink">황준성</span> · Daisy 대표
+              <span className="font-semibold text-ink">황준성</span> · MOVD 대표
             </p>
           </div>
         </div>

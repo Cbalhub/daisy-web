@@ -30,7 +30,7 @@ function emailShell(bodyHtml: string) {
     <table role="presentation" width="100%" style="max-width:480px;margin:0 auto;background:${BRAND.paper};border-radius:16px;overflow:hidden;">
       <tr>
         <td style="padding:32px 32px 8px;">
-          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.ink};letter-spacing:-0.01em;">Daisy</p>
+          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.ink};letter-spacing:-0.01em;">MOVD</p>
         </td>
       </tr>
       <tr>
@@ -66,10 +66,10 @@ export async function sendNewMessageNotification(input: {
 
   const { error } = await resend.emails.send({
     // TODO: overcook.kr 도메인을 Resend에서 인증하면 아래를
-    // "Daisy 웹사이트 <notify@overcook.kr>"로 되돌리세요. 그 전까지는 미인증
+    // "MOVD 웹사이트 <notify@overcook.kr>"로 되돌리세요. 그 전까지는 미인증
     // 도메인 발송이 막혀 있어, 관리자 본인 이메일로만 보낼 수 있는 Resend
     // 기본(sandbox) 발신자를 임시로 씁니다.
-    from: "Daisy 웹사이트 <onboarding@resend.dev>",
+    from: "MOVD 웹사이트 <onboarding@resend.dev>",
     to,
     subject: `[새 메시지] ${input.customerName}`,
     text: [
@@ -111,9 +111,9 @@ export async function sendPaymentConfirmedEmail(input: {
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
   const { error } = await resend.emails.send({
-    from: "Daisy 웹사이트 <notify@overcook.kr>",
+    from: "MOVD 웹사이트 <notify@overcook.kr>",
     to: input.customerEmail,
-    subject: `[Daisy] 결제가 완료됐어요 — ${input.orderTitle}`,
+    subject: `[MOVD] 결제가 완료됐어요 — ${input.orderTitle}`,
     text: [
       `${input.customerName} 님, 결제가 정상적으로 완료됐어요.`,
       "",
@@ -160,9 +160,9 @@ export async function sendReviewRequestEmail(input: {
   const reviewUrl = `${siteUrl}/review/${input.orderToken}`;
 
   const { error } = await resend.emails.send({
-    from: "Daisy 웹사이트 <notify@overcook.kr>",
+    from: "MOVD 웹사이트 <notify@overcook.kr>",
     to: input.customerEmail,
-    subject: `[Daisy] "${input.orderTitle}" 프로젝트, 어떠셨나요?`,
+    subject: `[MOVD] "${input.orderTitle}" 프로젝트, 어떠셨나요?`,
     text: [
       `${input.customerName} 님, 프로젝트 전달이 완료됐어요.`,
       "",
@@ -193,7 +193,7 @@ export async function sendOwnerNotification(input: { subject: string; bodyText: 
   if (!resend || !to) return { sent: false, reason: "not-configured" as const };
 
   const { error } = await resend.emails.send({
-    from: "Daisy 웹사이트 <onboarding@resend.dev>",
+    from: "MOVD 웹사이트 <onboarding@resend.dev>",
     to,
     subject: input.subject,
     text: input.bodyText,

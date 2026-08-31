@@ -2,7 +2,7 @@ import { DashboardPanel } from "@/components/marketing/DashboardPanel";
 import { ChatMiniCard, AutomationCard } from "@/components/marketing/ProductMocks";
 
 /**
- * 히어로 오른쪽 — Daisy가 실제로 만드는 화면 세 개(관리자 대시보드 · 실시간 상담 ·
+ * 히어로 오른쪽 — MOVD가 실제로 만드는 화면 세 개(관리자 대시보드 · 실시간 상담 ·
  * 자동화 배치)를 살짝 겹쳐 기울여 보여주고, 각자 다른 위상으로 아주 느리게 떠다닙니다.
  * 아이콘·장식 없이 제품 화면만. prefers-reduced-motion 이면 움직임 정지.
  *

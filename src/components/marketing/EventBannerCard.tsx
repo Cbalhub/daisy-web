@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 
 type EventStyle = "dark" | "light" | "festive";
@@ -72,7 +72,7 @@ export function EventBannerCard({
       {/* 큰 원형 배지가 시선을 가장 먼저 붙잡고, 그 위에 살짝 걸친 브랜드 심볼이
           "우리가 만든" 느낌을 더합니다. */}
       <div className={`relative mx-auto flex h-28 w-28 items-center justify-center rounded-full border-2 ${tone.ring}`}>
-        <DaisyAsterisk
+        <Mark
           variant="mono"
           className="absolute -top-4 -right-2 h-9 w-9 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]"
         />

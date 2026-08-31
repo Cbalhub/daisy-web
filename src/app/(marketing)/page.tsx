@@ -6,7 +6,7 @@ import { HeroShowcase } from "@/components/marketing/HeroShowcase";
 import { ProcessStepper } from "@/components/marketing/ProcessStepper";
 import { ReviewCard } from "@/components/marketing/ReviewCard";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 import { WorkTypeMarquee, Manifesto } from "@/components/marketing/HomeSections";
 import {
   ChatbotFlow,
@@ -95,7 +95,7 @@ export default async function HomePage() {
     <>
       {/* 히어로 */}
       <section className="relative overflow-hidden pt-16 pb-16 md:pt-24 md:pb-24">
-        <DaisyAsterisk
+        <Mark
           variant="mono"
           className="pointer-events-none absolute -left-28 -top-24 h-[22rem] w-[22rem] text-accent/[0.045]"
         />
@@ -185,7 +185,7 @@ export default async function HomePage() {
       {/* 1+2+3. 다크 매니페스토 */}
       <Manifesto />
 
-      {/* 왜 Daisy */}
+      {/* 왜 MOVD */}
       <section className="border-t border-line bg-paper-dim py-20 md:py-28">
         <Container>
           <div className="grid gap-x-14 gap-y-12 lg:grid-cols-2">
@@ -340,9 +340,9 @@ export default async function HomePage() {
       {/* CTA */}
       <section className="border-t border-line py-20 text-center md:py-28">
         <Container>
-          <DaisyAsterisk variant="color" className="mx-auto mb-6 h-8 w-8" />
+          <Mark variant="brand" className="mx-auto mb-6 h-8 w-8 text-accent" />
           <h2 className="mx-auto max-w-xl font-display text-2xl font-extrabold tracking-tight text-balance md:text-3xl">
-            다음 프로젝트, Daisy와 함께 시작해볼까요?
+            다음 프로젝트, MOVD와 함께 시작해볼까요?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted">
             채팅 한 번이면 충분합니다. 보통 하루 안에 답변드리고, 견적부터 도와드려요.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 
 export const metadata: Metadata = { title: "페이지를 찾을 수 없어요" };
 
@@ -10,7 +10,7 @@ export default function NotFound() {
     <section className="flex min-h-[70vh] items-center pt-20 pb-24 md:pt-28">
       <Container>
         <div className="text-center">
-          <DaisyAsterisk variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
+          <Mark variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
           <p className="mt-4 font-display text-5xl font-semibold tracking-tight md:text-6xl">
             404
           </p>

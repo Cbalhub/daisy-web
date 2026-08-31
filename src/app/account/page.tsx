@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { OrderList } from "@/components/account/OrderList";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { requireCustomerSession } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
@@ -74,7 +74,7 @@ export default async function AccountDashboardPage() {
           <h2 className="font-display text-lg font-bold">주문 · 결제 내역</h2>
           {customer.orders.length === 0 ? (
             <div className="mt-8 text-center">
-              <DaisyAsterisk variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
+              <Mark variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
               <p className="mt-4 text-sm text-muted">
                 아직 주문 내역이 없습니다. 문의를 남기면 견적부터 도와드려요.
               </p>

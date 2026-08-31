@@ -61,7 +61,7 @@ export default async function TransactionConfirmationPage({
     <div className="w-full max-w-lg rounded-xl border border-line bg-paper p-7 shadow-[var(--shadow-e1)] print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-lg font-semibold tracking-tight">Daisy</p>
+          <p className="font-display text-lg font-semibold tracking-tight">MOVD</p>
           <p className="mt-1 text-xs text-muted">거래확인서 · Transaction Confirmation</p>
         </div>
         <p className="shrink-0 rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft">
@@ -72,7 +72,7 @@ export default async function TransactionConfirmationPage({
       <div className="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6 text-sm">
         <div>
           <p className="text-xs text-muted">제공자 (Provider)</p>
-          <p className="mt-1 font-medium">{settings.businessName || "Daisy"}</p>
+          <p className="mt-1 font-medium">{settings.businessName || "MOVD"}</p>
           {settings.representativeName && (
             <p className="text-xs text-muted">대표 {settings.representativeName}</p>
           )}
@@ -131,7 +131,7 @@ export default async function TransactionConfirmationPage({
       </div>
 
       <p className="mt-8 text-center text-xs leading-relaxed text-muted">
-        본 문서는 Daisy가 내부적으로 보관하는 거래 기록을 바탕으로 발급된 확인 문서이며,
+        본 문서는 MOVD가 내부적으로 보관하는 거래 기록을 바탕으로 발급된 확인 문서이며,
         국세청 현금영수증이나 세금계산서를 대체하지 않습니다.
         <br />
         문의: {settings.contactEmail}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
-import { DaisyAsterisk } from "@/components/marketing/DaisyAsterisk";
+import { Mark } from "@/components/brand/Mark";
 import { ReviewCard } from "@/components/marketing/ReviewCard";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +10,7 @@ import { absoluteUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "고객 후기",
   description:
-    "챗봇, 자동화 시스템, 무인 판매 시스템을 Daisy와 함께 만든 고객들의 실제 후기. 가격·기능·보안·유지보수에 대한 솔직한 평가를 확인해 보세요.",
+    "챗봇, 자동화 시스템, 무인 판매 시스템을 MOVD와 함께 만든 고객들의 실제 후기. 가격·기능·보안·유지보수에 대한 솔직한 평가를 확인해 보세요.",
   alternates: { canonical: "/reviews" },
 };
 
@@ -30,7 +30,7 @@ export default async function ReviewsPage() {
       ? {
           "@context": "https://schema.org",
           "@type": "ProfessionalService",
-          name: "Daisy",
+          name: "MOVD",
           "@id": `${absoluteUrl("/")}#org`,
           url: absoluteUrl("/"),
           aggregateRating: {
@@ -66,7 +66,7 @@ export default async function ReviewsPage() {
             함께한 분들의 이야기
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-            Daisy와 프로젝트를 진행한 고객들의 실제 후기입니다.
+            MOVD와 프로젝트를 진행한 고객들의 실제 후기입니다.
           </p>
         </Container>
       </section>
@@ -75,7 +75,7 @@ export default async function ReviewsPage() {
         <Container>
           {REVIEWS.length === 0 ? (
             <div className="text-center">
-              <DaisyAsterisk variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
+              <Mark variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
               <p className="mt-4 text-sm text-muted">곧 새로운 후기로 찾아뵙겠습니다.</p>
             </div>
           ) : (

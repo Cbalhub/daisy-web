@@ -26,7 +26,7 @@ const SERVICES_JSON_LD = {
       name: service.title,
       description: service.description,
       url: absoluteUrl(`/services#${service.slug}`),
-      provider: { "@type": "ProfessionalService", name: "Daisy" },
+      provider: { "@type": "ProfessionalService", name: "MOVD" },
       areaServed: "KR",
     },
   })),
