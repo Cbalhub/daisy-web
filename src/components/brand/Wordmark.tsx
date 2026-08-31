@@ -3,8 +3,8 @@ import { Mark } from "@/components/brand/Mark";
 import { cn } from "@/lib/utils";
 
 /**
- * MOVD 워드마크 — Architects Daughter 손글씨 + O 자리에 마크(꽉 찬 버건디 원 + 하늘색 애스터리스크).
- * 글자는 검정(무채색), O 만 색. 단일 굵기 폰트라 굵기는 -webkit-text-stroke 로 살짝 불립니다.
+ * MOVD 워드마크 — Architects Daughter 손글씨 + O 자리에 손그림 애스터리스크(버건디).
+ * 글자는 검정(무채색), 애스터리스크만 색. 단일 굵기 폰트라 굵기는 -webkit-text-stroke 로 살짝 불립니다.
  * tone="inverse" 는 어두운 배경용(글자 종이색).
  */
 export function Wordmark({
@@ -25,7 +25,7 @@ export function Wordmark({
       )}
     >
       M
-      <Mark className="mx-[0.015em] inline-block h-[0.9em] w-[0.9em] align-[-0.16em] [-webkit-text-stroke:0]" />
+      <Mark className="mx-[0.04em] inline-block h-[0.86em] w-[0.86em] align-[-0.12em] [-webkit-text-stroke:0]" />
       VD
     </span>
   );

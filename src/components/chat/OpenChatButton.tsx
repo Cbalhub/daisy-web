@@ -23,7 +23,7 @@ export function OpenChatButton({
       type="button"
       onClick={openChatWidget}
       className={cn(
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap bg-accent font-semibold text-white shadow-[var(--shadow-e1)] transition-[transform,background-color] duration-200 ease-out hover:bg-accent-bright active:scale-[0.98] active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap bg-accent font-semibold text-on-accent shadow-[var(--shadow-e1)] transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-px hover:bg-accent-bright hover:shadow-[var(--shadow-e2)] active:translate-y-px active:shadow-none active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper",
         sizes[size],
         className
       )}

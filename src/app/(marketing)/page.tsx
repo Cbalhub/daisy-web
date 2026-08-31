@@ -94,22 +94,22 @@ export default async function HomePage() {
   return (
     <>
       {/* 히어로 */}
-      <section className="border-b border-line py-14 md:py-20">
-        <Container className="md:px-0">
-          <div className="grid items-stretch gap-y-10 lg:grid-cols-[minmax(0,24rem)_1fr]">
-            <div className="flex flex-col px-6 md:pl-10 lg:border-r lg:border-line lg:pr-12">
+      <section className="border-b border-line py-12 md:py-20">
+        <Container>
+          <div className="grid gap-x-0 gap-y-12 lg:grid-cols-[minmax(0,22rem)_1fr]">
+            <div className="flex flex-col lg:border-r lg:border-line lg:pr-12">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
                 소프트웨어 개발 외주
               </p>
-              <h1 className="mt-4 font-display text-[2rem] leading-[1.14] font-extrabold tracking-tight text-balance sm:text-[2.4rem]">
+              <h1 className="mt-4 font-display text-[1.9rem] leading-[1.14] font-extrabold tracking-tight text-balance sm:text-[2.4rem]">
                 카톡 봇, 자동화, 관리자 페이지.
                 <br />
                 대표가 직접 만듭니다.
               </h1>
-              <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink-soft">
+              <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-soft">
                 이 사이트의 채팅·결제·관리자 도구도 전부 저희가 만들었어요.
               </p>
-              <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-8">
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 lg:mt-auto lg:pt-8">
                 <OpenChatButton>프로젝트 문의</OpenChatButton>
                 <Link
                   href="/portfolio"
@@ -120,7 +120,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="px-6 md:px-10 lg:pl-10">
+            <div className="min-w-0 lg:pl-12">
               <HeroShowcase />
             </div>
           </div>
@@ -162,7 +162,7 @@ export default async function HomePage() {
                   </div>
                   <div
                     className={cn(
-                      "rounded-xl border border-line bg-paper-dim p-5 sm:p-9 md:order-2",
+                      "rounded-xl border border-line bg-paper p-5 shadow-[var(--shadow-e2)] sm:p-9 md:order-2",
                       i % 2 === 1 && "md:order-1"
                     )}
                   >

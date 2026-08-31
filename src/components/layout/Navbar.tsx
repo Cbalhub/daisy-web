@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatWidget } from "@/components/chat/openChat";
 import { Wordmark } from "@/components/brand/Wordmark";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 const NAV_LINKS = [
   { href: "/services", label: "서비스" },
@@ -71,32 +72,36 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/account"
             className="whitespace-nowrap text-sm text-ink-soft transition-colors hover:text-ink"
           >
             {loggedIn ? "마이페이지" : "로그인"}
           </Link>
+          <ThemeToggle />
           <button
             type="button"
             onClick={openChatWidget}
-            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-4 text-sm font-semibold text-white transition-[transform,background-color] duration-200 ease-out hover:bg-accent-bright active:scale-[0.98] active:duration-100"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-4 text-sm font-semibold text-on-accent shadow-[var(--shadow-e1)] transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-px hover:bg-accent-bright hover:shadow-[var(--shadow-e2)] active:translate-y-px active:shadow-none active:duration-100"
           >
             프로젝트 문의
           </button>
         </div>
 
-        <button
-          className="-mr-1 flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="메뉴"
-          aria-expanded={open}
-        >
-          <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
-          <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
-          <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle className="!border-0" />
+          <button
+            className="-mr-1 flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="메뉴"
+            aria-expanded={open}
+          >
+            <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
+            <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
+            <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -127,7 +132,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={openChatWidget}
-                className="mt-1 flex min-h-11 items-center rounded-lg bg-accent px-3 text-left text-[15px] font-semibold text-white"
+                className="mt-1 flex min-h-11 items-center rounded-lg bg-accent px-3 text-left text-[15px] font-semibold text-on-accent"
               >
                 프로젝트 문의
               </button>

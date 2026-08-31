@@ -60,7 +60,7 @@ export function RefundConsent({
         <span
           className={cn(
             "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-            consented ? "border-accent bg-accent text-white" : "border-line text-transparent"
+            consented ? "border-accent bg-accent text-on-accent" : "border-line text-transparent"
           )}
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

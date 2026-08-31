@@ -15,9 +15,10 @@ model AdminUser {
   name         String?
   createdAt    DateTime @default(now())
 
-  orders    Order[]    @relation("OrderCreatedBy")
-  refunds   Refund[]
-  auditLogs AuditLog[]
+  orders             Order[]             @relation("OrderCreatedBy")
+  refunds            Refund[]
+  auditLogs          AuditLog[]
+  manualLedgerEntries ManualLedgerEntry[] @relation("ManualLedgerCreatedBy")
 }
 
 // ---------- 고객 계정 ----------
@@ -283,6 +284,54 @@ model QuickReply {
   updatedAt DateTime @updatedAt
 
   @@index([order])
+}
+
+// ---------- 장부 수동 입력 ----------
+// 사이트 결제 흐름을 거치지 않고 받은 대금(계좌로 직접 입금, 오프라인 협의 건 등)을
+// 장부에 직접 적어 넣기 위한 항목입니다. 자동 집계되는 Payment/Refund 와 합쳐서 보여줍니다.
+enum LedgerKind {
+  REVENUE // 결제(수입)
+  REFUND // 환불
+  EXPENSE // 지출(경비)
+}
+
+enum ProofType {
+  TAX_INVOICE // 세금계산서
+  CASH_RECEIPT // 현금영수증
+  TRANSFER_RECORD // 계좌이체 내역
+  NONE // 없음
+}
+
+enum ExpenseCategory {
+  SERVER // 서버·인프라
+  DOMAIN // 도메인
+  SUBCONTRACT // 재하청·외주
+  TAX // 세금·공과금
+  SOFTWARE // 소프트웨어·툴
+  MARKETING // 광고·마케팅
+  ETC // 기타
+}
+
+model ManualLedgerEntry {
+  id                 String           @id @default(cuid())
+  occurredAt         DateTime // 실제로 돈이 오간 날
+  kind               LedgerKind       @default(REVENUE)
+  title              String // 외주 프로젝트명 / 지출 항목
+  detail             String? // 상세 기능
+  customerName       String // 발주처·고객명 / 지급처
+  amount             Int // KRW, 항상 양수 (부호는 kind 로 결정)
+  businessRegNo      String?
+  phone              String?
+  proofType          ProofType? // 증빙 수단
+  expenseCategory    ExpenseCategory? // 지출일 때 경비 항목
+  taxInvoiceIssuedAt DateTime? // 세금계산서 발행일
+  memo               String? // 비고
+  createdById        String?
+  createdBy          AdminUser?       @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([occurredAt])
 }
 
 model AuditLog {

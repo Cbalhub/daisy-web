@@ -156,9 +156,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ko"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${pretendard.variable} ${architects.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        {/* 다크/라이트 토글 — 저장된 선택을 페인트 전에 반영해 깜빡임 방지 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('movd-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}",
+          }}
+        />
         {/* 로고·마크에 손그림 느낌을 주는 왜곡 필터 — feTurbulence 로 만든 노이즈를
             변위맵으로 써서 깔끔한 도형/글자의 가장자리를 살짝 흔듭니다. */}
         <svg width="0" height="0" className="absolute" aria-hidden focusable="false">

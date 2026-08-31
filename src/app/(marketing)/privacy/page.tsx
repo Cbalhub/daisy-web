@@ -25,20 +25,21 @@ export default function PrivacyPage() {
               <h2 className="font-display text-base font-semibold text-ink">
                 {section.title}
               </h2>
-              {section.body.length > 1 ? (
-                <ul className="mt-2 list-disc space-y-1 pl-5">
-                  {section.body.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2">{section.body[0]}</p>
-              )}
+              <div className="mt-2 space-y-1.5">
+                {section.body.map((line, i) => {
+                  const indented = line.startsWith("  ");
+                  return (
+                    <p key={i} className={indented ? "pl-4" : undefined}>
+                      {indented ? line.trim() : line}
+                    </p>
+                  );
+                })}
+              </div>
             </section>
           ))}
         </div>
 
-        <p className="mt-12 text-xs text-muted">최종 수정일: 2026년 8월 18일</p>
+        <p className="mt-12 text-xs text-muted">최종 수정일: 2026년 9월 1일</p>
       </Container>
     </section>
   );

@@ -109,7 +109,7 @@ export function ReviewSubmitForm({ orderToken }: { orderToken: string }) {
       <button
         type="submit"
         disabled={loading}
-        className="h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-white transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
+        className="h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-on-accent transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
       >
         {loading ? "제출 중..." : "후기 제출하기"}
       </button>

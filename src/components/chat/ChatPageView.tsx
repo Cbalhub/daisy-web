@@ -572,7 +572,7 @@ function ConversationTabs({
           </span>
         )}
         {totalUnread > 0 && !open && (
-          <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+          <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-on-accent">
             {totalUnread}
           </span>
         )}
@@ -628,7 +628,7 @@ function ConversationTabs({
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <span className="text-[11px] text-muted">{timeAgo(c.lastMessageAt)}</span>
                       {c.unreadCount > 0 && (
-                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-on-accent">
                           {c.unreadCount}
                         </span>
                       )}
@@ -729,7 +729,7 @@ function PaymentRequestCard({ order }: { order: OrderSummary }) {
           <div className="p-3 pt-4">
             <Link
               href={`/pay/${order.orderToken}`}
-              className="block rounded-[10px] bg-accent py-3 text-center text-sm font-semibold text-white transition-[transform,background-color] ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100"
+              className="block rounded-[10px] bg-accent py-3 text-center text-sm font-semibold text-on-accent transition-[transform,background-color] ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100"
             >
               결제하기
             </Link>

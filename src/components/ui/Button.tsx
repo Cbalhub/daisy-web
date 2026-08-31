@@ -13,13 +13,15 @@ type Common = {
 // 모서리 반경을 10px로 낮추고(Linear/Vercel 계열의 절제된 pill), 라벨은 항상 한 줄로
 // 유지합니다(whitespace-nowrap — 좁은 화면에서 두 줄 깨짐 방지).
 const base =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[transform,background-color,color,box-shadow,border-color,filter] duration-200 ease-out active:scale-[0.98] active:brightness-95 active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-30";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[transform,background-color,color,box-shadow,border-color,filter] duration-200 ease-out active:translate-y-px active:brightness-95 active:shadow-none active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-30";
 
 const variants = {
-  primary: "bg-accent text-white shadow-[var(--shadow-e1)] hover:bg-accent-bright",
-  secondary: "border border-line bg-paper text-ink hover:border-accent/30 hover:bg-paper-dim",
+  primary:
+    "bg-accent text-on-accent shadow-[var(--shadow-e1)] hover:bg-accent-bright hover:shadow-[var(--shadow-e2)] hover:-translate-y-px",
+  secondary:
+    "border border-line bg-paper text-ink shadow-[var(--shadow-e1)] hover:border-accent/30 hover:bg-paper-dim hover:shadow-[var(--shadow-e2)]",
   ghost: "text-accent hover:opacity-70",
-  danger: "bg-error text-white hover:bg-error/90",
+  danger: "bg-error text-white shadow-[var(--shadow-e1)] hover:bg-error/90",
 };
 
 const sizes = {

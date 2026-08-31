@@ -118,7 +118,7 @@ export function BankTransferPanel({
       <button
         onClick={claimDeposit}
         disabled={loading || !refundConsented}
-        className="mt-4 h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-white transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
+        className="mt-4 h-12 w-full rounded-[10px] bg-accent text-sm font-semibold text-on-accent transition-[background-color,transform] duration-200 ease-out hover:bg-accent/90 active:scale-[0.98] active:duration-100 disabled:pointer-events-none disabled:opacity-40"
       >
         {loading ? "처리 중..." : "입금 완료했어요"}
       </button>
