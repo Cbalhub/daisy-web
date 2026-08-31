@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatWidget } from "@/components/chat/openChat";
 import { Wordmark } from "@/components/brand/Wordmark";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 const NAV_LINKS = [
   { href: "/services", label: "서비스" },
@@ -71,13 +72,14 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/account"
             className="whitespace-nowrap text-sm text-ink-soft transition-colors hover:text-ink"
           >
             {loggedIn ? "마이페이지" : "로그인"}
           </Link>
+          <ThemeToggle />
           <button
             type="button"
             onClick={openChatWidget}
@@ -87,16 +89,19 @@ export function Navbar() {
           </button>
         </div>
 
-        <button
-          className="-mr-1 flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="메뉴"
-          aria-expanded={open}
-        >
-          <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
-          <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
-          <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle className="!border-0" />
+          <button
+            className="-mr-1 flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="메뉴"
+            aria-expanded={open}
+          >
+            <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
+            <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
+            <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>

@@ -82,11 +82,11 @@
 }
 
 /* 다크 모드 — 무채색이라 뉴트럴만 뒤집습니다. 색은 여전히 로고 애스터리스크(버건디)뿐.
-   OS 설정을 따라가고, 마케팅 사이트에만 적용합니다(관리자 도구는 라이트 유지). */
+   3가지 상태: 시스템(아무 표시 없음) / 사용자가 라이트 고정 / 사용자가 다크 고정.
+   토글 버튼이 <html data-theme="..."> 를 세팅합니다. 관리자 도구는 라이트 유지. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
-
     --color-ink: #ededed;
     --color-ink-soft: #a1a1a1;
     --color-paper: #121212;
@@ -99,12 +99,10 @@
     --color-accent-deep: #ffffff;
     --color-accent-soft: #262626;
     --color-on-accent: #131313;
-    --color-mark: #cf7182; /* 버건디 — 어두운 바탕이라 밝게 */
-
+    --color-mark: #cf7182;
     --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.45);
     --shadow-e2: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 28px -6px rgba(0, 0, 0, 0.6);
     --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.55), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
-
     --color-success: #6fce8f;
     --color-success-soft: #1c2e22;
     --color-warning: #d6a34a;
@@ -112,6 +110,31 @@
     --color-error: #e2756a;
     --color-error-soft: #331e1c;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #ededed;
+  --color-ink-soft: #a1a1a1;
+  --color-paper: #121212;
+  --color-paper-dim: #1c1c1c;
+  --color-tint: #1c1c1c;
+  --color-line: #2e2e2e;
+  --color-muted: #757575;
+  --color-accent: #ededed;
+  --color-accent-bright: #ffffff;
+  --color-accent-deep: #ffffff;
+  --color-accent-soft: #262626;
+  --color-on-accent: #131313;
+  --color-mark: #cf7182;
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-e2: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 28px -6px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.55), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
+  --color-success: #6fce8f;
+  --color-success-soft: #1c2e22;
+  --color-warning: #d6a34a;
+  --color-warning-soft: #2e2717;
+  --color-error: #e2756a;
+  --color-error-soft: #331e1c;
 }
 
 @theme inline {
