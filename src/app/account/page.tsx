@@ -20,7 +20,15 @@ export default async function AccountDashboardPage() {
     include: {
       orders: {
         orderBy: { createdAt: "desc" },
-        include: { review: { select: { id: true } } },
+        include: {
+          review: { select: { id: true } },
+          contracts: {
+            where: { status: { not: "VOID" } },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { token: true, status: true },
+          },
+        },
       },
     },
   });
@@ -29,54 +37,51 @@ export default async function AccountDashboardPage() {
   const paidOrders = customer.orders.filter((o) => o.status === "PAID");
   const inProgress = paidOrders.filter((o) => o.progressStage !== "DELIVERED").length;
   const totalPaid = paidOrders.reduce((sum, o) => sum + o.amount, 0);
-  const displayName = customer.name || customer.email;
-  const initial = displayName.trim().charAt(0).toUpperCase();
+  const needsAction = customer.orders.filter(
+    (o) =>
+      o.status === "DRAFT" ||
+      o.status === "PENDING" ||
+      o.contracts[0]?.status === "SENT"
+  ).length;
 
-  const STATS = [
-    { label: "전체 프로젝트", value: `${customer.orders.length}건` },
-    { label: "진행중", value: `${inProgress}건` },
-    { label: "누적 결제 금액", value: `₩${totalPaid.toLocaleString("ko-KR")}` },
+  const stats = [
+    { label: "전체 프로젝트", value: `${customer.orders.length}` },
+    { label: "진행 중", value: `${inProgress}` },
+    { label: "확인 필요", value: `${needsAction}` },
+    { label: "누적 결제", value: `₩${totalPaid.toLocaleString("ko-KR")}` },
   ];
 
   return (
-    <section className="pt-20 pb-24 md:pt-28">
+    <section className="pt-16 pb-24 md:pt-20">
       <Container>
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-base font-semibold text-paper">
-              {initial}
-            </div>
-            <div>
-              <p className="text-xs font-semibold tracking-[0.14em] text-accent uppercase">
-                마이페이지
-              </p>
-              <h1 className="mt-1 font-display text-2xl font-bold tracking-tight text-balance md:text-3xl">
-                {customer.name ? `${customer.name}님` : customer.email}
-              </h1>
-              <p className="mt-0.5 text-sm text-muted">{customer.email}</p>
-            </div>
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight md:text-[2rem]">
+              {customer.name ? `${customer.name} 님` : "내 프로젝트"}
+            </h1>
+            <p className="mt-1 text-sm text-muted">{customer.email}</p>
           </div>
           <LogoutButton />
         </div>
 
-        <div className="mt-10 grid grid-cols-3 divide-x divide-line border-y border-line">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="px-4 py-5 first:pl-0">
-              <p className="text-xs font-medium text-muted">{stat.label}</p>
-              <p className="mt-2 font-display text-xl font-bold tracking-tight tabular-nums md:text-2xl">
+        <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-5 border-y border-line py-5 sm:flex sm:flex-wrap sm:gap-x-12">
+          {stats.map((stat) => (
+            <div key={stat.label}>
+              <dt className="text-xs text-muted">{stat.label}</dt>
+              <dd className="mt-1 font-display text-xl font-bold tracking-tight tabular-nums">
                 {stat.value}
-              </p>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
 
-        <div className="mt-14">
-          <h2 className="font-display text-lg font-bold">주문 · 결제 내역</h2>
+        <div className="mt-12">
+          <h2 className="text-sm font-semibold text-ink">주문 · 프로젝트</h2>
           {customer.orders.length === 0 ? (
-            <div className="mt-8 text-center">
-              <Mark variant="mono" className="mx-auto h-12 w-12 text-accent/60" />
+            <div className="mt-10 flex flex-col items-center rounded-xl border border-line bg-paper-dim py-14 text-center">
+              <Mark variant="mono" className="h-10 w-10 text-muted" />
               <p className="mt-4 text-sm text-muted">
-                아직 주문 내역이 없습니다. 문의를 남기면 견적부터 도와드려요.
+                아직 주문 내역이 없어요. 문의를 남기면 견적부터 도와드립니다.
               </p>
               <OpenChatButton size="md" className="mt-5">
                 프로젝트 문의하기

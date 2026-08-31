@@ -12,7 +12,7 @@ const MAX_INVOICE_NUMBER_RETRIES = 5;
 function generateInvoiceNumber() {
   const yyyymm = new Date().toISOString().slice(0, 7).replace("-", "");
   const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `DS-${yyyymm}-${random}`;
+  return `MOVD-${yyyymm}-${random}`;
 }
 
 /**
