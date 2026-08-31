@@ -3,7 +3,8 @@ import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const BRAND = { ink: "#141f2c", paper: "#ffffff", accent: "#3182f6", muted: "#87919c" };
+// 사이트와 같은 무채색 톤 — 파란 액센트를 쓰지 않습니다(색은 로고 전용).
+const BRAND = { ink: "#191919", paper: "#ffffff", accent: "#191919", muted: "#8c8c8c" };
 
 // 고객명·주문명·메시지 미리보기처럼 사용자가 입력한 값을 HTML 템플릿에 그대로
 // 꽂으면, 그 값에 <script>나 <img onerror=...> 같은 마크업이 섞여 있을 때

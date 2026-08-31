@@ -49,24 +49,24 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
           background: "#ffffff",
           padding: "72px 64px",
           fontFamily: "Pretendard",
-          color: "#1d1d1f",
+          color: "#191919",
         }}
       >
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 700 }}>
-            MOVD<span style={{ color: "#3182f6" }}>.</span>
+          <div style={{ display: "flex", fontSize: 30, fontWeight: 700, letterSpacing: "0.02em" }}>
+            MOVD
           </div>
-          <div style={{ display: "flex", fontSize: 20, color: "#6e6e73" }}>{issuedAt}</div>
+          <div style={{ display: "flex", fontSize: 20, color: "#8c8c8c" }}>{issuedAt}</div>
         </div>
 
         <div style={{ display: "flex", marginTop: 48, fontSize: 44, fontWeight: 700 }}>견적서</div>
 
         <div style={{ display: "flex", flexDirection: "column", marginTop: 24, gap: 8 }}>
-          <div style={{ display: "flex", fontSize: 18, color: "#424245" }}>
+          <div style={{ display: "flex", fontSize: 18, color: "#5c5c5c" }}>
             견적번호 · {order.invoiceNumber}
           </div>
-          <div style={{ display: "flex", fontSize: 18, color: "#424245" }}>고객명 · {order.customerName}</div>
-          <div style={{ display: "flex", fontSize: 18, color: "#424245" }}>프로젝트 · {order.title}</div>
+          <div style={{ display: "flex", fontSize: 18, color: "#5c5c5c" }}>고객명 · {order.customerName}</div>
+          <div style={{ display: "flex", fontSize: 18, color: "#5c5c5c" }}>프로젝트 · {order.title}</div>
         </div>
 
         <div
@@ -74,17 +74,17 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
             display: "flex",
             flexDirection: "column",
             marginTop: 40,
-            borderTop: "2px solid #1d1d1f",
+            borderTop: "2px solid #191919",
           }}
         >
           <div
             style={{
               display: "flex",
               padding: "16px 4px",
-              borderBottom: "1px solid #d2d2d7",
+              borderBottom: "1px solid #dedede",
               fontSize: 16,
               fontWeight: 700,
-              color: "#6e6e73",
+              color: "#8c8c8c",
             }}
           >
             <div style={{ display: "flex" }}>포함 기능</div>
@@ -97,14 +97,14 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
                 alignItems: "center",
                 gap: 14,
                 padding: "18px 4px",
-                borderBottom: "1px solid #f0f0f2",
+                borderBottom: "1px solid #ededed",
                 fontSize: 20,
               }}
             >
-              <div style={{ display: "flex", width: 6, height: 6, borderRadius: 3, background: "#3182f6" }} />
+              <div style={{ display: "flex", width: 6, height: 6, borderRadius: 3, background: "#191919" }} />
               <div style={{ display: "flex", flex: 1 }}>{row.label}</div>
               {typeof row.amount === "number" && (
-                <div style={{ display: "flex", fontWeight: 700, color: "#424245" }}>{won(row.amount)}</div>
+                <div style={{ display: "flex", fontWeight: 700, color: "#5c5c5c" }}>{won(row.amount)}</div>
               )}
             </div>
           ))}
@@ -118,7 +118,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
             }}
           >
             <div style={{ display: "flex", fontSize: 20, fontWeight: 700 }}>합계</div>
-            <div style={{ display: "flex", fontSize: 32, fontWeight: 700, color: "#3182f6" }}>
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 700, color: "#191919" }}>
               {won(order.amount)}
             </div>
           </div>
@@ -132,9 +132,9 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
             flexDirection: "column",
             gap: 4,
             paddingTop: 24,
-            borderTop: "1px solid #d2d2d7",
+            borderTop: "1px solid #dedede",
             fontSize: 14,
-            color: "#6e6e73",
+            color: "#8c8c8c",
           }}
         >
           <div style={{ display: "flex" }}>
@@ -154,7 +154,7 @@ export async function renderQuoteImage(order: Order, settings: BusinessSettings)
         { name: "Pretendard", data: fontBold, style: "normal", weight: 700 },
       ],
       headers: {
-        "Content-Disposition": `inline; filename="overcook-quote-${order.invoiceNumber}.png"`,
+        "Content-Disposition": `inline; filename="movd-quote-${order.invoiceNumber}.png"`,
       },
     }
   );
