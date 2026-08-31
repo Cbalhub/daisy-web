@@ -19,7 +19,7 @@ export function ChatMiniCard() {
         <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">
           챗봇도 같이 붙일 수 있나요?
         </div>
-        <div className="w-fit max-w-[85%] rounded-2xl rounded-bl-md bg-accent px-3.5 py-2 text-[13px] text-white">
+        <div className="w-fit max-w-[85%] rounded-2xl rounded-bl-md bg-accent px-3.5 py-2 text-[13px] text-on-accent">
           네, 바로 견적 도와드릴게요
         </div>
       </div>
@@ -71,7 +71,7 @@ export function ChatbotFlow() {
         <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">
           예약 가능한 시간 알려주세요
         </div>
-        <div className="ml-auto w-fit max-w-[88%] rounded-2xl rounded-br-md bg-accent px-3.5 py-2 text-[13px] text-white">
+        <div className="ml-auto w-fit max-w-[88%] rounded-2xl rounded-br-md bg-accent px-3.5 py-2 text-[13px] text-on-accent">
           오늘 15:00 / 17:00 / 19:00 비어 있어요
         </div>
         <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">

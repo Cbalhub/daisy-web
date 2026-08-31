@@ -81,7 +81,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={openChatWidget}
-            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-4 text-sm font-semibold text-white transition-[transform,background-color] duration-200 ease-out hover:bg-accent-bright active:scale-[0.98] active:duration-100"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-4 text-sm font-semibold text-on-accent transition-[transform,background-color] duration-200 ease-out hover:bg-accent-bright active:scale-[0.98] active:duration-100"
           >
             프로젝트 문의
           </button>
@@ -127,7 +127,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={openChatWidget}
-                className="mt-1 flex min-h-11 items-center rounded-lg bg-accent px-3 text-left text-[15px] font-semibold text-white"
+                className="mt-1 flex min-h-11 items-center rounded-lg bg-accent px-3 text-left text-[15px] font-semibold text-on-accent"
               >
                 프로젝트 문의
               </button>

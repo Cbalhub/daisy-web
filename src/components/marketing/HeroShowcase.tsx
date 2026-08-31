@@ -8,9 +8,9 @@ import {
   WebhookFlow,
 } from "@/components/marketing/ProductMocks";
 
-// 히어로 쇼케이스 — 저희가 만들어 쓰는 도구들을 코드로 재현한 패널을 한 장씩 넘겨 봅니다.
-// 4.5초마다 천천히 넘어가고, 마우스를 올리거나 조작하면 멈춥니다.
-// (실제 고객 작업 스크린샷이 준비되면 SLIDES 를 그 이미지로 교체하면 됩니다.)
+// 히어로 쇼케이스 — 저희가 만들어 쓰는 도구들을 코드로 재현한 패널.
+// 데스크톱(lg+): 한 장씩 넘겨 보는 슬라이더, 4.5초 자동 넘김(hover 시 정지).
+// 모바일: 그냥 세로로 쌓아서 보여줍니다(슬라이더·자동넘김 없음).
 
 const SLIDES = [
   { label: "관리자 대시보드", node: <DashboardPanel /> },
@@ -41,17 +41,16 @@ export function HeroShowcase() {
 
   function onScroll() {
     const track = trackRef.current;
-    if (!track) return;
+    if (!track || track.clientWidth === 0) return;
     const idx = Math.round(track.scrollLeft / track.clientWidth);
     setI(Math.max(0, Math.min(SLIDES.length - 1, idx)));
   }
 
   useEffect(() => {
     if (held) return;
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => scrollTo(iRef.current + 1), INTERVAL_MS);
     return () => clearInterval(t);
   }, [held]);
@@ -64,7 +63,7 @@ export function HeroShowcase() {
       onFocusCapture={() => setHeld(true)}
       onBlurCapture={() => setHeld(false)}
     >
-      <div className="mb-3 flex items-center justify-between gap-4">
+      <div className="mb-3 hidden items-center justify-between gap-4 lg:flex">
         <p className="text-[13px] font-semibold text-ink">{SLIDES[i].label}</p>
         <div className="flex items-center gap-3">
           <span className="text-xs tabular-nums text-muted">
@@ -98,16 +97,16 @@ export function HeroShowcase() {
       <div
         ref={trackRef}
         onScroll={onScroll}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex flex-col gap-5 lg:snap-x lg:snap-mandatory lg:flex-row lg:gap-4 lg:overflow-x-auto lg:scroll-smooth lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
       >
         {SLIDES.map((s) => (
-          <div key={s.label} className="flex min-h-[24rem] w-full shrink-0 snap-start items-start">
-            <div className="w-full">{s.node}</div>
+          <div key={s.label} className="w-full shrink-0 lg:snap-start">
+            {s.node}
           </div>
         ))}
       </div>
 
-      <div className="mt-3 flex gap-1.5">
+      <div className="mt-3 hidden gap-1.5 lg:flex">
         {SLIDES.map((s, idx) => (
           <button
             key={s.label}

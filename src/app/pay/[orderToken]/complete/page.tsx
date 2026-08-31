@@ -45,7 +45,7 @@ export default async function CheckoutCompletePage({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/"
-          className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-5 text-sm font-semibold text-white transition-[background-color] hover:bg-accent/90"
+          className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-[10px] bg-accent px-5 text-sm font-semibold text-on-accent transition-[background-color] hover:bg-accent/90"
         >
           홈으로 돌아가기
         </Link>

@@ -20,8 +20,9 @@
   --color-accent-bright: #000000; /* hover 시 더 진하게 */
   --color-accent-deep: #000000; /* pressed */
   --color-accent-soft: #ededed; /* 선택된 행·틴트 칩 배경 (옅은 회색) */
-  --color-mark: #7a2e3e; /* 로고 전용 — MOVD 워드마크 O(꽉 채운 버건디 원). 사이트 유일한 색. UI엔 안 씀 */
-  --color-mark-2: #5b9fd0; /* 로고 전용 — O 안 애스터리스크(하늘색). UI엔 안 씀 */
+  --color-on-accent: #fafafa; /* accent 배경 위 글자색 (버튼 라벨 등) */
+  --color-mark: #7a2e3e; /* 로고 전용 — MOVD 워드마크 O 애스터리스크(버건디). 사이트 유일한 색. UI엔 안 씀 */
+  --color-mark-2: #5b9fd0; /* 로고 전용 — 예비(하늘색). 현재 미사용 */
 
   /* 로고 전용 — UI/섹션에는 안 씀 */
   --hue-1-ink: #bf4a2b;
@@ -80,6 +81,39 @@
   --color-admin-red-soft: #fbe9e7;
 }
 
+/* 다크 모드 — 무채색이라 뉴트럴만 뒤집습니다. 색은 여전히 로고 애스터리스크(버건디)뿐.
+   OS 설정을 따라가고, 마케팅 사이트에만 적용합니다(관리자 도구는 라이트 유지). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --color-ink: #ededed;
+    --color-ink-soft: #a1a1a1;
+    --color-paper: #121212;
+    --color-paper-dim: #1c1c1c;
+    --color-tint: #1c1c1c;
+    --color-line: #2e2e2e;
+    --color-muted: #757575;
+    --color-accent: #ededed;
+    --color-accent-bright: #ffffff;
+    --color-accent-deep: #ffffff;
+    --color-accent-soft: #262626;
+    --color-on-accent: #131313;
+    --color-mark: #cf7182; /* 버건디 — 어두운 바탕이라 밝게 */
+
+    --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.45);
+    --shadow-e2: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 28px -6px rgba(0, 0, 0, 0.6);
+    --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.55), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
+
+    --color-success: #6fce8f;
+    --color-success-soft: #1c2e22;
+    --color-warning: #d6a34a;
+    --color-warning-soft: #2e2717;
+    --color-error: #e2756a;
+    --color-error-soft: #331e1c;
+  }
+}
+
 @theme inline {
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
@@ -92,6 +126,7 @@
   --color-accent-bright: var(--color-accent-bright);
   --color-accent-deep: var(--color-accent-deep);
   --color-accent-soft: var(--color-accent-soft);
+  --color-on-accent: var(--color-on-accent);
   --color-mark: var(--color-mark);
   --color-mark-2: var(--color-mark-2);
   --color-hue-1-ink: var(--hue-1-ink);

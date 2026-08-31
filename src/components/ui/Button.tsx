@@ -16,7 +16,7 @@ const base =
   "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[transform,background-color,color,box-shadow,border-color,filter] duration-200 ease-out active:scale-[0.98] active:brightness-95 active:duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-30";
 
 const variants = {
-  primary: "bg-accent text-white shadow-[var(--shadow-e1)] hover:bg-accent-bright",
+  primary: "bg-accent text-on-accent shadow-[var(--shadow-e1)] hover:bg-accent-bright",
   secondary: "border border-line bg-paper text-ink hover:border-accent/30 hover:bg-paper-dim",
   ghost: "text-accent hover:opacity-70",
   danger: "bg-error text-white hover:bg-error/90",
