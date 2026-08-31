@@ -162,7 +162,7 @@ export default async function HomePage() {
                   </div>
                   <div
                     className={cn(
-                      "rounded-xl border border-line bg-paper-dim p-5 sm:p-9 md:order-2",
+                      "rounded-xl border border-line bg-paper p-5 shadow-[var(--shadow-e2)] sm:p-9 md:order-2",
                       i % 2 === 1 && "md:order-1"
                     )}
                   >
