@@ -11,6 +11,9 @@ export const CUSTOMER_TYPE_LABEL: Record<CustomerType, string> = {
 
 export type LedgerEntry = {
   id: string;
+  // "auto" = Payment/Refund 에서 자동 집계, "manual" = 관리자가 장부에 직접 입력
+  source: "auto" | "manual";
+  manualId: string | null; // manual 항목의 원본 id (삭제용). auto 면 null
   date: Date;
   type: "REVENUE" | "REFUND";
   title: string;
@@ -19,10 +22,11 @@ export type LedgerEntry = {
   // 사업자등록번호를 입력받은 주문이면 사업자, 안 받았으면 개인으로 분류합니다 —
   // 세금계산서(사업자용)/현금영수증(개인용) 중 뭘 준비해야 할지 장부에서 바로 구분되도록.
   customerType: CustomerType;
-  detail: string | null; // 주문 설명 (상세 기능)
+  detail: string | null; // 상세 기능
   businessRegNo: string | null;
   phone: string | null;
-  progressStage: ProjectStage;
+  memo: string | null; // 비고 (manual 만)
+  progressStage: ProjectStage | null; // manual 항목엔 없음
 };
 
 export type DailyTotal = { revenue: number; refund: number };
@@ -60,7 +64,7 @@ export async function getLedgerEntries(
     progressStage: true,
   } as const;
 
-  const [payments, refunds] = await Promise.all([
+  const [payments, refunds, manual] = await Promise.all([
     prisma.payment.findMany({
       where: { status: "PAID", approvedAt: { gte: start, lt: end } },
       include: { order: { select: orderSelect } },
@@ -71,6 +75,10 @@ export async function getLedgerEntries(
       include: { payment: { include: { order: { select: orderSelect } } } },
       orderBy: { cancelledAt: "asc" },
     }),
+    prisma.manualLedgerEntry.findMany({
+      where: { occurredAt: { gte: start, lt: end } },
+      orderBy: { occurredAt: "asc" },
+    }),
   ]);
 
   const typeOf = (businessRegNo: string | null): CustomerType =>
@@ -79,6 +87,8 @@ export async function getLedgerEntries(
   let entries: LedgerEntry[] = [
     ...payments.map((p) => ({
       id: `payment:${p.id}`,
+      source: "auto" as const,
+      manualId: null,
       date: p.approvedAt as Date,
       type: "REVENUE" as const,
       title: p.order.title,
@@ -88,10 +98,13 @@ export async function getLedgerEntries(
       detail: p.order.description,
       businessRegNo: p.order.businessRegNo,
       phone: p.order.customerPhone,
+      memo: null,
       progressStage: p.order.progressStage,
     })),
     ...refunds.map((r) => ({
       id: `refund:${r.id}`,
+      source: "auto" as const,
+      manualId: null,
       date: r.cancelledAt,
       type: "REFUND" as const,
       title: r.payment.order.title,
@@ -101,7 +114,24 @@ export async function getLedgerEntries(
       detail: r.payment.order.description,
       businessRegNo: r.payment.order.businessRegNo,
       phone: r.payment.order.customerPhone,
+      memo: null,
       progressStage: r.payment.order.progressStage,
+    })),
+    ...manual.map((e) => ({
+      id: `manual:${e.id}`,
+      source: "manual" as const,
+      manualId: e.id,
+      date: e.occurredAt,
+      type: e.kind === "REFUND" ? ("REFUND" as const) : ("REVENUE" as const),
+      title: e.title,
+      customerName: e.customerName,
+      amount: e.kind === "REFUND" ? -e.amount : e.amount,
+      customerType: typeOf(e.businessRegNo),
+      detail: e.detail,
+      businessRegNo: e.businessRegNo,
+      phone: e.phone,
+      memo: e.memo,
+      progressStage: null,
     })),
   ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
@@ -144,7 +174,7 @@ function csvField(value: string | number): string {
  * 엑셀에서 한글이 깨지지 않도록 UTF-8 BOM을 앞에 붙입니다.
  */
 export function buildLedgerCsv(entries: LedgerEntry[]): string {
-  const header = ["결제일", "구분", "외주 프로젝트명", "발주처/고객명", "유형", "사업자등록번호", "연락처", "금액(KRW)"].join(",");
+  const header = ["결제일", "구분", "외주 프로젝트명", "발주처/고객명", "유형", "사업자등록번호", "연락처", "비고", "금액(KRW)"].join(",");
   const rows = entries.map((e) =>
     [
       csvField(
@@ -159,6 +189,7 @@ export function buildLedgerCsv(entries: LedgerEntry[]): string {
       csvField(CUSTOMER_TYPE_LABEL[e.customerType]),
       csvField(e.businessRegNo ?? ""),
       csvField(e.phone ?? ""),
+      csvField(e.memo ?? ""),
       csvField(e.amount),
     ].join(",")
   );

@@ -6,6 +6,7 @@ import { DateRangeFilter } from "@/components/admin/ui/DateRangeFilter";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDownload } from "@/components/admin/icons";
 import { PROJECT_STAGE_LABEL } from "@/lib/admin/status";
+import { AddLedgerEntry, DeleteManualEntry } from "@/components/admin/ManualLedgerEntry";
 import {
   getMonthlyLedger,
   getLedgerEntries,
@@ -181,16 +182,18 @@ export default async function AdminLedgerPage({
       </RevealGroup>
 
       <div className="px-8 pt-5">
+        <AddLedgerEntry />
+
         {rows.length === 0 ? (
-          <AdminCard className="p-0">
+          <AdminCard className="mt-4 p-0">
             <AdminEmptyState
               icon={<IconCalendar className="h-6 w-6" />}
               title={isCustomRange ? "이 기간 거래 내역이 없습니다." : "이번 달 거래 내역이 없습니다."}
             />
           </AdminCard>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-admin-border bg-admin-surface">
-            <table className="w-full min-w-[74rem] border-collapse text-[13px] text-admin-text">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-admin-border bg-admin-surface">
+            <table className="w-full min-w-[80rem] border-collapse text-[13px] text-admin-text">
               <thead>
                 <tr className="border-b border-admin-border text-admin-muted">
                   <Th kind="date" label="결제일" />
@@ -204,18 +207,25 @@ export default async function AdminLedgerPage({
                   <Th kind="select" label="유형" />
                   <Th kind="text" label="사업자등록번호" />
                   <Th kind="text" label="연락처" />
+                  <Th kind="text" label="비고" />
+                  <th className="w-8" />
                 </tr>
               </thead>
               <tbody>
                 {rows.map((e) => {
-                  const stage = PROJECT_STAGE_LABEL[e.progressStage];
+                  const stage = e.progressStage ? PROJECT_STAGE_LABEL[e.progressStage] : null;
                   return (
                     <tr
                       key={e.id}
-                      className="border-b border-admin-border/60 transition-colors last:border-0 hover:bg-admin-content/50"
+                      className="group border-b border-admin-border/60 transition-colors last:border-0 hover:bg-admin-content/50"
                     >
                       <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
                         {DATE_FORMAT.format(e.date)}
+                        {e.source === "manual" && (
+                          <span className="ml-1.5 rounded bg-admin-bg-soft px-1 py-0.5 text-[10px] font-medium text-admin-muted">
+                            직접
+                          </span>
+                        )}
                       </td>
                       <td className="px-3 py-2 font-medium">{e.customerName}</td>
                       <td className="max-w-[16rem] truncate px-3 py-2">{e.title}</td>
@@ -239,7 +249,7 @@ export default async function AdminLedgerPage({
                         </Pill>
                       </td>
                       <td className="px-3 py-2">
-                        <Pill tone={stage.tone}>{stage.label}</Pill>
+                        {stage ? <Pill tone={stage.tone}>{stage.label}</Pill> : <span className="text-admin-muted">–</span>}
                       </td>
                       <td className="px-3 py-2">
                         <Pill tone={e.customerType === "BUSINESS" ? "blue" : "neutral"}>
@@ -251,6 +261,12 @@ export default async function AdminLedgerPage({
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
                         {e.phone || "–"}
+                      </td>
+                      <td className="max-w-[14rem] truncate px-3 py-2 text-admin-muted">
+                        {e.memo || "–"}
+                      </td>
+                      <td className="px-2 py-2 text-right">
+                        {e.source === "manual" && e.manualId && <DeleteManualEntry id={e.manualId} />}
                       </td>
                     </tr>
                   );

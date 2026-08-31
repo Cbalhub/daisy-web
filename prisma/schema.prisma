@@ -15,9 +15,10 @@ model AdminUser {
   name         String?
   createdAt    DateTime @default(now())
 
-  orders    Order[]    @relation("OrderCreatedBy")
-  refunds   Refund[]
-  auditLogs AuditLog[]
+  orders             Order[]             @relation("OrderCreatedBy")
+  refunds            Refund[]
+  auditLogs          AuditLog[]
+  manualLedgerEntries ManualLedgerEntry[] @relation("ManualLedgerCreatedBy")
 }
 
 // ---------- 고객 계정 ----------
@@ -283,6 +284,33 @@ model QuickReply {
   updatedAt DateTime @updatedAt
 
   @@index([order])
+}
+
+// ---------- 장부 수동 입력 ----------
+// 사이트 결제 흐름을 거치지 않고 받은 대금(계좌로 직접 입금, 오프라인 협의 건 등)을
+// 장부에 직접 적어 넣기 위한 항목입니다. 자동 집계되는 Payment/Refund 와 합쳐서 보여줍니다.
+enum LedgerKind {
+  REVENUE // 결제(수입)
+  REFUND // 환불
+}
+
+model ManualLedgerEntry {
+  id            String     @id @default(cuid())
+  occurredAt    DateTime // 실제로 돈이 오간 날
+  kind          LedgerKind @default(REVENUE)
+  title         String // 외주 프로젝트명
+  detail        String? // 상세 기능
+  customerName  String
+  amount        Int // KRW, 항상 양수 (부호는 kind 로 결정)
+  businessRegNo String?
+  phone         String?
+  memo          String? // 비고
+  createdById   String?
+  createdBy     AdminUser? @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([occurredAt])
 }
 
 model AuditLog {
