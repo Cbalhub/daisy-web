@@ -56,6 +56,14 @@ export default async function OrdersPage({
   const orders = await prisma.order.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    include: {
+      contracts: {
+        where: { status: { not: "VOID" } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { status: true },
+      },
+    },
   });
 
   return (
@@ -119,6 +127,12 @@ export default async function OrdersPage({
                       <p className="font-medium text-admin-text">
                         ₩{order.amount.toLocaleString("ko-KR")}
                       </p>
+                      {order.contracts[0]?.status === "SENT" && (
+                        <AdminBadge tone="amber">계약 서명 대기</AdminBadge>
+                      )}
+                      {order.contracts[0]?.status === "SIGNED" && (
+                        <AdminBadge tone="green">계약 완료</AdminBadge>
+                      )}
                       {order.status === "PAID" && (
                         <AdminBadge tone={PROJECT_STAGE_LABEL[order.progressStage].tone}>
                           {PROJECT_STAGE_LABEL[order.progressStage].label}

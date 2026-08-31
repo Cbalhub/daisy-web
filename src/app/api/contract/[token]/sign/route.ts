@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/csrf";
 import { signContractSchema } from "@/lib/validation/contract";
 import { hashContractFacts, type CompanySnapshot } from "@/lib/contract";
+import { sendSlackText } from "@/lib/slack";
+import { sendOwnerNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -100,6 +102,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
     }
     throw err;
   }
+
+  // 서명 완료를 대표님에게 바로 알립니다(Slack 푸시 + 이메일). 서버리스 환경에서
+  // 응답 후 백그라운드 작업이 중단될 수 있어, 알림 전송까지 기다린 뒤 응답합니다.
+  // 알림 각각의 실패는 무시합니다(서명은 이미 성공적으로 저장됨).
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const adminUrl = `${siteUrl}/admin/orders/${contract.orderId}`;
+  const amountText = `₩${contract.amount.toLocaleString("ko-KR")}`;
+  const orderTitle = order?.title ?? "프로젝트";
+  await Promise.allSettled([
+    sendSlackText(
+      `✍️ 계약서 서명 완료 — ${contract.clientName} 님\n${orderTitle} · ${amountText}`,
+      { url: adminUrl, urlLabel: "관리자에서 열기" }
+    ),
+    sendOwnerNotification({
+      subject: `[MOVD] 계약서 서명 완료 — ${orderTitle}`,
+      bodyText: `${contract.clientName} 님이 "${orderTitle}" 계약서에 서명했습니다.\n금액: ${amountText}\n관리자: ${adminUrl}`,
+    }),
+  ]);
 
   return NextResponse.json({ ok: true });
 }

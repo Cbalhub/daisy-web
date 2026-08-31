@@ -6,7 +6,13 @@ import { CopyLinkButton } from "@/components/admin/CopyLinkButton";
 import { RefundPanel } from "@/components/admin/RefundPanel";
 import { ConfirmPaymentButton } from "@/components/admin/ConfirmPaymentButton";
 import { CancelOrderButton } from "@/components/admin/CancelOrderButton";
-import { ContractPanel } from "@/components/admin/ContractPanel";
+import { ContractPanel, type ContractRow } from "@/components/admin/ContractPanel";
+import {
+  contractDisplayNumber,
+  hashContractFacts,
+  type CompanySnapshot,
+} from "@/lib/contract";
+import { formatSeoulDateTime } from "@/lib/utils";
 import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL, PROJECT_STAGE_LABEL } from "@/lib/admin/status";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +35,45 @@ export default async function OrderDetailPage({
 
   const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const payLink = `${siteUrl}/pay/${order.orderToken}`;
+
+  const contractRows: ContractRow[] = order.contracts.map((c) => {
+    let integrity: ContractRow["integrity"] = null;
+    if (c.status === "SIGNED" && c.contentHash && c.signedAt) {
+      const company = c.companySnapshot as CompanySnapshot;
+      const recomputed = hashContractFacts({
+        contractId: c.id,
+        orderInvoiceNumber: order.invoiceNumber,
+        clientName: c.clientName,
+        clientEmail: c.clientEmail,
+        companyName: company.name,
+        companyBizNo: company.bizNo,
+        amount: c.amount,
+        scope: c.scope,
+        warrantyMonths: c.warrantyMonths,
+        startDate: c.startDate?.toISOString() ?? "",
+        endDate: c.endDate?.toISOString() ?? "",
+        signedName: c.signedName ?? "",
+        signedAt: c.signedAt.toISOString(),
+        signatureDataUrl: c.signatureDataUrl ?? "",
+      });
+      integrity = recomputed === c.contentHash ? "verified" : "mismatch";
+    }
+    const meta =
+      c.status === "SIGNED" && c.signedAt
+        ? `${c.signedName ?? ""} 서명 · ${formatSeoulDateTime(c.signedAt)}`
+        : c.sentAt
+          ? `발송 · ${formatSeoulDateTime(c.sentAt)}`
+          : "미발송";
+    return {
+      id: c.id,
+      token: c.token,
+      status: c.status,
+      amount: c.amount,
+      number: contractDisplayNumber(c.id, c.createdAt),
+      meta,
+      integrity,
+    };
+  });
   const hasManualPaidPayment = order.payments.some(
     (p) => p.status === "PAID" && p.pgProvider === "manual"
   );
@@ -72,21 +117,9 @@ export default async function OrderDetailPage({
             <Row label="이메일" value={order.customerEmail} />
             {order.customerPhone && <Row label="연락처" value={order.customerPhone} />}
             {order.description && <Row label="설명" value={order.description} />}
-            <Row
-              label="생성일"
-              value={new Intl.DateTimeFormat("ko-KR", {
-                dateStyle: "medium",
-                timeStyle: "short",
-              }).format(order.createdAt)}
-            />
+            <Row label="생성일" value={formatSeoulDateTime(order.createdAt)} />
             {order.expiresAt && (
-              <Row
-                label="유효 기한"
-                value={new Intl.DateTimeFormat("ko-KR", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                }).format(order.expiresAt)}
-              />
+              <Row label="유효 기한" value={formatSeoulDateTime(order.expiresAt)} />
             )}
           </dl>
         </AdminCard>
@@ -117,15 +150,7 @@ export default async function OrderDetailPage({
             siteUrl={siteUrl}
             defaultAmount={order.amount}
             defaultClientBizNo={order.businessRegNo ?? ""}
-            contracts={order.contracts.map((c) => ({
-              id: c.id,
-              token: c.token,
-              status: c.status,
-              amount: c.amount,
-              sentAt: c.sentAt?.toISOString() ?? null,
-              signedAt: c.signedAt?.toISOString() ?? null,
-              signedName: c.signedName,
-            }))}
+            contracts={contractRows}
           />
         </AdminCard>
       </div>
@@ -148,12 +173,7 @@ export default async function OrderDetailPage({
                     <p className="mt-0.5 text-xs text-admin-muted">
                       ₩{payment.amount.toLocaleString("ko-KR")}
                       {payment.method ? ` · ${payment.method}` : ""}
-                      {payment.approvedAt
-                        ? ` · ${new Intl.DateTimeFormat("ko-KR", {
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          }).format(payment.approvedAt)}`
-                        : ""}
+                      {payment.approvedAt ? ` · ${formatSeoulDateTime(payment.approvedAt)}` : ""}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

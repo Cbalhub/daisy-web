@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
 import { AdminBadge } from "@/components/admin/ui/Badge";
@@ -14,9 +14,11 @@ export type ContractRow = {
   token: string;
   status: ContractStatus;
   amount: number;
-  sentAt: string | null;
-  signedAt: string | null;
-  signedName: string | null;
+  number: string;
+  // 서버에서 만든 표시 문자열 — "홍길동 서명 · 2026. 9. 1. 오후 8:11" 등.
+  // (클라이언트에서 Date 를 다시 포맷하면 서버/클라 결과가 어긋나 하이드레이션 오류)
+  meta: string;
+  integrity: "verified" | "mismatch" | "unavailable" | null;
 };
 
 const STATUS: Record<ContractStatus, { label: string; tone: "neutral" | "blue" | "green" | "amber" }> = {
@@ -29,7 +31,7 @@ const STATUS: Record<ContractStatus, { label: string; tone: "neutral" | "blue" |
 const inputCls =
   "w-full rounded-lg border border-admin-border bg-admin-content px-3 py-2 text-sm outline-none focus:border-admin-blue";
 
-const DATETIME = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short" });
+const POLL_MS = 10_000;
 
 export function ContractPanel({
   orderId,
@@ -55,6 +57,16 @@ export function ContractPanel({
   const signed = contracts.find((c) => c.status === "SIGNED") ?? null;
   const active = contracts.find((c) => c.status === "SENT") ?? null;
   const linkFor = (token: string) => `${siteUrl}/contract/${token}`;
+
+  // 서명 대기 중인 계약서가 있으면, 고객이 다른 기기에서 서명했을 때 이 화면이
+  // 저절로 갱신되도록 주기적으로 서버 컴포넌트를 다시 조회합니다. 서명되면
+  // active 가 사라져 폴링도 멈춥니다. (Slack/이메일로도 별도 알림이 갑니다.)
+  const waitingToken = active && !signed ? active.token : null;
+  useEffect(() => {
+    if (!waitingToken) return;
+    const timer = setInterval(() => router.refresh(), POLL_MS);
+    return () => clearInterval(timer);
+  }, [waitingToken, router]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -127,19 +139,20 @@ export function ContractPanel({
               className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-admin-border bg-admin-content px-4 py-3"
             >
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <AdminBadge tone={STATUS[c.status].tone}>{STATUS[c.status].label}</AdminBadge>
                   <span className="text-sm font-medium text-admin-text tabular-nums">
                     ₩{c.amount.toLocaleString("ko-KR")}
                   </span>
+                  <span className="text-xs text-admin-muted tabular-nums">{c.number}</span>
+                  {c.integrity === "verified" && (
+                    <span className="text-xs font-medium text-admin-green">무결성 ✓</span>
+                  )}
+                  {c.integrity === "mismatch" && (
+                    <span className="text-xs font-medium text-admin-red">무결성 ⚠ 불일치</span>
+                  )}
                 </div>
-                <p className="mt-1 text-xs text-admin-muted">
-                  {c.status === "SIGNED" && c.signedAt
-                    ? `${c.signedName ?? ""} 서명 · ${DATETIME.format(new Date(c.signedAt))}`
-                    : c.sentAt
-                      ? `발송 · ${DATETIME.format(new Date(c.sentAt))}`
-                      : "미발송"}
-                </p>
+                <p className="mt-1 text-xs text-admin-muted">{c.meta}</p>
               </div>
               <div className="flex items-center gap-2">
                 <a
