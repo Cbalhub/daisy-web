@@ -20,7 +20,7 @@
   --color-accent-bright: #4a6d43; /* hover 시 살짝 밝게 */
   --color-accent-deep: #26331f; /* 매니페스토·강한 대비·버튼 pressed */
   --color-accent-soft: #e7ece2; /* 세이지 틴트 칩·선택된 행 배경 */
-  --color-tomato: #d4663c; /* 로고 전용 — MOVD 워드마크 O 안 애스터리스크. UI/섹션에는 안 씀 */
+  --color-mark: #5b9fd0; /* 로고 전용 — MOVD 워드마크 O 안 애스터리스크(하늘색). UI/섹션에는 안 씀 */
 
   /* 로고 전용 — UI/섹션에는 안 씀 */
   --hue-1-ink: #bf4a2b;
@@ -93,7 +93,7 @@
   --color-accent-bright: var(--color-accent-bright);
   --color-accent-deep: var(--color-accent-deep);
   --color-accent-soft: var(--color-accent-soft);
-  --color-tomato: var(--color-tomato);
+  --color-mark: var(--color-mark);
   --color-hue-1-ink: var(--hue-1-ink);
   --color-hue-1-soft: var(--hue-1-soft);
   --color-hue-2-ink: var(--hue-2-ink);
