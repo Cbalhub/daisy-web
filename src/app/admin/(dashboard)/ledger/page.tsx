@@ -5,11 +5,11 @@ import { Segmented } from "@/components/admin/ui/Segmented";
 import { DateRangeFilter } from "@/components/admin/ui/DateRangeFilter";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDownload } from "@/components/admin/icons";
+import { PROJECT_STAGE_LABEL } from "@/lib/admin/status";
 import {
   getMonthlyLedger,
   getLedgerEntries,
   CUSTOMER_TYPE_LABEL,
-  type LedgerEntry,
   type CustomerType,
 } from "@/lib/admin/ledger";
 
@@ -19,27 +19,54 @@ function amountText(n: number) {
   return `${n < 0 ? "-" : ""}₩${Math.abs(n).toLocaleString("ko-KR")}`;
 }
 
-// 같은 날짜(day)끼리 묶어서 최신 날짜가 위로 오게 정렬합니다 — 은행 앱 가계부처럼
-// 날짜 헤더 아래에 그날의 거래를 나열하는 방식이 달력 그리드보다 한눈에 잘 들어옵니다.
-function groupByDay(entries: LedgerEntry[]) {
-  const groups = new Map<string, LedgerEntry[]>();
-  for (const entry of entries) {
-    const key = entry.date.toDateString();
-    const list = groups.get(key) ?? [];
-    list.push(entry);
-    groups.set(key, list);
-  }
-  return [...groups.entries()]
-    .map(([key, list]) => ({ date: new Date(key), entries: list }))
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
+const DATE_FORMAT = new Intl.DateTimeFormat("ko-KR", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
+
+// 노션 데이터베이스 태그 색 (라이트) — 관리자는 라이트 고정이라 그대로 씁니다.
+type Tone = "neutral" | "blue" | "green" | "amber" | "red";
+const NOTION_PILL: Record<Tone, string> = {
+  neutral: "bg-[#e9e9e7] text-[#4b4a45]",
+  blue: "bg-[#d3e5ef] text-[#1c3d52]",
+  green: "bg-[#dbeddb] text-[#22432f]",
+  amber: "bg-[#fadec9] text-[#5a3417]",
+  red: "bg-[#ffe2dd] text-[#5d1715]",
+};
+
+function Pill({ tone, children }: { tone: Tone; children: React.ReactNode }) {
+  return (
+    <span
+      className={`inline-flex max-w-full items-center truncate rounded px-1.5 py-0.5 text-[11px] font-medium ${NOTION_PILL[tone]}`}
+    >
+      {children}
+    </span>
+  );
 }
 
-const DAY_HEADER_FORMAT = new Intl.DateTimeFormat("ko-KR", {
-  month: "long",
-  day: "numeric",
-  weekday: "short",
-});
-const TIME_FORMAT = new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit" });
+// 노션 헤더의 속성 타입 아이콘 흉내
+function Th({
+  kind,
+  label,
+  right,
+}: {
+  kind: "text" | "num" | "date" | "select";
+  label: string;
+  right?: boolean;
+}) {
+  const glyph = { text: "Aa", num: "#", date: "☷", select: "⌄" }[kind];
+  return (
+    <th className={`whitespace-nowrap px-3 py-2 font-medium ${right ? "text-right" : "text-left"}`}>
+      <span className="inline-flex items-center gap-1.5">
+        <span className="text-[10px] text-admin-muted/60">{glyph}</span>
+        {label}
+      </span>
+    </th>
+  );
+}
 
 export default async function AdminLedgerPage({
   searchParams,
@@ -53,18 +80,16 @@ export default async function AdminLedgerPage({
   const customerType: CustomerType | undefined =
     type === "INDIVIDUAL" || type === "BUSINESS" ? type : undefined;
 
-  // from/to가 둘 다 있으면 그 기간을 그대로 쓰고, 없으면 기존처럼 달력 월 단위로 봅니다.
   const isCustomRange = Boolean(from && to);
   const rangeStart = from ? new Date(`${from}T00:00:00`) : undefined;
   const rangeEnd = to ? new Date(`${to}T00:00:00`) : undefined;
-  if (rangeEnd) rangeEnd.setDate(rangeEnd.getDate() + 1); // "to" 날짜 하루 끝까지 포함
+  if (rangeEnd) rangeEnd.setDate(rangeEnd.getDate() + 1);
 
   const { entries, totalRevenue, totalRefund, netRevenue } =
     isCustomRange && rangeStart && rangeEnd
       ? await getLedgerEntries(rangeStart, rangeEnd, customerType)
       : await getMonthlyLedger(year, month, customerType);
-  const days = groupByDay(entries);
-  const today = new Date();
+  const rows = [...entries].reverse(); // 최신 결제가 위로
 
   const prev = month === 1 ? { y: year - 1, m: 12 } : { y: year, m: month - 1 };
   const next = month === 12 ? { y: year + 1, m: 1 } : { y: year, m: month + 1 };
@@ -78,7 +103,7 @@ export default async function AdminLedgerPage({
 
   return (
     <div className="pb-16">
-      <AdminPageHeader title="장부" description="매출·환불 내역을 날짜별로 확인합니다." />
+      <AdminPageHeader title="장부" description="결제·환불 내역. 노션 결제 내역 DB와 같은 구성입니다." />
 
       <div className="flex flex-wrap items-center justify-between gap-3 px-8 pt-6">
         <div className="flex items-center gap-3">
@@ -134,7 +159,7 @@ export default async function AdminLedgerPage({
             <p className="text-xs font-medium text-admin-muted">
               {isCustomRange ? "기간 내 매출" : "이번 달 매출"}
             </p>
-            <p className="mt-1.5 text-xl font-semibold text-admin-blue">{amountText(totalRevenue)}</p>
+            <p className="mt-1.5 text-xl font-semibold text-admin-text">{amountText(totalRevenue)}</p>
           </AdminCard>
         </RevealItem>
         <RevealItem>
@@ -156,7 +181,7 @@ export default async function AdminLedgerPage({
       </RevealGroup>
 
       <div className="px-8 pt-5">
-        {days.length === 0 ? (
+        {rows.length === 0 ? (
           <AdminCard className="p-0">
             <AdminEmptyState
               icon={<IconCalendar className="h-6 w-6" />}
@@ -165,97 +190,72 @@ export default async function AdminLedgerPage({
           </AdminCard>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-admin-border bg-admin-surface">
-            <table className="w-full min-w-[52rem] border-collapse text-sm">
+            <table className="w-full min-w-[74rem] border-collapse text-[13px] text-admin-text">
               <thead>
-                <tr className="border-b border-admin-border text-left text-[11px] font-medium uppercase tracking-wider text-admin-muted">
-                  <th className="w-20 px-4 py-2.5 font-medium">시각</th>
-                  <th className="px-4 py-2.5 font-medium">내용</th>
-                  <th className="px-4 py-2.5 font-medium">고객</th>
-                  <th className="w-24 px-4 py-2.5 font-medium">유형</th>
-                  <th className="w-20 px-4 py-2.5 font-medium">구분</th>
-                  <th className="w-40 px-4 py-2.5 text-right font-medium">금액</th>
+                <tr className="border-b border-admin-border text-admin-muted">
+                  <Th kind="date" label="결제일" />
+                  <Th kind="text" label="발주처 / 고객명" />
+                  <Th kind="text" label="외주 프로젝트명" />
+                  <Th kind="text" label="상세 기능" />
+                  <Th kind="num" label="금액(KRW)" right />
+                  <Th kind="select" label="결제 방식" />
+                  <Th kind="select" label="구분" />
+                  <Th kind="select" label="진행 상태" />
+                  <Th kind="select" label="유형" />
+                  <Th kind="text" label="사업자등록번호" />
+                  <Th kind="text" label="연락처" />
                 </tr>
               </thead>
-              {days.map((group) => {
-                const dayRevenue = group.entries
-                  .filter((e) => e.type === "REVENUE")
-                  .reduce((sum, e) => sum + e.amount, 0);
-                const dayRefund = group.entries
-                  .filter((e) => e.type === "REFUND")
-                  .reduce((sum, e) => sum + Math.abs(e.amount), 0);
-                const isToday = group.date.toDateString() === today.toDateString();
-
-                return (
-                  <tbody key={group.date.toDateString()} className="border-b border-admin-border last:border-0">
-                    <tr className="bg-admin-content/70">
-                      <td colSpan={5} className="px-4 py-2 text-xs font-semibold text-admin-muted">
-                        {DAY_HEADER_FORMAT.format(group.date)}
-                        {isToday && (
-                          <span className="ml-1.5 rounded bg-admin-blue px-1.5 py-0.5 text-[10px] font-semibold text-admin-bg">
-                            오늘
-                          </span>
-                        )}
-                        <span className="ml-2 font-normal text-admin-muted/70">
-                          {group.entries.length}건
-                        </span>
+              <tbody>
+                {rows.map((e) => {
+                  const stage = PROJECT_STAGE_LABEL[e.progressStage];
+                  return (
+                    <tr
+                      key={e.id}
+                      className="border-b border-admin-border/60 transition-colors last:border-0 hover:bg-admin-content/50"
+                    >
+                      <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
+                        {DATE_FORMAT.format(e.date)}
                       </td>
-                      <td className="px-4 py-2 text-right text-xs font-semibold tabular-nums">
-                        {dayRevenue > 0 && <span className="text-admin-text">+{amountText(dayRevenue)}</span>}
-                        {dayRefund > 0 && <span className="ml-2 text-admin-red">-{amountText(dayRefund)}</span>}
+                      <td className="px-3 py-2 font-medium">{e.customerName}</td>
+                      <td className="max-w-[16rem] truncate px-3 py-2">{e.title}</td>
+                      <td className="max-w-[18rem] truncate px-3 py-2 text-admin-muted">
+                        {e.detail || "–"}
+                      </td>
+                      <td
+                        className={`whitespace-nowrap px-3 py-2 text-right font-semibold tabular-nums ${
+                          e.type === "REVENUE" ? "" : "text-admin-red"
+                        }`}
+                      >
+                        {e.type === "REVENUE" ? "" : "-"}
+                        {amountText(Math.abs(e.amount))}
+                      </td>
+                      <td className="px-3 py-2">
+                        <Pill tone="green">계좌이체</Pill>
+                      </td>
+                      <td className="px-3 py-2">
+                        <Pill tone={e.type === "REVENUE" ? "neutral" : "red"}>
+                          {e.type === "REVENUE" ? "결제" : "환불"}
+                        </Pill>
+                      </td>
+                      <td className="px-3 py-2">
+                        <Pill tone={stage.tone}>{stage.label}</Pill>
+                      </td>
+                      <td className="px-3 py-2">
+                        <Pill tone={e.customerType === "BUSINESS" ? "blue" : "neutral"}>
+                          {CUSTOMER_TYPE_LABEL[e.customerType]}
+                        </Pill>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
+                        {e.businessRegNo || "–"}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2 text-admin-muted tabular-nums">
+                        {e.phone || "–"}
                       </td>
                     </tr>
-                    {[...group.entries].reverse().map((entry) => (
-                      <tr
-                        key={entry.id}
-                        className="border-t border-admin-border/50 transition-colors hover:bg-admin-content/50"
-                      >
-                        <td className="whitespace-nowrap px-4 py-2.5 text-xs text-admin-muted tabular-nums">
-                          {TIME_FORMAT.format(entry.date)}
-                        </td>
-                        <td className="max-w-0 truncate px-4 py-2.5 font-medium text-admin-text">
-                          {entry.title}
-                        </td>
-                        <td className="max-w-0 truncate px-4 py-2.5 text-admin-muted">
-                          {entry.customerName}
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span
-                            className={
-                              "inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium " +
-                              (entry.customerType === "BUSINESS"
-                                ? "bg-admin-blue-soft text-admin-blue"
-                                : "bg-admin-bg-soft text-admin-muted")
-                            }
-                          >
-                            {CUSTOMER_TYPE_LABEL[entry.customerType]}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span
-                            className={
-                              "inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium " +
-                              (entry.type === "REVENUE"
-                                ? "bg-admin-bg-soft text-admin-text"
-                                : "bg-admin-red-soft text-admin-red")
-                            }
-                          >
-                            {entry.type === "REVENUE" ? "수입" : "환불"}
-                          </span>
-                        </td>
-                        <td
-                          className={
-                            "px-4 py-2.5 text-right font-semibold tabular-nums " +
-                            (entry.type === "REVENUE" ? "text-admin-text" : "text-admin-red")
-                          }
-                        >
-                          {entry.type === "REVENUE" ? "+" : ""}
-                          {amountText(entry.amount)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                );
-              })}
+                  );
+                })}
+              </tbody>
             </table>
           </div>
         )}
