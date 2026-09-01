@@ -1,34 +1,34 @@
 import Image from "next/image";
+import { Mark } from "@/components/brand/Mark";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { cn } from "@/lib/utils";
 
 type EventStyle = "dark" | "light" | "festive";
 
-// 사이트가 무채색이라 이벤트 팝업도 무채색으로 — light(기본, 흰 카드) / dark(검정 카드).
-// 예전 festive(주황 그라데이션)는 dark 로 접습니다.
-const STYLE_MAP: Record<
-  EventStyle,
-  { card: string; title: string; desc: string; pill: string; btn: string }
-> = {
-  light: {
-    card: "bg-paper border-line",
-    title: "text-ink",
-    desc: "text-muted",
-    pill: "bg-paper-dim text-ink-soft",
-    btn: "",
-  },
-  festive: {
-    card: "bg-paper border-line",
-    title: "text-ink",
-    desc: "text-muted",
-    pill: "bg-paper-dim text-ink-soft",
-    btn: "",
-  },
+// 사이트가 무채색이라 이벤트 팝업도 무채색 + 로고 버건디 한 점.
+// light(흰 카드) / dark(검정 카드). 예전 festive(주황 그라데이션)는 light 로 접습니다.
+type Tone = { card: string; chip: string; title: string; desc: string; rule: string; mark: "brand" | "mono"; btn: string };
+
+const LIGHT: Tone = {
+  card: "bg-paper border-line",
+  chip: "border-mark/35 text-mark",
+  title: "text-ink",
+  desc: "text-muted",
+  rule: "bg-mark",
+  mark: "brand",
+  btn: "",
+};
+
+const TONE: Record<EventStyle, Tone> = {
+  light: LIGHT,
+  festive: LIGHT,
   dark: {
     card: "bg-ink border-ink",
+    chip: "border-paper/25 text-paper/90",
     title: "text-paper",
     desc: "text-paper/65",
-    pill: "bg-paper/15 text-paper",
+    rule: "bg-paper/40",
+    mark: "mono",
     btn: "!bg-paper !text-ink hover:!bg-paper/90",
   },
 };
@@ -65,34 +65,45 @@ export function EventBannerCard({
     );
   }
 
-  const tone = STYLE_MAP[style] ?? STYLE_MAP.light;
+  const t = TONE[style] ?? TONE.light;
 
   return (
-    <div className={cn("overflow-hidden rounded-2xl border p-7 shadow-[var(--shadow-e2)]", tone.card)}>
-      {badge && (
-        <span className={cn("inline-block rounded-full px-2.5 py-1 text-xs font-semibold", tone.pill)}>
-          {badge}
-        </span>
-      )}
+    <div className={cn("overflow-hidden rounded-2xl border p-8 shadow-[var(--shadow-e2)]", t.card)}>
+      <div className="flex items-center gap-2.5">
+        <Mark variant={t.mark} rough={false} className={cn("h-5 w-5", t.mark === "mono" && "text-paper")} />
+        {badge && (
+          <span
+            className={cn(
+              "rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-wide",
+              t.chip
+            )}
+          >
+            {badge}
+          </span>
+        )}
+      </div>
+
       {title && (
         <h2
           className={cn(
-            "font-display text-[1.35rem] leading-tight font-extrabold tracking-tight text-balance",
-            badge ? "mt-3.5" : "",
-            tone.title
+            "mt-5 font-display text-[1.65rem] leading-[1.18] font-extrabold tracking-tight text-balance",
+            t.title
           )}
         >
           {title}
         </h2>
       )}
+
       {description && (
-        <p className={cn("mt-2.5 text-sm leading-relaxed", tone.desc)}>{description}</p>
+        <>
+          <span className={cn("mt-4 block h-0.5 w-8 rounded-full", t.rule)} />
+          <p className={cn("mt-3.5 text-[13.5px] leading-relaxed", t.desc)}>{description}</p>
+        </>
       )}
-      <div className="mt-6">
-        <OpenChatButton size="md" className={cn("w-full", tone.btn)}>
-          지금 문의하기
-        </OpenChatButton>
-      </div>
+
+      <OpenChatButton size="md" className={cn("mt-7 w-full", t.btn)}>
+        지금 문의하기
+      </OpenChatButton>
     </div>
   );
 }
