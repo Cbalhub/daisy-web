@@ -130,7 +130,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
       body: JSON.stringify({ enabled: !event.enabled }),
     });
     if (!res.ok) {
-      toast("변경에 실패했습니다.", "error");
+      toast("변경에 실패했어요.", "error");
       return;
     }
     router.refresh();
@@ -142,7 +142,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
     const res = await fetch(`/api/admin/events/${deleteTarget.id}`, { method: "DELETE" });
     setDeleting(false);
     if (!res.ok) {
-      toast("삭제에 실패했습니다.", "error");
+      toast("삭제에 실패했어요.", "error");
       return;
     }
     toast("삭제했어요", "success");

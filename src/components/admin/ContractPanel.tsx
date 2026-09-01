@@ -93,7 +93,7 @@ export function ContractPanel({
     const body = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const message = body?.error ?? "계약서 발송에 실패했습니다.";
+      const message = body?.error ?? "계약서 발송에 실패했어요.";
       setError(message);
       toast(message, "error");
       setLoading(false);
@@ -177,13 +177,13 @@ export function ContractPanel({
         >
           <p className="text-sm font-semibold text-admin-text">계약 조건</p>
           <p className="mt-0.5 text-xs text-admin-muted">
-            발주처 · 연락처는 주문 정보(고객: 자동)를 씁니다. 아래 조건으로 계약서를 만들어 고객
-            이메일로 서명 링크를 보냅니다.
+            고객명·연락처·금액은 이 주문에서 자동으로 채워집니다. 아래 조건만 입력하면 계약서를 만들어
+            고객 이메일로 서명 링크를 보냅니다.
           </p>
 
           <div className="mt-4 space-y-3">
             <label className="block text-xs font-medium text-admin-muted">
-              용역 범위 <span className="font-normal">(한 줄에 하나씩 — 그대로 제2조에 항목으로 들어갑니다)</span>
+              용역 범위 <span className="font-normal">(한 줄에 하나씩. 그대로 제2조 항목이 됩니다)</span>
               <textarea
                 name="scope"
                 required

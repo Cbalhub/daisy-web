@@ -56,7 +56,7 @@ export default async function AccountDashboardPage() {
       <Container>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-2xl font-bold tracking-tight md:text-[2rem]">
+            <h1 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
               {customer.name ? `${customer.name} 님` : "내 프로젝트"}
             </h1>
             <p className="mt-1 text-sm text-muted">{customer.email}</p>
@@ -68,7 +68,7 @@ export default async function AccountDashboardPage() {
           {stats.map((stat) => (
             <div key={stat.label}>
               <dt className="text-xs text-muted">{stat.label}</dt>
-              <dd className="mt-1 font-display text-xl font-bold tracking-tight tabular-nums">
+              <dd className="mt-1 font-display text-xl font-extrabold tracking-tight tabular-nums">
                 {stat.value}
               </dd>
             </div>

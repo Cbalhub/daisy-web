@@ -30,7 +30,7 @@ export function SignupForm() {
       return;
     }
     if (String(data.password ?? "").length < 8) {
-      toast("비밀번호는 8자 이상이어야 합니다.", "error");
+      toast("비밀번호는 8자 이상으로 정해 주세요.", "error");
       return;
     }
     if (!data.privacyConsent) {
@@ -49,7 +49,7 @@ export function SignupForm() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error ?? "가입에 실패했습니다.");
+        throw new Error(body?.error ?? "가입에 실패했어요.");
       }
 
       toast("가입이 완료됐어요", "success");
