@@ -33,7 +33,7 @@ function TelegramShell({ name, children }: { name: string; children: React.React
           </p>
         </div>
       </div>
-      <div className="flex-1 space-y-2 overflow-hidden px-3 py-3.5 [min-height:200px]">{children}</div>
+      <div className="flex-1 space-y-2 overflow-hidden px-3 py-3.5 [min-height:236px]">{children}</div>
     </div>
   );
 }
@@ -111,7 +111,7 @@ function DiscordShell({ channel, children }: { channel: string; children: React.
           {channel}
         </span>
       </div>
-      <div className="flex-1 space-y-3.5 overflow-hidden px-3.5 py-3.5 [min-height:210px]">{children}</div>
+      <div className="flex-1 space-y-3.5 overflow-hidden px-3.5 py-3.5 [min-height:244px]">{children}</div>
     </div>
   );
 }
@@ -233,7 +233,7 @@ function ProgramShell({
         <span className="h-2 w-2 rounded-full bg-line" />
         <p className="ml-1.5 truncate text-[11px] font-medium text-ink-soft">{title}</p>
       </div>
-      <div className="flex flex-1 overflow-hidden [min-height:210px]">
+      <div className="flex flex-1 overflow-hidden [min-height:244px]">
         <div className="hidden w-[72px] shrink-0 space-y-1 border-r border-line p-2 sm:block">
           {(["작업", "스케줄", "로그", "데이터"] as const).map((s) => (
             <p
@@ -346,16 +346,21 @@ const TELEGRAM: Record<string, { name: string; buttons: string[]; a: Row[]; b: R
     buttons: ["💰 잔액", "📥 입금내역", "📊 시세", "⚙️ 알림설정"],
     a: [
       { from: "in", text: "잔액" },
-      { from: "out", text: "4,208.55 USDT\n오늘 입금 +620 · 출금 −75" },
+      { from: "out", text: "💰 4,208.55 USDT\n오늘 입금 +620.00 · 출금 −75.40" },
+      { from: "in", text: "최근 입금 3건 보여줘" },
+      { from: "out", text: "09:41  +120.00  Tx a3f9…\n02:15  +500.00  Tx 7c2b…\n어제  +75.00  Tx e10d…" },
     ],
     b: [
-      { from: "in", text: "입금 오면 알려줘" },
-      { from: "out", text: "🔔 입금 감지\n+120.00 USDT · TRC20" },
-      { from: "out", text: "⚠️ 가짜 USDT 컨트랙트 차단됨" },
+      { from: "in", text: "입금 오면 바로 알려줘" },
+      { from: "out", text: "🔔 알림 켬 — TRC20 지갑 감시 중" },
+      { from: "out", text: "🔔 입금 감지\n+120.00 USDT · 홍길동 지갑" },
+      { from: "out", text: "⚠️ 가짜 USDT 컨트랙트 1건 차단됨" },
     ],
     c: [
       { from: "in", text: "/시세" },
-      { from: "out", text: "USDT/KRW 1,384원\nBTC 96,240,000원 (+1.2%)" },
+      { from: "out", text: "USDT/KRW  1,384원\nBTC  96,240,000원  ▲ 1.2%\nETH  5,180,000원  ▼ 0.4%" },
+      { from: "in", text: "10만원어치면 몇 개야?" },
+      { from: "out", text: "약 72.25 USDT (수수료 제외)" },
     ],
   },
   "telegram-rpg-bot": {
@@ -363,16 +368,20 @@ const TELEGRAM: Record<string, { name: string; buttons: string[]; a: Row[]; b: R
     buttons: ["⚔️ 전투", "🛒 상점", "🏆 랭킹", "🎒 인벤토리"],
     a: [
       { from: "in", text: "/전투" },
-      { from: "out", text: "⚔️ 필드보스 등장 — 참여 18명\n당신의 피해량 3,240 (2위)" },
-      { from: "out", text: "🎁 드랍: 희귀 장비 +1 · EXP +450" },
+      { from: "out", text: "⚔️ 필드보스 '이그니스' 등장 — 참여 18명" },
+      { from: "out", text: "당신의 피해량 3,240 (2위)\n🎁 드랍: 희귀 장비 +1 · EXP +450" },
+      { from: "in", text: "장비 착용" },
+      { from: "out", text: "✅ '용의 롱소드' 장착 — 공격력 +38" },
     ],
     b: [
       { from: "in", text: "/강화 롱소드" },
-      { from: "out", text: "+6 → +7 강화 성공! (성공률 42%)" },
+      { from: "out", text: "현재 +6 → 다음 +7 (성공률 42%)\n필요: 강화석 3개 · 골드 1,200" },
+      { from: "in", text: "ㄱㄱ" },
+      { from: "out", text: "✨ 강화 성공! +7 롱소드\n공격력 +38 → +47" },
     ],
     c: [
       { from: "in", text: "/랭킹" },
-      { from: "out", text: "1. 홍길동  Lv.51\n2. 김철수  Lv.48\n3. 나  Lv.24" },
+      { from: "out", text: "🏆 이번 주 랭킹\n1. 홍길동  Lv.51\n2. 김철수  Lv.48\n3. 나  Lv.24  (▲ 2)" },
     ],
   },
   "telegram-collection-bot": {
@@ -380,31 +389,42 @@ const TELEGRAM: Record<string, { name: string; buttons: string[]; a: Row[]; b: R
     buttons: ["🎣 낚시", "📖 도감", "🏪 상점", "🥇 랭킹"],
     a: [
       { from: "in", text: "/낚시" },
-      { from: "out", text: "🎣 참돔 (희귀) 낚음!\n무게 3.4kg · 도감 42/120" },
+      { from: "out", text: "🎣 던졌습니다… 입질이 옵니다!" },
+      { from: "out", text: "참돔 (희귀) 낚음!\n무게 3.4kg · 도감 42/120 · +80P" },
+      { from: "in", text: "한 번 더" },
+      { from: "out", text: "붕어 (일반) · 0.6kg — 방생했습니다" },
     ],
     b: [
       { from: "in", text: "/도감 참돔" },
-      { from: "out", text: "참돔 ★★★★☆\n최대 기록 5.1kg · 3회 포획" },
+      { from: "out", text: "참돔  ★★★★☆\n최대 기록 5.1kg · 3회 포획\n서식지: 남해 · 미끼: 새우" },
+      { from: "in", text: "도감 몇 %?" },
+      { from: "out", text: "전체 완성도 35% (42/120)" },
     ],
     c: [
       { from: "in", text: "/랭킹" },
-      { from: "out", text: "이번 주 1위\n누적 무게 812kg · 도감 완성 35%" },
+      { from: "out", text: "🥇 이번 주 낚시왕\n1. 나  누적 812kg\n2. 이영희  누적 690kg\n3. 박민수  누적 604kg" },
     ],
   },
   telegram: {
     name: "게임봇",
     buttons: ["🎮 게임", "💎 포인트", "🏆 랭킹", "❓ 도움말"],
     a: [
-      { from: "in", text: "가위바위보" },
-      { from: "out", text: "✌️ 냈어요 — 당신 승리! +10P" },
+      { from: "in", text: "가위바위보 바위" },
+      { from: "out", text: "✌️ 저는 가위! 당신 승리 — +10P" },
+      { from: "in", text: "한판 더, 보" },
+      { from: "out", text: "✊ 저는 바위! 아쉽네요 — +2P (참가상)" },
     ],
     b: [
       { from: "in", text: "/퀴즈" },
-      { from: "out", text: "Q. 대한민국 수도는?\n① 서울  ② 부산  ③ 인천" },
+      { from: "out", text: "Q. 대한민국의 수도는?\n① 서울  ② 부산  ③ 인천" },
+      { from: "in", text: "1" },
+      { from: "out", text: "⭕ 정답! +15P · 연속 정답 3회 🔥" },
     ],
     c: [
       { from: "in", text: "/포인트" },
-      { from: "out", text: "보유 340P · 이번 주 5위\n연속 출석 7일 🔥" },
+      { from: "out", text: "💎 보유 340P · 이번 주 5위\n연속 출석 7일 · 다음 보상까지 60P" },
+      { from: "in", text: "출석" },
+      { from: "out", text: "📅 오늘 출석 완료 — +20P" },
     ],
   },
 };
@@ -428,20 +448,25 @@ const DISCORD: Record<
     ],
     a: [
       { author: "손님", text: "환불 언제 되나요?" },
-      { author: "MOVD 봇", bot: true, text: "주문번호 알려주시면 확인해 드릴게요. 카드 결제는 3~5영업일 걸립니다." },
+      { author: "MOVD 봇", bot: true, text: "주문번호 알려주시면 바로 확인해 드릴게요. 카드 결제는 3~5영업일 걸립니다." },
+      { author: "손님", text: "주문번호 #2841 이에요" },
+      { author: "MOVD 봇", bot: true, text: "확인했습니다. 어제 오후 환불 접수됐고 3/12까지 카드사 반영 예정이에요." },
     ],
     b: [
       { author: "유저", text: "봇 만드는 데 얼마나 걸려요?" },
       { author: "MOVD 봇", bot: true, text: "간단한 건 3일, 게임 봇은 1~2주 정도예요. 원하시는 기능 알려주시면 견적 드릴게요." },
+      { author: "유저", text: "포인트 상점이랑 미니게임 3개요" },
+      { author: "MOVD 봇", bot: true, text: "그 정도면 약 1주, 30만원대예요. 담당자 연결해 드릴까요?" },
     ],
     c: [
-      { author: "유저", text: "/요약" },
+      { author: "유저", text: "/요약 오늘" },
       {
         author: "MOVD 봇",
         bot: true,
-        text: "최근 20개 메시지 요약",
+        text: "오늘 대화 42개 요약",
         embed: { title: "핵심 3줄", note: "가격 문의 5건 · 버그 제보 2건 · 기능 제안 1건" },
       },
+      { author: "MOVD 봇", bot: true, text: "버그 제보 2건은 #개발-이슈 로 자동 등록했어요." },
     ],
   },
   "discord-utility-bot": {
@@ -457,8 +482,10 @@ const DISCORD: Record<
         author: "유틸봇",
         bot: true,
         text: "조회 완료",
-        embed: { title: "Hide on bush — 솔로랭크", note: "Challenger 1,204LP · 14승 6패 (70%)" },
+        embed: { title: "Hide on bush — 솔로랭크", note: "Challenger 1,204LP · 14승 6패 (70%) · 최근 KDA 4.2" },
       },
+      { author: "유저", text: "최근 판 보여줘" },
+      { author: "유틸봇", bot: true, text: "승 · 아트록스 8/2/6\n승 · 아트록스 11/4/3\n패 · 케일 2/7/9" },
     ],
     b: [
       { author: "유저", text: "/재생 lofi hip hop" },
@@ -466,12 +493,16 @@ const DISCORD: Record<
         author: "유틸봇",
         bot: true,
         text: "▶️ 재생 시작",
-        embed: { title: "lofi hip hop radio", note: "대기열 3곡 · 요청자 @유저" },
+        embed: { title: "lofi hip hop radio", note: "대기열 3곡 · 요청자 @유저 · 볼륨 40%" },
       },
+      { author: "다른유저", text: "/대기열 추가 study beats" },
+      { author: "유틸봇", bot: true, text: "➕ 대기열 4번으로 추가됨" },
     ],
     c: [
-      { author: "유저", text: "/청소 50" },
-      { author: "유틸봇", bot: true, text: "🧹 메시지 50개 삭제 완료 (관리자 전용)" },
+      { author: "관리자", text: "/청소 50" },
+      { author: "유틸봇", bot: true, text: "🧹 메시지 50개 삭제 완료" },
+      { author: "관리자", text: "/역할 @신규 멤버" },
+      { author: "유틸봇", bot: true, text: "✅ '멤버' 역할 지급 — 인증 채널 접근 열림" },
     ],
   },
   "discord-vending-bot": {
@@ -483,11 +514,12 @@ const DISCORD: Record<
     ],
     a: [
       { author: "구매자", text: "닌텐도 기프트카드 1만원 구매합니다" },
+      { author: "판매봇", bot: true, text: "9,400원을 아래 계좌로 입금해 주세요. 입금자명에 디스코드 닉네임 부탁드려요." },
       {
         author: "판매봇",
         bot: true,
-        text: "입금 문자 확인됨 · 자동 지급 완료",
-        embed: { title: "닌텐도 기프트카드 1만원", note: "9,400원 · 재고 11개 · 24시간 무인" },
+        text: "✅ 입금 문자 확인됨 · 자동 지급 완료",
+        embed: { title: "닌텐도 기프트카드 1만원", note: "코드 DM 발송 완료 · 재고 11개 · 24시간 무인" },
       },
     ],
     b: [
@@ -495,12 +527,16 @@ const DISCORD: Record<
       {
         author: "판매봇",
         bot: true,
-        text: "현재 재고",
+        text: "현재 판매 재고",
         embed: { title: "판매 중 3종", note: "기프트카드 11 · 서버부스트 5 · 커스텀롤 ∞" },
       },
+      { author: "구매자", text: "품절되면 알림 와요?" },
+      { author: "판매봇", bot: true, text: "네, 재입고 시 이 채널에 자동 공지됩니다." },
     ],
     c: [
-      { author: "판매봇", bot: true, text: "🔔 신한은행 입금 9,400원 (홍길*) 감지 → 주문 #2841 자동 처리" },
+      { author: "판매봇", bot: true, text: "🔔 신한은행 입금 9,400원 (홍길*) 감지" },
+      { author: "판매봇", bot: true, text: "→ 주문 #2841 매칭 · 코드 자동 발송 · 장부 기록 완료" },
+      { author: "판매봇", bot: true, text: "⚠️ 금액 불일치 입금 1건 — 관리자 확인 대기" },
     ],
   },
 };

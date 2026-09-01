@@ -44,7 +44,7 @@ export function MockupCarousel({ panels }: { panels: React.ReactNode[] }) {
           >
             {panels.map((p, idx) => (
               <div key={idx} className="flex w-full shrink-0 justify-center px-1">
-                <div className="h-[350px] w-full max-w-[380px] overflow-hidden rounded-2xl border border-line/60 shadow-[var(--shadow-e2)] sm:h-[380px]">
+                <div className="h-[384px] w-full max-w-[380px] overflow-hidden rounded-2xl border border-line/60 shadow-[var(--shadow-e2)] sm:h-[404px]">
                   {p}
                 </div>
               </div>
