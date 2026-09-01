@@ -34,6 +34,10 @@ export const manualLedgerEntrySchema = z.object({
     .optional()
     .or(z.literal("")),
   memo: z.string().trim().max(1000).optional().or(z.literal("")),
+  // 이 항목을 연결할 고객 대화(ChatConversation) id. 빈 값이면 연결 없음.
+  conversationId: z.string().trim().max(40).optional().or(z.literal("")),
+  // true 면 연결된 대화로 안내 메시지를 보냅니다(저장 자체와는 별개, DB 에 저장 안 함).
+  notifyChat: z.boolean().optional(),
 });
 
 export type ManualLedgerEntryInput = z.infer<typeof manualLedgerEntrySchema>;

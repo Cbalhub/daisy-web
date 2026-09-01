@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { manualLedgerEntrySchema } from "@/lib/validation/ledger";
+import { postLedgerNotice } from "@/lib/admin/ledger";
 
 export const runtime = "nodejs";
 
@@ -37,37 +39,60 @@ export async function POST(req: NextRequest) {
     expenseCategory,
     taxInvoiceIssuedAt,
     memo,
+    conversationId,
+    notifyChat,
   } = parsed.data;
 
-  const entry = await prisma.$transaction(async (tx) => {
-    const created = await tx.manualLedgerEntry.create({
-      data: {
-        occurredAt: new Date(occurredAt),
-        kind,
-        title,
-        detail: detail || null,
-        customerName,
-        amount,
-        businessRegNo: businessRegNo || null,
-        phone: phone || null,
-        proofType: proofType || null,
-        expenseCategory: kind === "EXPENSE" && expenseCategory ? expenseCategory : null,
-        taxInvoiceIssuedAt: taxInvoiceIssuedAt ? new Date(taxInvoiceIssuedAt) : null,
-        memo: memo || null,
-        createdById: session.adminId,
-      },
+  let entry;
+  try {
+    entry = await prisma.$transaction(async (tx) => {
+      const created = await tx.manualLedgerEntry.create({
+        data: {
+          occurredAt: new Date(occurredAt),
+          kind,
+          title,
+          detail: detail || null,
+          customerName,
+          amount,
+          businessRegNo: businessRegNo || null,
+          phone: phone || null,
+          proofType: proofType || null,
+          expenseCategory: kind === "EXPENSE" && expenseCategory ? expenseCategory : null,
+          taxInvoiceIssuedAt: taxInvoiceIssuedAt ? new Date(taxInvoiceIssuedAt) : null,
+          memo: memo || null,
+          conversationId: conversationId || null,
+          createdById: session.adminId,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminId: session.adminId,
+          action: "ledger.manual_entry_create",
+          targetType: "ManualLedgerEntry",
+          targetId: created.id,
+          metadata: { kind, amount, occurredAt: created.occurredAt.toISOString(), title },
+        },
+      });
+      return created;
     });
-    await tx.auditLog.create({
-      data: {
-        adminId: session.adminId,
-        action: "ledger.manual_entry_create",
-        targetType: "ManualLedgerEntry",
-        targetId: created.id,
-        metadata: { kind, amount, occurredAt: created.occurredAt.toISOString(), title },
-      },
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2003") {
+      return NextResponse.json({ error: "연결하려는 대화를 찾을 수 없습니다." }, { status: 400 });
+    }
+    throw err;
+  }
+
+  if (conversationId && notifyChat) {
+    await postLedgerNotice({
+      conversationId,
+      kind,
+      title,
+      amount,
+      occurredAt: entry.occurredAt,
+      proofType: entry.proofType,
+      isUpdate: false,
     });
-    return created;
-  });
+  }
 
   return NextResponse.json({ ok: true, id: entry.id });
 }

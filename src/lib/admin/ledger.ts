@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import type { ProjectStage, ProofType, ExpenseCategory } from "@prisma/client";
 import { PROOF_TYPE_LABEL, EXPENSE_CATEGORY_LABEL } from "@/lib/admin/status";
+import { postAdminReply } from "@/lib/chat";
 
 export type CustomerType = "INDIVIDUAL" | "BUSINESS";
 
@@ -31,9 +32,60 @@ export type LedgerEntry = {
   taxInvoiceIssuedAt: Date | null; // 세금계산서 발행일 (manual 만)
   memo: string | null; // 비고 (manual 만)
   progressStage: ProjectStage | null; // manual 항목엔 없음
+  conversationId: string | null; // 연결된 고객 대화 (manual 만)
 };
 
 export type DailyTotal = { revenue: number; refund: number; expense: number };
+
+const SEOUL_LONG_DATE = new Intl.DateTimeFormat("ko-KR", {
+  dateStyle: "long",
+  timeZone: "Asia/Seoul",
+});
+
+// 장부 항목을 연결된 고객 대화로 안내하는 메시지. 관리자가 "대화에 알림"을 켰을 때만
+// 호출됩니다. 실패해도(대화 없음 등) 장부 저장 자체는 되돌리지 않습니다.
+export async function postLedgerNotice(input: {
+  conversationId: string;
+  kind: "REVENUE" | "REFUND" | "EXPENSE";
+  title: string;
+  amount: number; // 항상 양수
+  occurredAt: Date;
+  proofType: ProofType | null;
+  isUpdate: boolean;
+}): Promise<void> {
+  const won = `₩${input.amount.toLocaleString("ko-KR")}`;
+  const date = SEOUL_LONG_DATE.format(input.occurredAt);
+  const tail = input.isUpdate ? "\n(내용이 정정되었습니다.)" : "";
+
+  let text: string;
+  if (input.kind === "REFUND") {
+    text = `↩️ 환불 처리 안내\n· ${input.title}\n· ${won} · ${date}${tail}`;
+  } else if (input.kind === "EXPENSE") {
+    text = `📌 ${input.title}\n· ${won} · ${date}${tail}`;
+  } else {
+    const proof = input.proofType ? `\n· 증빙: ${PROOF_TYPE_LABEL[input.proofType].label}` : "";
+    text = `💰 결제가 확인되었습니다\n· ${input.title}\n· ${won} · ${date}${proof}${tail}`;
+  }
+
+  try {
+    await postAdminReply({ conversationId: input.conversationId, body: text });
+  } catch (err) {
+    console.error("[ledger] 대화 안내 전송 실패:", err);
+  }
+}
+
+// 관리자 편집 UI 의 대화 선택용 — 최근 대화 목록(고객명 포함).
+export async function listConversationsForPicker(limit = 200) {
+  const rows = await prisma.chatConversation.findMany({
+    orderBy: { lastMessageAt: "desc" },
+    take: limit,
+    select: { id: true, title: true, customer: { select: { name: true } } },
+  });
+  return rows.map((c) => ({
+    id: c.id,
+    label: c.customer.name + (c.title ? ` · ${c.title}` : ""),
+  }));
+}
 
 /**
  * start(포함) ~ end(미포함) 구간의 매출/환불 내역을 날짜별로 집계합니다.
@@ -99,6 +151,7 @@ export async function getLedgerEntries(
       taxInvoiceIssuedAt: null,
       memo: null,
       progressStage: p.order.progressStage,
+      conversationId: null,
     })),
     ...refunds.map((r) => ({
       id: `refund:${r.id}`,
@@ -118,6 +171,7 @@ export async function getLedgerEntries(
       taxInvoiceIssuedAt: null,
       memo: null,
       progressStage: r.payment.order.progressStage,
+      conversationId: null,
     })),
     ...manual.map((e) => ({
       id: `manual:${e.id}`,
@@ -137,6 +191,7 @@ export async function getLedgerEntries(
       taxInvoiceIssuedAt: e.taxInvoiceIssuedAt,
       memo: e.memo,
       progressStage: null,
+      conversationId: e.conversationId,
     })),
   ].sort((a, b) => a.date.getTime() - b.date.getTime());
 

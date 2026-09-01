@@ -43,11 +43,9 @@ export function EventPopup({ events }: { events: EventItem[] }) {
     } catch {
       // 시크릿 모드 등 저장소 접근 불가 — 그냥 보여줍니다.
     }
-    if (hiddenToday) {
-      setPhase("min");
-      return;
-    }
-    const timer = setTimeout(() => setPhase("open"), 500);
+    // "오늘 안 보기"면 런처만(min) 바로, 아니면 0.5초 뒤 팝업(open). setState 를 effect
+    // 본문에서 바로 부르지 않도록 두 경우 모두 타이머를 통해 전환합니다.
+    const timer = setTimeout(() => setPhase(hiddenToday ? "min" : "open"), hiddenToday ? 0 : 500);
     return () => clearTimeout(timer);
   }, []);
 

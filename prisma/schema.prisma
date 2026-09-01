@@ -333,10 +333,15 @@ model ManualLedgerEntry {
   memo               String? // 비고
   createdById        String?
   createdBy          AdminUser?       @relation("ManualLedgerCreatedBy", fields: [createdById], references: [id])
+  // 이 항목을 특정 고객 대화에 연결하면, 추가·수정 시 그 대화로 안내 메시지를
+  // 자동 전송할 수 있습니다(선택). 대화가 삭제되면 연결만 끊고 항목은 남깁니다.
+  conversationId     String?
+  conversation       ChatConversation? @relation("LedgerConversation", fields: [conversationId], references: [id], onDelete: SetNull)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
 
   @@index([occurredAt])
+  @@index([conversationId])
 }
 
 // ---------- 용역계약서 (온라인 서명) ----------
@@ -435,8 +440,9 @@ model ChatConversation {
   lastMessageAt DateTime               @default(now())
   createdAt     DateTime               @default(now())
 
-  messages ChatMessage[]
-  orders   Order[]
+  messages     ChatMessage[]
+  orders       Order[]
+  ledgerEntries ManualLedgerEntry[] @relation("LedgerConversation")
 
   @@index([customerId, lastMessageAt])
   @@index([status, lastMessageAt])

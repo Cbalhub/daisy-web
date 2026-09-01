@@ -6,8 +6,13 @@ import { DateRangeFilter } from "@/components/admin/ui/DateRangeFilter";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDownload } from "@/components/admin/icons";
 import { PROJECT_STAGE_LABEL, PROOF_TYPE_LABEL, EXPENSE_CATEGORY_LABEL } from "@/lib/admin/status";
-import { AddLedgerEntry, DeleteManualEntry } from "@/components/admin/ManualLedgerEntry";
-import { getLedgerEntries, CUSTOMER_TYPE_LABEL, type CustomerType } from "@/lib/admin/ledger";
+import { AddLedgerEntry, ManualEntryActions } from "@/components/admin/ManualLedgerEntry";
+import {
+  getLedgerEntries,
+  listConversationsForPicker,
+  CUSTOMER_TYPE_LABEL,
+  type CustomerType,
+} from "@/lib/admin/ledger";
 
 export const dynamic = "force-dynamic";
 
@@ -109,11 +114,13 @@ export default async function AdminLedgerPage({
     heading = `${year}년 ${month}월`;
   }
 
-  const { entries, totalRevenue, totalRefund, totalExpense, netProfit } = await getLedgerEntries(
-    start,
-    end,
-    customerType
-  );
+  const [
+    { entries, totalRevenue, totalRefund, totalExpense, netProfit },
+    conversations,
+  ] = await Promise.all([
+    getLedgerEntries(start, end, customerType),
+    listConversationsForPicker(),
+  ]);
   const rows = [...entries].reverse();
 
   const typeParam = customerType ? `&type=${customerType}` : "";
@@ -248,7 +255,7 @@ export default async function AdminLedgerPage({
       </RevealGroup>
 
       <div className="px-8 pt-5">
-        <AddLedgerEntry />
+        <AddLedgerEntry conversations={conversations} />
 
         {rows.length === 0 ? (
           <AdminCard className="mt-4 p-0">
@@ -340,7 +347,27 @@ export default async function AdminLedgerPage({
                       </td>
                       <td className="max-w-[14rem] truncate px-3 py-2 text-admin-muted">{e.memo || "–"}</td>
                       <td className="px-2 py-2 text-right">
-                        {e.source === "manual" && e.manualId && <DeleteManualEntry id={e.manualId} />}
+                        {e.source === "manual" && e.manualId && (
+                          <ManualEntryActions
+                            conversations={conversations}
+                            entry={{
+                              id: e.manualId,
+                              occurredAt: e.date,
+                              kind: e.type,
+                              customerName: e.customerName,
+                              title: e.title,
+                              detail: e.detail,
+                              amount: e.amount,
+                              businessRegNo: e.businessRegNo,
+                              phone: e.phone,
+                              proofType: e.proofType,
+                              expenseCategory: e.expenseCategory,
+                              taxInvoiceIssuedAt: e.taxInvoiceIssuedAt,
+                              memo: e.memo,
+                              conversationId: e.conversationId,
+                            }}
+                          />
+                        )}
                       </td>
                     </tr>
                   );
