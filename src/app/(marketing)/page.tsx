@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/Container";
-import { PlaceholderArt } from "@/components/ui/PlaceholderArt";
+import { ProjectMockup } from "@/components/marketing/ProjectMockup";
 import { Reveal } from "@/components/ui/Reveal";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { HeroShowcase } from "@/components/marketing/HeroShowcase";
@@ -252,8 +252,8 @@ export default async function HomePage() {
                       />
                     </div>
                   ) : (
-                    <PlaceholderArt
-                      label={item.category}
+                    <ProjectMockup
+                      item={item}
                       className="aspect-[16/10] shadow-[var(--shadow-e1)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-e2)]"
                     />
                   )}
