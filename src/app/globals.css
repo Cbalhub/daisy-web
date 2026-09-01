@@ -321,6 +321,14 @@
     transform: translateY(10px) scale(0.96);
     transition: opacity 0.18s ease, transform 0.18s ease;
   }
+  /* 팝업을 닫은 뒤 남는 "진행 중인 이벤트" 런처. */
+  @keyframes popup-fab-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  .popup-fab {
+    animation: popup-fab-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 
   /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. */
   @keyframes overcook-scroll-x {
