@@ -135,7 +135,7 @@ export default async function HomePage() {
         <Container>
           <div className="max-w-lg">
             <h2 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
-              뭘 만드나
+              무엇을 만드나요
             </h2>
             <Link
               href="/services"

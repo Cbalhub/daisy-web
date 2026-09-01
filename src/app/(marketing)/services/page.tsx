@@ -43,7 +43,7 @@ export default function ServicesPage() {
       <section className="pt-20 pb-16 md:pt-28">
         <Container>
           <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">
-            뭘 하나
+            무엇을 만드나요
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
             필요한 것만 골라도 되고, 처음부터 끝까지 다 맡겨도 됩니다.
