@@ -45,7 +45,9 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    // method=post + action: JS 가 뜨지 않은 상태에서 실수로 폼이 전송되더라도
+    // 자격증명이 URL 쿼리스트링(GET)에 노출되지 않도록 합니다.
+    <form onSubmit={onSubmit} method="post" action="/api/account/login" noValidate className="space-y-5">
       <div>
         <label className="text-sm font-medium text-ink-soft">이메일</label>
         <input
