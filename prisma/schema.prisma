@@ -117,7 +117,7 @@ model Review {
 // 직접 바꿀 수 있어야 하는 값들 — 항상 id="singleton" 한 행만 존재합니다.
 model BusinessSettings {
   id                 String   @id @default("singleton")
-  businessName       String   @default("Daisy")
+  businessName       String   @default("MOVD")
   representativeName String   @default("")
   businessRegNo      String   @default("")
   mailOrderRegNo     String   @default("")

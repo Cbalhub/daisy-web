@@ -1,13 +1,16 @@
-# Daisy
+# MOVD
 
-소프트웨어 개발 외주 스튜디오 Daisy의 웹사이트입니다. 마케팅 페이지, 실시간
-채팅, 문의, 상담 후 발급하는 커스텀 결제 링크(무통장입금),
-관리자 대시보드(문의/주문/포트폴리오/채팅/방문·이탈 분석)를 포함합니다.
+소프트웨어 개발 외주 스튜디오 MOVD의 웹사이트입니다. 마케팅 페이지, 실시간
+채팅, 문의, 상담 후 발급하는 커스텀 결제 링크(무통장입금), 용역계약서 온라인 서명,
+관리자 대시보드(문의/주문/포트폴리오/채팅/장부/방문·이탈 분석)를 포함합니다.
 
 ## 기술 스택
 
-- Next.js 16 (App Router) + TypeScript
-- Tailwind CSS v4 + Framer Motion
+- Next.js 16 (App Router, Turbopack) + React 19 + TypeScript
+- Tailwind CSS v4. 등장·전환 애니메이션은 대부분 CSS(`globals.css @layer utilities`),
+  일부 화면(admin·chat·payment)만 framer-motion.
+- 본문 폰트 Pretendard 는 `public/fonts/pretendard/` 에 동적 서브셋(unicode-range 92청크)으로
+  자체 호스팅. `src/styles/pretendard-subset.css` 를 layout 에서 import. next/font 로 되돌리지 말 것.
 - PostgreSQL + Prisma 7 (드라이버 어댑터: `@prisma/adapter-pg`)
 - 결제: 무통장입금(계좌이체)만. PG/결제대행사(포트원 등) 연동 없음 —
   고객이 입금 후 입금자명을 알리면 관리자가 실제 입금 내역을 직접 확인해 승인.
@@ -38,12 +41,15 @@ cp .env.example .env
 - 입금 계좌 정보는 `.env`가 아니라 관리자 페이지(`/admin/settings`)에서 관리합니다.
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: 프로덕션 배포 시 반드시 설정하세요(서버리스 다중 인스턴스에서는 in-memory 레이트리밋이 동작하지 않습니다).
 
-### 3. 데이터베이스 마이그레이션 및 관리자 계정 생성
+### 3. 스키마 적용 및 관리자 계정 생성
 
 ```bash
-npm run db:migrate    # 최초 마이그레이션 생성 및 적용
+npx prisma db push    # 스키마를 DB에 반영 (마이그레이션 히스토리를 쓰지 않습니다)
 npm run db:seed       # 관리자 계정 생성 (기본: admin@overcook.kr / changeme123!)
 ```
+
+이 프로젝트는 `prisma migrate` 대신 `prisma db push`를 씁니다 — `npm run build`도
+`prisma db push && next build`로 되어 있어 배포 시 스키마가 자동 반영됩니다.
 
 `.env`에 `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`를 지정하면 그 값으로 생성됩니다.
 **최초 로그인 후 반드시 비밀번호를 변경하세요.**
@@ -91,8 +97,29 @@ npm run dev
   `/admin`에서 DB로 관리합니다.
 - **레이트리밋**: 프로덕션에는 Upstash Redis를 반드시 연결하세요.
 
-## 배포
+## 배포 (VPS + nginx)
 
-Vercel 배포를 기준으로 설계되었습니다(Next.js 네이티브 지원). PostgreSQL은
-Vercel과 별개로 Neon/Supabase 등 관리형 서비스를 사용하는 것을 권장합니다.
-환경 변수는 위 `.env.example`의 항목을 배포 환경에 동일하게 설정하세요.
+`npm run build` (= `prisma db push && next build`) 후 `npm run start`. 환경 변수는
+`.env.example` 항목을 그대로 설정하고, 특히 `SITE_URL`을 실제 도메인으로.
+
+**nginx 앞단에서 반드시:**
+
+- `client_max_body_size 60m;` — 업로드 라우트가 본문을 메모리에 올리기 전에 헤더로
+  거르지만, 위조·누락된 Content-Length의 최종 방어선입니다.
+- `gzip on;` (가능하면 `brotli on;`) — JS/CSS/HTML. `.woff2`는 이미 압축본이라 제외.
+- `X-Real-IP` 를 실제 접속 IP로 세팅 (`proxy_set_header X-Real-IP $remote_addr;`).
+  계약서 서명 증거·레이트리밋이 이 값을 신뢰합니다.
+
+**crontab** (`CRON_SECRET` 설정 후):
+
+```
+0  0 * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" https://<도메인>/api/cron/daily-report
+30 4 * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" https://<도메인>/api/cron/sweep-uploads
+```
+
+- `daily-report` — 전날 방문 요약을 슬랙으로.
+- `sweep-uploads` — `public/uploads` 에서 DB 미참조 고아 파일 정리(24h 유예).
+  첫 실행은 `?dryRun=1` 로 확인.
+
+PostgreSQL은 같은 VPS 또는 Neon/Supabase 등 관리형. 업로드 파일은 로컬 디스크
+(`public/uploads`)에 저장되므로 VPS 재배포 시 볼륨을 유지해야 합니다.

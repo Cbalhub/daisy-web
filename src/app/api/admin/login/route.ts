@@ -4,11 +4,14 @@ import { verifyAdminCredentials } from "@/lib/auth";
 import { getSession } from "@/lib/session";
 import { limitLoginAttempt } from "@/lib/ratelimit";
 import { isSameOrigin } from "@/lib/csrf";
+import { clientIp } from "@/lib/request-ip";
 
 export const runtime = "nodejs";
 
 function getClientIp(req: NextRequest) {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  // XFF 맨 앞값은 위조 가능 — 이걸 rate limit 키로 쓰면 IP 를 계속 바꿔가며 무제한
+  // 로그인 시도를 할 수 있습니다. 프록시가 세운 값만 신뢰합니다.
+  return clientIp(req) ?? "unknown";
 }
 
 export async function POST(req: NextRequest) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { eventSchema } from "@/lib/validation/event";
+import { eventUpdateSchema } from "@/lib/validation/event";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { deleteUploadByUrl } from "@/lib/upload";
@@ -21,7 +21,7 @@ export async function PATCH(
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const parsed = eventSchema.partial().safeParse(await req.json().catch(() => null));
+  const parsed = eventUpdateSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." },

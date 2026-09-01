@@ -5,6 +5,7 @@ import { signContractSchema } from "@/lib/validation/contract";
 import { hashContractFacts, isSentContractExpired, type CompanySnapshot } from "@/lib/contract";
 import { sendSlackText } from "@/lib/slack";
 import { sendOwnerNotification } from "@/lib/email";
+import { clientIp } from "@/lib/request-ip";
 
 export const runtime = "nodejs";
 
@@ -43,10 +44,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
 
   const { signedName, signatureDataUrl } = parsed.data;
   const signedAt = new Date();
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    null;
+  // 서명 증거로 저장되는 값 — 위조 가능한 XFF 맨 앞값 대신 프록시가 세운 값을 씁니다.
+  const ip = clientIp(req);
   const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
 
   const company = contract.companySnapshot as CompanySnapshot;

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getOrCreateAnalyticsSessionId, logAnalyticsEvent } from "@/lib/analytics";
 import { limitTrack } from "@/lib/ratelimit";
+import { clientIp } from "@/lib/request-ip";
 
 export const runtime = "nodejs";
 
 function getClientIp(req: NextRequest) {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  return clientIp(req) ?? "unknown";
 }
 
 // 클라이언트에서 직접 보낼 수 있는 이벤트만 허용합니다.

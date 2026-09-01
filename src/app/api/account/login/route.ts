@@ -5,11 +5,12 @@ import { getCustomerSession } from "@/lib/customer-session";
 import { prisma } from "@/lib/prisma";
 import { limitLoginAttempt } from "@/lib/ratelimit";
 import { isSameOrigin } from "@/lib/csrf";
+import { clientIp } from "@/lib/request-ip";
 
 export const runtime = "nodejs";
 
 function getClientIp(req: NextRequest) {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  return clientIp(req) ?? "unknown";
 }
 
 export async function POST(req: NextRequest) {
