@@ -4,22 +4,31 @@
 
 const SPARK = [4, 5, 4, 7, 6, 8, 7, 10, 9, 8, 11, 10, 13, 12];
 const BARS = [38, 52, 44, 61, 48, 70, 58];
+const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
+// Catmull-Rom → 부드러운 스플라인 경로.
 function sparkPaths() {
   const w = 300;
-  const h = 64;
+  const h = 60;
   const max = Math.max(...SPARK);
+  const min = Math.min(...SPARK);
   const pts = SPARK.map((v, i) => ({
     x: (i / (SPARK.length - 1)) * w,
-    y: h - 4 - (v / max) * (h - 12),
+    y: h - 3 - ((v - min) / (max - min || 1)) * (h - 10),
   }));
-  let line = `M ${pts[0].x} ${pts[0].y}`;
+  let line = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
   for (let i = 0; i < pts.length - 1; i++) {
-    const mx = (pts[i].x + pts[i + 1].x) / 2;
-    line += ` Q ${pts[i].x} ${pts[i].y} ${mx} ${(pts[i].y + pts[i + 1].y) / 2}`;
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    line += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
   }
-  line += ` L ${pts[pts.length - 1].x} ${pts[pts.length - 1].y}`;
-  return { line, area: `${line} L ${w} ${h} L 0 ${h} Z`, w, h };
+  return { line, area: `${line} L ${w} ${h} L 0 ${h} Z`, w, h, end: pts[pts.length - 1] };
 }
 
 const ORDERS = [
@@ -29,56 +38,68 @@ const ORDERS = [
 ];
 
 export function DashboardPanel({ caption = false }: { caption?: boolean }) {
-  const { line, area, w, h } = sparkPaths();
+  const { line, area, w, h, end } = sparkPaths();
 
   return (
-    <figure className="m-0">
-      <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
+    <figure className="m-0 h-full">
+      <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
         <div className="flex items-center gap-2 border-b border-line px-5 py-3">
           <span className="h-2 w-2 rounded-full bg-accent" />
           <p className="text-[13px] font-semibold text-ink">관리자 대시보드</p>
-          <span className="ml-auto rounded-md bg-paper-dim px-2 py-0.5 text-[12px] font-medium text-ink-soft">
-            이번 달
+          <span className="ml-auto rounded-md bg-paper-dim px-2 py-0.5 text-[11.5px] font-medium text-ink-soft">
+            2026년 9월
           </span>
         </div>
 
-        <div className="p-5">
+        <div className="flex-1 overflow-hidden p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[12px] font-medium text-ink-soft">결제 완료 금액</p>
-              <p className="mt-1 font-display text-[30px] font-extrabold tracking-tight tabular-nums text-ink">
+              <p className="mt-1 font-display text-[30px] leading-none font-extrabold tracking-tight tabular-nums text-ink">
                 ₩8,420,000
               </p>
             </div>
-            <span className="shrink-0 rounded-full bg-accent-soft px-2 py-1 text-[12px] font-bold text-accent">
+            <span className="shrink-0 rounded-full bg-accent-soft px-2 py-1 text-[11.5px] font-bold text-accent">
               ▲ 12%
             </span>
           </div>
 
-          <svg
-            viewBox={`0 0 ${w} ${h}`}
-            className="mt-3 h-14 w-full"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            <path d={area} fill="var(--color-accent-bright)" opacity="0.12" />
+          <svg viewBox={`0 0 ${w} ${h}`} className="mt-4 h-[52px] w-full" preserveAspectRatio="none" aria-hidden>
+            <defs>
+              <linearGradient id="movd-spark" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--color-accent-bright)" stopOpacity="0.18" />
+                <stop offset="100%" stopColor="var(--color-accent-bright)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={area} fill="url(#movd-spark)" />
             <path
               d={line}
               fill="none"
               stroke="var(--color-accent-bright)"
-              strokeWidth="2"
+              strokeWidth="1.75"
+              strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
+            <circle cx={end.x} cy={end.y} r="3" fill="var(--color-accent-bright)" vectorEffect="non-scaling-stroke" />
           </svg>
 
-          <div className="mt-4 flex items-end gap-1.5 border-t border-line pt-4">
-            {BARS.map((v, i) => (
-              <span
-                key={i}
-                className={`w-full rounded-t-[3px] ${i === BARS.length - 1 ? "bg-accent" : "bg-line"}`}
-                style={{ height: `${v}px` }}
-              />
-            ))}
+          <div className="mt-4 border-t border-line pt-4">
+            <div className="flex items-end gap-2">
+              {BARS.map((v, i) => (
+                <span
+                  key={i}
+                  className={`w-full rounded-[2px] ${i === BARS.length - 1 ? "bg-accent" : "bg-line"}`}
+                  style={{ height: `${v}px` }}
+                />
+              ))}
+            </div>
+            <div className="mt-1.5 flex gap-2 text-center text-[9.5px] text-muted">
+              {DAYS.map((d) => (
+                <span key={d} className="w-full">
+                  {d}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="mt-4 border-t border-line pt-4">

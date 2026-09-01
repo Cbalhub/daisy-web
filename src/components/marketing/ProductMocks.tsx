@@ -13,15 +13,31 @@ function PanelHead({ title, right }: { title: string; right?: string }) {
 
 export function ChatMiniCard() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
       <PanelHead title="실시간 상담" right="응답 가능" />
-      <div className="space-y-2.5 p-4">
-        <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">
-          챗봇도 같이 붙일 수 있나요?
+      <div className="flex-1 space-y-2.5 overflow-hidden p-4">
+        <div className="ml-auto w-fit max-w-[82%] rounded-2xl rounded-br-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">
+          안녕하세요, 디스코드 봇 문의드려요
         </div>
-        <div className="w-fit max-w-[85%] rounded-2xl rounded-bl-md bg-accent px-3.5 py-2 text-[13px] text-on-accent">
-          네, 바로 견적 도와드릴게요
+        <div className="w-fit max-w-[82%] rounded-2xl rounded-bl-md bg-accent px-3.5 py-2 text-[13px] text-on-accent">
+          네 안녕하세요! 어떤 기능이 필요하세요?
         </div>
+        <div className="ml-auto w-fit max-w-[82%] rounded-2xl rounded-br-md bg-paper-dim px-3.5 py-2 text-[13px] text-ink">
+          포인트 시스템이랑 미니게임이요. 챗봇도 같이 붙일 수 있나요?
+        </div>
+        <div className="w-fit max-w-[82%] rounded-2xl rounded-bl-md bg-accent px-3.5 py-2 text-[13px] text-on-accent">
+          둘 다 가능해요. 바로 견적 도와드릴게요
+        </div>
+      </div>
+      <div className="flex items-center gap-2 border-t border-line px-4 py-3">
+        <span className="flex-1 rounded-full bg-paper-dim px-3.5 py-2 text-[12px] text-muted">
+          메시지 입력…
+        </span>
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent">
+          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden>
+            <path d="M8 13V3M4 7l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
       </div>
     </div>
   );
@@ -29,15 +45,17 @@ export function ChatMiniCard() {
 
 const RUN = [
   { step: "주문 12건 수집", t: "0.2s" },
+  { step: "중복 제거 · 검증", t: "0.1s" },
   { step: "구글 시트 동기화", t: "0.4s" },
-  { step: "알림 3건 발송", t: "0.1s" },
+  { step: "정산 리포트 생성", t: "0.1s" },
+  { step: "카톡 알림 3건 발송", t: "0.1s" },
 ];
 
 export function AutomationCard() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
       <PanelHead title="자동화 배치" right="매일 09:00" />
-      <ul className="space-y-2.5 p-4">
+      <ul className="flex-1 space-y-3 p-4">
         {RUN.map((r) => (
           <li key={r.step} className="flex items-center gap-2.5 text-[13px]">
             <svg viewBox="0 0 14 14" className="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden>
@@ -55,9 +73,12 @@ export function AutomationCard() {
           </li>
         ))}
       </ul>
-      <p className="border-t border-line px-4 py-2.5 text-[12px] font-semibold text-accent">
-        완료 · 0.7s
-      </p>
+      <div className="border-t border-line px-4 py-3">
+        <span className="block h-1.5 overflow-hidden rounded-full bg-paper-dim">
+          <span className="block h-full w-full rounded-full bg-accent" />
+        </span>
+        <p className="mt-2 text-[12px] font-semibold text-ink">완료 · 12건 처리 · 0.9s</p>
+      </div>
     </div>
   );
 }
@@ -89,14 +110,20 @@ export function ChatbotFlow() {
 // API·웹훅 연동 — 세로 흐름
 const FLOW = [
   { name: "주문 시스템", note: "새 주문 이벤트 발생" },
-  { name: "결제 API 연동", note: "승인 확인 · 정산 처리" },
-  { name: "알림 · 시트 기록", note: "카톡 발송 · 자동 반영" },
+  { name: "결제 API 연동", note: "승인 확인 · 금액 검증" },
+  { name: "정산 처리", note: "수수료 계산 · 장부 기록" },
+  { name: "알림 · 시트", note: "카톡 발송 · 구글 시트 반영" },
 ];
 
 export function WebhookFlow() {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-5 shadow-[var(--shadow-e2)]">
-      <ol className="relative">
+    <div className="flex h-full flex-col rounded-2xl border border-line bg-paper p-5 shadow-[var(--shadow-e2)]">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-accent" />
+        <p className="text-[13px] font-semibold text-ink">웹훅 연동</p>
+        <span className="ml-auto text-[12px] font-medium text-ink-soft">실시간</span>
+      </div>
+      <ol className="relative flex-1">
         {FLOW.map((f, i) => (
           <li key={f.name} className="relative flex gap-4 pb-6 last:pb-0">
             {i < FLOW.length - 1 && (
@@ -110,7 +137,7 @@ export function WebhookFlow() {
           </li>
         ))}
       </ol>
-      <p className="mt-1 border-t border-line pt-3 text-[12px] text-ink-soft">
+      <p className="border-t border-line pt-3 text-[12px] text-ink-soft">
         이벤트가 생기면 자동 전달 · 실패하면 재시도 · 전부 로그로 남김
       </p>
     </div>
