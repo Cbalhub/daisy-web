@@ -37,6 +37,7 @@ export function LoginForm() {
       }
 
       toast("로그인됐어요", "success");
+      window.dispatchEvent(new Event("movd-auth-change"));
       router.replace(params.get("next") || "/account");
     } catch (err) {
       toast(err instanceof Error ? err.message : "로그인에 실패했습니다.", "error");

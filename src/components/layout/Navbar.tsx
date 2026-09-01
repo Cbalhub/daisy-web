@@ -22,15 +22,27 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // 로그인 여부는 클라이언트에서 마운트 후 한 번만 조회합니다. 서버 컴포넌트에서
-  // cookies()로 확인하면 이 컴포넌트를 쓰는 모든 마케팅 페이지가 정적으로
-  // 미리 렌더링되지 못하고 매 요청마다 동적 렌더링으로 바뀌기 때문입니다.
+  // 로그인 여부는 클라이언트에서 조회합니다(서버 컴포넌트 cookies()로 확인하면
+  // 마케팅 페이지들이 정적 프리렌더가 안 됨). 마운트뿐 아니라 ① 경로가 바뀔 때
+  // ② 로그인/로그아웃 이벤트가 올 때 다시 확인해서, 로그아웃했는데 nav 는
+  // "마이페이지"로 남아있는 어긋남을 없앱니다.
   useEffect(() => {
-    fetch("/api/account/me")
-      .then((res) => res.json())
-      .then((data) => setLoggedIn(Boolean(data.loggedIn)))
-      .catch(() => {});
-  }, []);
+    let alive = true;
+    const check = () => {
+      fetch("/api/account/me")
+        .then((res) => res.json())
+        .then((data) => {
+          if (alive) setLoggedIn(Boolean(data.loggedIn));
+        })
+        .catch(() => {});
+    };
+    check();
+    window.addEventListener("movd-auth-change", check);
+    return () => {
+      alive = false;
+      window.removeEventListener("movd-auth-change", check);
+    };
+  }, [pathname]);
 
   // 경로가 바뀌면 모바일 메뉴를 닫습니다. effect 대신 렌더링 중 상태를 맞춰
   // 불필요한 추가 렌더링(cascading render)을 피합니다.
