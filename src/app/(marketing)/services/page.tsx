@@ -4,9 +4,23 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { ProcessStepper } from "@/components/marketing/ProcessStepper";
+import {
+  AutomationCard,
+  ChatbotFlow,
+  WebhookFlow,
+  MonitorCard,
+} from "@/components/marketing/ProductMocks";
 import { SERVICES, PROCESS_STEPS } from "@/lib/content";
 import { jsonLdScript } from "@/lib/json-ld";
 import { absoluteUrl } from "@/lib/site";
+import { cn } from "@/lib/utils";
+
+const VISUALS: Record<string, React.ReactNode> = {
+  automation: <AutomationCard />,
+  chatbot: <ChatbotFlow />,
+  integration: <WebhookFlow />,
+  maintenance: <MonitorCard />,
+};
 
 export const metadata: Metadata = {
   title: "서비스",
@@ -53,33 +67,39 @@ export default function ServicesPage() {
 
       <section className="pb-24">
         <Container>
-          <div className="border-t border-line">
+          <div className="space-y-16 md:space-y-24">
             {SERVICES.map((service, i) => (
               <div
                 key={service.slug}
                 id={service.slug}
-                className="scroll-mt-28 grid gap-x-8 gap-y-4 border-b border-line py-10 md:grid-cols-[3rem_1fr] md:py-12"
+                className="scroll-mt-28 grid items-center gap-x-12 gap-y-7 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
               >
-                <span className="font-display text-sm font-extrabold tabular-nums text-accent md:pt-1.5">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="md:grid md:grid-cols-[16rem_1fr] md:gap-10">
-                  <h2 className="font-display text-xl font-extrabold tracking-tight md:text-2xl">
+                <div className={cn("md:order-1", i % 2 === 1 && "md:order-2")}>
+                  <span className="font-display text-sm font-extrabold tabular-nums text-accent">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight">
                     {service.title}
                   </h2>
-                  <div className="mt-3 md:mt-0">
-                    <p className="text-sm leading-relaxed text-muted md:text-[15px]">
-                      {service.description}
-                    </p>
-                    <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-soft">
-                      {service.points.map((point) => (
-                        <li key={point} className="flex items-center gap-1.5">
-                          <span className="h-1 w-1 rounded-full bg-accent" />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink-soft">
+                    {service.description}
+                  </p>
+                  <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-soft">
+                    {service.points.map((point) => (
+                      <li key={point} className="flex items-center gap-1.5">
+                        <span className="h-1 w-1 rounded-full bg-accent" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div
+                  className={cn(
+                    "rounded-2xl bg-paper-dim p-4 sm:p-6 md:order-2",
+                    i % 2 === 1 && "md:order-1"
+                  )}
+                >
+                  {VISUALS[service.slug]}
                 </div>
               </div>
             ))}

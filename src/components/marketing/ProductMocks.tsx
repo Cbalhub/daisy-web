@@ -144,6 +144,37 @@ export function WebhookFlow() {
   );
 }
 
+// 운영·유지보수 — 상태 점검 패널
+const CHECKS = [
+  { name: "챗봇 응답", ok: true, meta: "정상 · 0.3s" },
+  { name: "결제 웹훅", ok: true, meta: "정상 · 마지막 12분 전" },
+  { name: "자동화 배치", ok: true, meta: "오늘 09:00 성공" },
+  { name: "외부 API", ok: false, meta: "지연 감지 — 재시도 중" },
+];
+
+export function MonitorCard() {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
+      <PanelHead title="상태 점검" right="자동 모니터링" />
+      <ul className="flex-1 divide-y divide-line">
+        {CHECKS.map((c) => (
+          <li key={c.name} className="flex items-center gap-3 px-4 py-3 text-[13px]">
+            <span
+              className={`h-2 w-2 shrink-0 rounded-full ${c.ok ? "bg-accent" : "bg-warning"}`}
+              aria-hidden
+            />
+            <span className="flex-1 font-medium text-ink">{c.name}</span>
+            <span className="text-[11.5px] text-ink-soft">{c.meta}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="border-t border-line px-4 py-2.5 text-[12px] text-ink-soft">
+        문제가 생기면 즉시 알림 · 대부분 고객이 알기 전에 조치
+      </p>
+    </div>
+  );
+}
+
 // 진행 단계 트래커 — 마이페이지의 실제 컴포넌트를 축약.
 // 모바일: 세로 레일 / sm 이상: 가로 스텝.
 const STAGES = ["문의", "기획·견적", "개발", "납품", "유지보수"];
