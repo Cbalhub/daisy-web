@@ -79,7 +79,8 @@ export default async function ReviewsPage() {
               <p className="mt-4 text-sm text-muted">아직 후기가 없어요.</p>
             </div>
           ) : (
-            <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            // 후기 길이가 제각각이라 그리드보다 컬럼 흐름(마조너리 느낌)이 덜 비어 보입니다.
+            <div className="gap-5 sm:columns-2 lg:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
               {REVIEWS.map((review) => (
                 <ReviewCard key={review.id} review={review} />
               ))}
