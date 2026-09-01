@@ -115,6 +115,7 @@ async function notifyAdminOfNewMessage(
     sendSlackText(`💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`, {
       url: `${siteUrl}/admin/chats/${conversationId}`,
       urlLabel: "채팅 열기",
+      webhook: process.env.SLACK_WEBHOOK_URL_CHAT || undefined,
     }),
   ]);
 }

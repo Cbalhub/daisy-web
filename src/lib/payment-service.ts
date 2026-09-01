@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { updateOrderProgress } from "@/lib/progress";
 import { postAdminReply, getOrCreateDefaultConversation } from "@/lib/chat";
 import { sendPaymentConfirmedEmail } from "@/lib/email";
+import { sendSlackText } from "@/lib/slack";
 import { hashTransactionFacts } from "@/lib/document-hash";
 
 const MAX_INVOICE_NUMBER_RETRIES = 5;
@@ -132,6 +133,11 @@ export async function confirmManualPayment(input: {
     amount: order.amount,
     orderToken: order.orderToken,
   }).catch((err) => console.error("payment confirmation email failed", err));
+
+  await sendSlackText(
+    `✅ 결제 완료 처리 — ${order.title}\n₩${order.amount.toLocaleString("ko-KR")} · ${order.customerName}`,
+    { webhook: process.env.SLACK_WEBHOOK_URL_PAYMENT || undefined }
+  ).catch(() => {});
 
   return { ok: true };
 }

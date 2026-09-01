@@ -63,7 +63,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ord
   const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   await sendSlackText(
     `💰 입금했다고 알려왔어요 — ${order.title}\n₩${order.amount.toLocaleString("ko-KR")} · 입금자명 ${depositorName}`,
-    { url: `${siteUrl}/admin/orders/${order.id}`, urlLabel: "입금 확인하기" }
+    {
+      url: `${siteUrl}/admin/orders/${order.id}`,
+      urlLabel: "입금 확인하기",
+      webhook: process.env.SLACK_WEBHOOK_URL_PAYMENT || undefined,
+    }
   );
 
   return NextResponse.json({ ok: true });
