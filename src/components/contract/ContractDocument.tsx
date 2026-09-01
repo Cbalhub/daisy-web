@@ -108,7 +108,7 @@ export function ContractDocument({
                 <img
                   src={view.signatureDataUrl}
                   alt={`${view.client.name} 서명`}
-                  className="max-h-20 w-auto object-contain"
+                  className="max-h-20 max-w-full object-contain"
                 />
               ) : (
                 <span className="text-xs text-muted">서명 대기</span>

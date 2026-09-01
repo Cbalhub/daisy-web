@@ -38,7 +38,7 @@ export function SignForm({ token }: { token: string }) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body?.error ?? "서명 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      setError(body?.error ?? "서명 처리에 실패했어요. 잠시 후 다시 시도해 주세요.");
       setLoading(false);
       return;
     }
@@ -64,16 +64,16 @@ export function SignForm({ token }: { token: string }) {
       <div>
         <p className="text-sm font-medium text-ink">서명</p>
         <div className="mt-1.5">
-          <SignaturePad onChange={setSignature} />
+          <SignaturePad onChange={setSignature} typedName={name} />
         </div>
       </div>
 
-      <label className="flex items-start gap-2.5 text-sm text-ink-soft">
+      <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 text-sm text-ink-soft transition-colors has-[:checked]:border-ink/30 has-[:checked]:bg-paper-dim">
         <input
           type="checkbox"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-accent)]"
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]"
         />
         <span>
           본인은 위 계약 내용을 모두 확인하였으며, 전자적 방법으로 서명하는 것에 동의합니다. 서명 시각과
