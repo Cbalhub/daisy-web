@@ -59,12 +59,12 @@ export async function postLedgerNotice(input: {
 
   let text: string;
   if (input.kind === "REFUND") {
-    text = `↩️ 환불 처리 안내\n· ${input.title}\n· ${won} · ${date}${tail}`;
+    text = `[환불 처리 안내]\n· ${input.title}\n· ${won} · ${date}${tail}`;
   } else if (input.kind === "EXPENSE") {
-    text = `📌 ${input.title}\n· ${won} · ${date}${tail}`;
+    text = `${input.title}\n· ${won} · ${date}${tail}`;
   } else {
     const proof = input.proofType ? `\n· 증빙: ${PROOF_TYPE_LABEL[input.proofType].label}` : "";
-    text = `💰 결제가 확인되었습니다\n· ${input.title}\n· ${won} · ${date}${proof}${tail}`;
+    text = `[결제 확인]\n· ${input.title}\n· ${won} · ${date}${proof}${tail}`;
   }
 
   try {
