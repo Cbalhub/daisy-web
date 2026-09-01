@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { ProjectMockup } from "@/components/marketing/ProjectMockup";
+import { ProjectMockup, ProjectMockupGallery } from "@/components/marketing/ProjectMockup";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { prisma } from "@/lib/prisma";
 import { jsonLdScript } from "@/lib/json-ld";
@@ -128,30 +128,31 @@ export default async function PortfolioDetailPage({
           <span className="truncate text-ink-soft">{item.title}</span>
         </nav>
 
-        {/* 히어로 이미지 — 케이스 스터디 느낌을 살리되, 다른 페이지들과 같은 컨테이너
-            폭 안에 둬서 갑자기 화면 끝까지 밀려나가지 않게 합니다. */}
-        {item.images[0] ? (
-          <div className="relative aspect-[16/9] max-h-[420px] w-full overflow-hidden rounded-xl border border-line">
-            <Image
-              src={item.images[0]}
-              alt={item.title}
-              fill
-              sizes="(min-width: 768px) 1152px, 100vw"
-              priority
-              className="object-cover"
-            />
-          </div>
-        ) : (
-          <ProjectMockup item={item} className="aspect-[16/9] max-h-[420px] w-full" />
-        )}
-
-        <p className="mt-10 text-xs font-medium text-muted">
+        {/* 케이스 스터디 인트로 — 제목·요약을 먼저 읽히고, 그 아래에 화면 목업. */}
+        <p className="text-xs font-medium text-muted">
           {item.category} · {item.publishedAt.getFullYear()}
         </p>
         <h1 className="mt-3 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">
           {item.title}
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">{item.summary}</p>
+
+        <div className="mt-8">
+          {item.images.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto rounded-xl border border-line bg-paper-dim p-4 sm:justify-center sm:p-6 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+              {item.images.map((src) => (
+                <div
+                  key={src}
+                  className="relative aspect-[4/3] w-[280px] shrink-0 overflow-hidden rounded-xl border border-line sm:w-[360px]"
+                >
+                  <Image src={src} alt={item.title} fill sizes="360px" priority className="object-cover" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <ProjectMockupGallery item={item} />
+          )}
+        </div>
 
         {(item.industry || item.duration || item.cost || item.features.length > 0) && (
           <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-line py-6 sm:grid-cols-4">
