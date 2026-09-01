@@ -153,10 +153,10 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-16 space-y-14 md:space-y-20">
+          <div className="mt-16 space-y-16 md:space-y-24">
             {CAPABILITIES.map((item, i) => (
               <Reveal key={item.title}>
-                <div className="grid items-center gap-x-12 gap-y-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+                <div className="grid items-center gap-x-12 gap-y-7 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
                   <div className={cn("md:order-1", i % 2 === 1 && "md:order-2")}>
                     <span className="font-display text-sm font-extrabold tabular-nums text-accent">
                       {String(i + 1).padStart(2, "0")}
@@ -168,9 +168,10 @@ export default async function HomePage() {
                       {item.description}
                     </p>
                   </div>
+                  {/* 목업 컴포넌트가 이미 테두리·그림자를 가진 카드라 감싸는 카드는 두지 않습니다. */}
                   <div
                     className={cn(
-                      "rounded-xl border border-line bg-paper p-5 shadow-[var(--shadow-e2)] sm:p-9 md:order-2",
+                      "rounded-2xl bg-paper-dim p-4 sm:p-6 md:order-2",
                       i % 2 === 1 && "md:order-1"
                     )}
                   >
