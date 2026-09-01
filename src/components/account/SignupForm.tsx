@@ -53,6 +53,7 @@ export function SignupForm() {
       }
 
       toast("가입이 완료됐어요", "success");
+      window.dispatchEvent(new Event("movd-auth-change"));
       router.replace("/account");
     } catch (err) {
       toast(err instanceof Error ? err.message : "가입에 실패했습니다.", "error");

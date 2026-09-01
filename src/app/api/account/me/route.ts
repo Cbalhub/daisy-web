@@ -1,13 +1,29 @@
 import { NextResponse } from "next/server";
-import { requireCustomerSession } from "@/lib/customer-auth";
+import { prisma } from "@/lib/prisma";
+import { getCustomerSession } from "@/lib/customer-session";
 
 export const runtime = "nodejs";
 
 // 네비게이션 바의 "로그인/마이페이지" 표시만을 위한 가벼운 엔드포인트입니다.
-// 이걸 서버 컴포넌트에서 cookies()로 직접 확인하면 정적으로 미리 렌더링될 수 있었던
-// 모든 마케팅 페이지가 요청마다 동적 렌더링으로 바뀌어버리므로, 클라이언트에서
-// 마운트 후 한 번만 조회하는 방식을 씁니다.
+// 세션 쿠키에 customerId 가 있어도, 그 고객이 실제로 DB 에 존재하는지 확인합니다 —
+// 계정이 삭제됐는데 세션만 남은 경우 nav 는 "마이페이지"로 보이지만 클릭하면
+// 로그인으로 튕기는 어긋난 상태가 생기므로, 여기서 세션을 정리합니다.
 export async function GET() {
-  const session = await requireCustomerSession();
-  return NextResponse.json({ loggedIn: Boolean(session) });
+  const session = await getCustomerSession();
+  if (!session.customerId) {
+    return NextResponse.json({ loggedIn: false });
+  }
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: session.customerId },
+    select: { id: true },
+  });
+
+  if (!customer) {
+    session.destroy();
+    await session.save();
+    return NextResponse.json({ loggedIn: false });
+  }
+
+  return NextResponse.json({ loggedIn: true });
 }
