@@ -118,18 +118,24 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
         <h2 className="font-display text-base font-semibold transition-colors group-hover:text-accent">
           {item.title}
         </h2>
-        <span className="shrink-0 text-xs text-muted">
-          {item.category}
-          {item.publishedAt ? ` · ${item.publishedAt.getFullYear()}` : ""}
-        </span>
+        <span className="shrink-0 text-xs text-muted">{item.category}</span>
       </div>
       <p className="mt-1 line-clamp-1 text-sm text-muted">{item.summary}</p>
       {(item.duration || item.cost) && (
-        <p className="mt-2 text-xs text-ink-soft">
-          {[item.duration && `기간 ${item.duration}`, item.cost && `비용 ${item.cost}`]
-            .filter(Boolean)
-            .join("   ")}
-        </p>
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-t border-line pt-3 text-sm">
+          {item.duration && (
+            <span>
+              <span className="text-muted">기간</span>{" "}
+              <span className="font-semibold text-ink">{item.duration}</span>
+            </span>
+          )}
+          {item.cost && (
+            <span>
+              <span className="text-muted">비용</span>{" "}
+              <span className="font-semibold text-ink">{item.cost}</span>
+            </span>
+          )}
+        </div>
       )}
     </Link>
   );

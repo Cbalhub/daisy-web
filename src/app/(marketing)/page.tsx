@@ -94,7 +94,15 @@ export default async function HomePage() {
   return (
     <>
       {/* 히어로 */}
-      <section className="border-b border-line py-12 md:py-20">
+      <section className="relative overflow-hidden border-b border-line py-12 md:py-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(ellipse_55%_60%_at_78%_45%,#000,transparent_75%)]"
+          style={{
+            backgroundImage: "radial-gradient(var(--color-line) 1px, transparent 1.4px)",
+            backgroundSize: "22px 22px",
+          }}
+        />
         <Container>
           <div className="grid gap-x-0 gap-y-12 lg:grid-cols-[minmax(0,22rem)_1fr]">
             <div className="flex flex-col lg:border-r lg:border-line lg:pr-12">
@@ -261,12 +269,19 @@ export default async function HomePage() {
                     <h3 className="font-display text-[15px] font-semibold transition-colors group-hover:text-accent">
                       {item.title}
                     </h3>
-                    <span className="shrink-0 text-xs text-muted">
-                      {item.category}
-                      {item.duration ? ` · ${item.duration}` : ""}
-                    </span>
+                    <span className="shrink-0 text-xs text-muted">{item.category}</span>
                   </div>
                   <p className="mt-1 line-clamp-1 text-sm text-muted">{item.summary}</p>
+                  {(item.duration || item.cost) && (
+                    <p className="mt-2.5 text-sm">
+                      {[item.duration, item.cost].filter(Boolean).map((v, i) => (
+                        <span key={i}>
+                          {i > 0 && <span className="text-line"> · </span>}
+                          <span className="font-semibold text-ink">{v}</span>
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </Link>
               ))}
             </div>
