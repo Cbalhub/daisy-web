@@ -142,8 +142,11 @@ model Event {
   id          String   @id @default(cuid())
   enabled     Boolean  @default(true)
   order       Int      @default(0) // 노출 순서, 작을수록 먼저 표시
-  badge       String   @default("") // 원형 배지에 들어가는 짧은 텍스트, 예: "20%"
-  style       String   @default("dark") // "dark" | "light" | "festive" — 카드 디자인 톤
+  badge       String   @default("") // 짧은 텍스트, 예: "20%" · "9월 한정" · "NEW"
+  style       String   @default("light") // "light" | "dark" — 카드 색
+  // 배너 레이아웃 프리셋 자리(현재는 standard 하나). 이미지 배너를 imageUrl로 올리는
+  // 경우가 많아 코드 프리셋은 최소만 둡니다.
+  template    String   @default("standard")
   title       String   @default("")
   description String   @default("")
   imageUrl    String   @default("") // 비어있지 않으면 문구 대신 이 이미지를 그대로 보여줌
