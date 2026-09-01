@@ -92,6 +92,23 @@ export function contractDisplayNumber(id: string, createdAt: Date): string {
   return `MOVD-${ym}-${code}`;
 }
 
+/**
+ * 발송된 계약서 서명 링크의 유효 기간(일). 이 기간이 지나면 서명이 막히고,
+ * 관리자가 "재발송"하면 sentAt 이 갱신되며 다시 이만큼 유효해집니다.
+ * (링크 유출 시 노출 창구를 좁히는 용도. 토큰 자체는 추측 불가.)
+ */
+export const SENT_CONTRACT_TTL_DAYS = 14;
+
+export function contractExpiresAt(sentAt: Date | null): Date | null {
+  if (!sentAt) return null;
+  return new Date(sentAt.getTime() + SENT_CONTRACT_TTL_DAYS * 24 * 60 * 60 * 1000);
+}
+
+export function isSentContractExpired(sentAt: Date | null, now: Date = new Date()): boolean {
+  const exp = contractExpiresAt(sentAt);
+  return exp !== null && now.getTime() > exp.getTime();
+}
+
 // ── 계약서 조항 렌더 ──────────────────────────────────────────
 
 const KRW = (n: number) => `₩${n.toLocaleString("ko-KR")}`;

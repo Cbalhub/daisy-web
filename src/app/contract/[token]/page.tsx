@@ -4,6 +4,7 @@ import {
   buildContractSections,
   contractDisplayNumber,
   hashContractFacts,
+  isSentContractExpired,
   type CompanySnapshot,
 } from "@/lib/contract";
 import { ContractDocument, type ContractView } from "@/components/contract/ContractDocument";
@@ -25,6 +26,8 @@ export default async function ContractPage({
 
   // 초안(아직 발송 전)이거나 존재하지 않으면 유효하지 않은 링크로 취급합니다.
   if (!contract || contract.status === "DRAFT") notFound();
+
+  const expired = contract.status === "SENT" && isSentContractExpired(contract.sentAt);
 
   const company = contract.companySnapshot as CompanySnapshot;
 
@@ -92,11 +95,18 @@ export default async function ContractPage({
         </div>
       )}
 
+      {expired && (
+        <div className="rounded-xl border border-line bg-paper p-4 text-sm text-muted">
+          서명 유효 기간이 지난 링크입니다. 아래 내용은 확인하실 수 있지만 서명하려면 담당자에게
+          링크 재발송을 요청해 주세요.
+        </div>
+      )}
+
       <div className="rounded-xl border border-line bg-paper p-6 shadow-[var(--shadow-e1)] print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-9">
         <ContractDocument sections={sections} view={view} />
       </div>
 
-      {contract.status === "SENT" && (
+      {contract.status === "SENT" && !expired && (
         <div className="rounded-xl border border-line bg-paper p-6 shadow-[var(--shadow-e1)] print:hidden sm:p-8">
           <h2 className="text-base font-semibold text-ink">전자서명</h2>
           <p className="mt-1 text-sm text-muted">

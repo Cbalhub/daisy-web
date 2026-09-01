@@ -10,6 +10,7 @@ import { ContractPanel, type ContractRow } from "@/components/admin/ContractPane
 import {
   contractDisplayNumber,
   hashContractFacts,
+  isSentContractExpired,
   type CompanySnapshot,
 } from "@/lib/contract";
 import { formatSeoulDateTime } from "@/lib/utils";
@@ -72,6 +73,7 @@ export default async function OrderDetailPage({
       number: contractDisplayNumber(c.id, c.createdAt),
       meta,
       integrity,
+      expired: c.status === "SENT" && isSentContractExpired(c.sentAt),
     };
   });
   const hasManualPaidPayment = order.payments.some(
