@@ -24,14 +24,13 @@ type EventItem = {
 };
 
 const STYLE_OPTIONS: { value: EventStyle; label: string; swatch: string }[] = [
-  { value: "dark", label: "다크 포스터", swatch: "bg-ink" },
   { value: "light", label: "밝은 카드", swatch: "bg-paper border border-admin-border" },
-  { value: "festive", label: "컬러풀 축제형", swatch: "bg-[linear-gradient(155deg,#f2b134_0%,#c9821f_100%)]" },
+  { value: "dark", label: "다크 카드", swatch: "bg-ink" },
 ];
 
 const EMPTY_DRAFT = {
   badge: "",
-  style: "dark" as EventStyle,
+  style: "light" as EventStyle,
   title: "",
   description: "",
   imageUrl: "",
