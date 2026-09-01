@@ -33,7 +33,7 @@ function TelegramShell({ name, children }: { name: string; children: React.React
           </p>
         </div>
       </div>
-      <div className="flex-1 space-y-1.5 overflow-hidden px-3 py-3">{children}</div>
+      <div className="flex-1 space-y-2 overflow-hidden px-3 py-3.5 [min-height:200px]">{children}</div>
     </div>
   );
 }
@@ -111,7 +111,7 @@ function DiscordShell({ channel, children }: { channel: string; children: React.
           {channel}
         </span>
       </div>
-      <div className="flex-1 space-y-3 overflow-hidden px-3.5 py-3">{children}</div>
+      <div className="flex-1 space-y-3.5 overflow-hidden px-3.5 py-3.5 [min-height:210px]">{children}</div>
     </div>
   );
 }
@@ -233,7 +233,7 @@ function ProgramShell({
         <span className="h-2 w-2 rounded-full bg-line" />
         <p className="ml-1.5 truncate text-[11px] font-medium text-ink-soft">{title}</p>
       </div>
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden [min-height:210px]">
         <div className="hidden w-[72px] shrink-0 space-y-1 border-r border-line p-2 sm:block">
           {(["작업", "스케줄", "로그", "데이터"] as const).map((s) => (
             <p
