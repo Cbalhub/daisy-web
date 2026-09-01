@@ -59,7 +59,18 @@ function parseBody(body: string): BodyBlock[] {
   return blocks;
 }
 
-export const dynamic = "force-dynamic";
+// ISR — 게시된 슬러그는 빌드 때 정적 생성하고, 이후 5분마다 백그라운드 재생성.
+// 관리자가 케이스 스터디를 고치면 revalidatePortfolio() 가 즉시 캐시를 비웁니다.
+// 빌드 이후 새로 게시된 슬러그도 첫 요청에 렌더 후 캐시됩니다(dynamicParams 기본값).
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const items = await prisma.portfolioItem.findMany({
+    where: { publishedAt: { not: null } },
+    select: { slug: true },
+  });
+  return items.map((i) => ({ slug: i.slug }));
+}
 
 export async function generateMetadata({
   params,

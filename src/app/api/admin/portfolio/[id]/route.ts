@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { portfolioSchema } from "@/lib/validation/portfolio";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { revalidatePortfolio } from "@/lib/revalidate";
+import { deleteUploadByUrl } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
@@ -32,11 +34,21 @@ export async function PATCH(
   const { published, body, ...rest } = parsed.data;
   const publishedAt = await resolvePublishedAt(id, published);
 
+  const before = await prisma.portfolioItem.findUnique({
+    where: { id },
+    select: { images: true },
+  });
+
   try {
     const item = await prisma.portfolioItem.update({
       where: { id },
       data: { ...rest, body: body || "", publishedAt },
     });
+    // 이번 저장에서 빠진 이미지 파일은 디스크에서도 지웁니다(안 그러면 교체할 때마다
+    // 옛 파일이 public/uploads 에 영영 쌓입니다).
+    const removed = (before?.images ?? []).filter((u) => !item.images.includes(u));
+    await Promise.allSettled(removed.map(deleteUploadByUrl));
+    revalidatePortfolio();
     return NextResponse.json({ ok: true, item });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
@@ -71,6 +83,11 @@ export async function DELETE(
   }
 
   const { id } = await params;
+  const removed = await prisma.portfolioItem
+    .findUnique({ where: { id }, select: { images: true } })
+    .then((p) => p?.images ?? []);
   await prisma.portfolioItem.delete({ where: { id } });
+  await Promise.allSettled(removed.map(deleteUploadByUrl));
+  revalidatePortfolio();
   return NextResponse.json({ ok: true });
 }

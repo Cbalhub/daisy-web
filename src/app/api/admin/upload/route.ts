@@ -6,6 +6,7 @@ import { isSameOrigin } from "@/lib/csrf";
 import {
   MAX_IMAGES_PER_REQUEST,
   MAX_IMAGE_BYTES,
+  declaredBodyTooLarge,
   detectImageExt,
   randomImageFilename,
 } from "@/lib/upload";
@@ -22,6 +23,11 @@ export async function POST(req: NextRequest) {
   const session = await requireAdminSession();
   if (!session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // 본문을 메모리에 올리기 전에 선반영 — 8MB × 8장을 넘는 요청은 파싱 자체를 안 합니다.
+  if (declaredBodyTooLarge(req, MAX_IMAGE_BYTES * MAX_IMAGES_PER_REQUEST)) {
+    return NextResponse.json({ error: "업로드 용량이 너무 큽니다." }, { status: 413 });
   }
 
   const form = await req.formData().catch(() => null);

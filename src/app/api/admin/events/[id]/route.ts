@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { eventSchema } from "@/lib/validation/event";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { deleteUploadByUrl } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
@@ -29,7 +30,13 @@ export async function PATCH(
   }
 
   const { id } = await params;
+  const before = await prisma.event.findUnique({ where: { id }, select: { imageUrl: true } });
   const event = await prisma.event.update({ where: { id }, data: parsed.data });
+
+  // 배너 이미지를 바꿨거나 텍스트 배너로 되돌렸으면 옛 파일을 지웁니다.
+  if (before?.imageUrl && before.imageUrl !== event.imageUrl) {
+    await deleteUploadByUrl(before.imageUrl);
+  }
 
   revalidatePath("/", "layout");
 
@@ -50,7 +57,11 @@ export async function DELETE(
   }
 
   const { id } = await params;
+  const removed = await prisma.event
+    .findUnique({ where: { id }, select: { imageUrl: true } })
+    .then((e) => e?.imageUrl);
   await prisma.event.delete({ where: { id } });
+  await deleteUploadByUrl(removed);
 
   revalidatePath("/", "layout");
 

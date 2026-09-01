@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatWidget } from "@/components/chat/openChat";
 import { Wordmark } from "@/components/brand/Wordmark";
@@ -109,21 +108,41 @@ export function Navbar() {
             aria-label="메뉴"
             aria-expanded={open}
           >
-            <motion.span animate={{ rotate: open ? 45 : 0, y: open ? 6 : 0 }} className="h-px w-5 bg-ink" />
-            <motion.span animate={{ opacity: open ? 0 : 1 }} className="h-px w-5 bg-ink" />
-            <motion.span animate={{ rotate: open ? -45 : 0, y: open ? -6 : 0 }} className="h-px w-5 bg-ink" />
+            {/* 햄버거 → X 전환은 CSS transform 만으로. framer-motion 을 네비게이션에서
+                걷어내 모든 페이지의 공통 JS 에서 애니메이션 라이브러리를 뺐습니다. */}
+            <span
+              className={cn(
+                "h-px w-5 origin-center bg-ink transition-transform duration-200 ease-out motion-reduce:transition-none",
+                open && "translate-y-[6px] rotate-45"
+              )}
+            />
+            <span
+              className={cn(
+                "h-px w-5 bg-ink transition-opacity duration-200 ease-out motion-reduce:transition-none",
+                open && "opacity-0"
+              )}
+            />
+            <span
+              className={cn(
+                "h-px w-5 origin-center bg-ink transition-transform duration-200 ease-out motion-reduce:transition-none",
+                open && "-translate-y-[6px] -rotate-45"
+              )}
+            />
           </button>
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.nav
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-            className="mx-auto mt-2 max-w-[64rem] overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e1)] md:hidden"
+      {/* 모바일 메뉴 — grid-rows 0fr↔1fr 트릭으로 "높이 auto" 를 CSS 만으로 접었다 폅니다. */}
+      <div
+        className={cn(
+          "mx-auto grid max-w-[64rem] overflow-hidden transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] md:hidden motion-reduce:transition-none",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+      >
+        <div className="min-h-0 overflow-hidden pt-2">
+          <nav
+            inert={!open}
+            className="rounded-2xl border border-line bg-paper shadow-[var(--shadow-e1)]"
           >
             <div className="flex flex-col p-2">
               {NAV_LINKS.map((link) => (
@@ -149,9 +168,9 @@ export function Navbar() {
                 프로젝트 문의
               </button>
             </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+          </nav>
+        </div>
+      </div>
     </header>
   );
 }

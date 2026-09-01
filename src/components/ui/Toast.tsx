@@ -1,10 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 
 type Tone = "default" | "success" | "error";
-type ToastEntry = { id: number; message: string; tone: Tone };
+type ToastEntry = { id: number; message: string; tone: Tone; leaving: boolean };
 type ToastFn = (message: string, tone?: Tone) => void;
 
 const ToastContext = createContext<ToastFn | null>(null);
@@ -13,6 +12,11 @@ const ToastContext = createContext<ToastFn | null>(null);
  * 사이트 전체(고객/관리자 페이지 공용)에서 쓰는 토스트입니다. 다크 칩 스타일을 그냥
  * 리터럴 색으로 고정해서, ink/paper든 admin-* 토큰이든 어느 화면 위에 떠도
  * 항상 같은 모습으로 보이게 합니다.
+ *
+ * 이 Provider 는 루트 레이아웃에 있어 모든 페이지에 로드됩니다. 예전엔 등장/퇴장을
+ * framer-motion 으로 처리했는데, 그것 때문에 사이트 전체가 애니메이션 라이브러리를
+ * 공통 번들로 받고 있었습니다. 지금은 CSS(.toast-item)만 씁니다 — 등장은 keyframe,
+ * 퇴장은 [data-leaving] 클래스로 짧게 페이드아웃한 뒤 DOM 에서 제거합니다.
  */
 export function useToast() {
   const push = useContext(ToastContext);
@@ -25,30 +29,28 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const push = useCallback<ToastFn>((message, tone = "default") => {
     const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, tone }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2400);
+    setToasts((prev) => [...prev, { id, message, tone, leaving: false }]);
+    // 2.4초 뒤 퇴장 애니메이션을 걸고, 0.2초 뒤 실제로 제거합니다.
+    setTimeout(() => {
+      setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, leaving: true } : t)));
+      setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 200);
+    }, 2400);
   }, []);
 
   return (
     <ToastContext.Provider value={push}>
       {children}
       <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[200] flex flex-col items-center gap-2 px-4">
-        <AnimatePresence>
-          {toasts.map((t) => (
-            <motion.div
-              key={t.id}
-              layout
-              initial={{ opacity: 0, y: 16, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
-              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="pointer-events-auto flex items-center gap-2.5 rounded-[14px] bg-neutral-900 py-2.5 pl-2.5 pr-4 text-sm font-medium text-white shadow-lg"
-            >
-              <ToneIcon tone={t.tone} />
-              {t.message}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            data-leaving={t.leaving || undefined}
+            className="toast-item pointer-events-auto flex items-center gap-2.5 rounded-[14px] bg-neutral-900 py-2.5 pr-4 pl-2.5 text-sm font-medium text-white shadow-lg"
+          >
+            <ToneIcon tone={t.tone} />
+            {t.message}
+          </div>
+        ))}
       </div>
     </ToastContext.Provider>
   );

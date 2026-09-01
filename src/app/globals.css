@@ -185,7 +185,7 @@
 
   /* 사이트 전체 Pretendard 단일. 진짜 등폭이 필요한 곳(문서 해시)만 OS 기본 등폭.
      제목용 자간/굵기 튜닝은 아래 .font-display 유틸리티에서 처리합니다. */
-  --font-sans: var(--font-pretendard), "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", monospace;
   /* 로고 워드마크 전용 손글씨 */
   --font-hand: var(--font-architects), "Architects Daughter", "Comic Sans MS", cursive;
@@ -261,10 +261,65 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 마케팅 탭 전환 — 아주 짧게 아래에서 페이드인. */
+  /* 마케팅 탭 전환 — 아주 짧은 페이드인. PageTransition 래퍼가 페이지 전체를
+     감싸므로 transform 은 쓰지 않습니다(rest 상태에서 containing block 을 만들어
+     내부 position:fixed 를 깨뜨림). key 변경 → 리마운트 시 재생. */
   @keyframes pagein {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .page-fade {
+    animation: pagein 0.26s ease both;
+  }
+
+  /* 토스트 등장 — framer-motion 을 걷어내고 CSS 로. 루트 레이아웃의 ToastProvider
+     때문에 모든 페이지가 애니메이션 라이브러리를 공통 번들로 받고 있었습니다.
+     퇴장은 [data-leaving] 로 짧게 페이드아웃 후 JS 가 DOM 에서 제거합니다. */
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.92); }
+    to { opacity: 1; transform: none; }
+  }
+  .toast-item {
+    animation: toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .toast-item[data-leaving] {
+    animation: none;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  /* 이벤트 팝업 — 등장/퇴장·이벤트 전환을 CSS 로. (framer-motion 제거) */
+  @keyframes popup-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes popup-card-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.96); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes popup-swap-in {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: none; }
+  }
+  .popup-backdrop {
+    animation: popup-backdrop-in 0.2s ease both;
+  }
+  .popup-card {
+    animation: popup-card-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .popup-swap {
+    animation: popup-swap-in 0.25s ease both;
+  }
+  .popup-backdrop[data-closing],
+  .popup-card[data-closing] {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .popup-card[data-closing] {
+    transform: translateY(10px) scale(0.96);
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
   /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. */

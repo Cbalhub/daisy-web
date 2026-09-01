@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
+// Pretendard 동적 서브셋 @font-face 92개(unicode-range 분할). 파일은 이 import 로
+// 번들·압축되고, 참조하는 woff2 는 public/fonts/pretendard/ 에서 서빙됩니다.
+import "@/styles/pretendard-subset.css";
 import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getBusinessSettings } from "@/lib/settings";
@@ -9,14 +12,15 @@ import { jsonLdScript } from "@/lib/json-ld";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
-// 사이트 본문·UI 는 Pretendard 하나 — 제목/본문/숫자 모두. 위계는 굵기(400·600·800)와
+// 본문·UI 는 Pretendard 하나 — 제목/본문/숫자 모두. 위계는 굵기(400·600·800)와
 // 크기·자간으로만. 등폭이 필요한 곳(문서 해시 등)만 OS 기본 등폭.
-const pretendard = localFont({
-  src: "../fonts/PretendardVariable.woff2",
-  variable: "--font-pretendard",
-  weight: "45 920",
-  display: "swap",
-});
+//
+// Pretendard 는 next/font 로 통짜 2MB woff2 를 받던 걸 그만두고, public/fonts 에
+// 자체 호스팅하는 "동적 서브셋"(unicode-range 로 쪼갠 92개 청크)으로 바꿨습니다.
+// 브라우저는 페이지에 실제로 나온 글자가 든 청크만 받으므로, 첫 로딩에 폰트로만
+// 2MB 씩 나가던 게 한글 페이지 기준 300~500KB 로 줄고 청크별로 캐시됩니다.
+// @font-face 정의는 public/fonts/pretendard/pretendard-subset.css, 아래 <head> 에서
+// <link> 로 부르고 가장 흔한 청크(라틴+상용 한글)만 preload 합니다.
 
 // 로고 워드마크 "MOVD" 전용 손글씨 — 그 외 어디에도 쓰지 않습니다. 라틴 서브셋만
 // 담긴 13KB woff2 (Architects Daughter, OFL). 단일 굵기라 굵기는 워드마크 쪽에서
@@ -157,9 +161,34 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${pretendard.variable} ${architects.variable} h-full antialiased`}
+      className={`${architects.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        {/* Pretendard 동적 서브셋 — 브라우저는 페이지에 실제 등장한 글자가 든 청크만
+            받습니다(@font-face 정의는 위 import). 라틴+상용 한글이 든 청크(91·90·89)만
+            preload 해서 첫 문단이 시스템 폰트 대체 없이 바로 뜨게 합니다. React 19 가
+            이 <link> 들을 <head> 로 올려줍니다. */}
+        <link
+          rel="preload"
+          href="/fonts/pretendard/PretendardVariable.subset.91.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/pretendard/PretendardVariable.subset.90.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/pretendard/PretendardVariable.subset.89.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         {/* 다크/라이트 토글 — 저장된 선택을 페인트 전에 반영해 깜빡임 방지 */}
         <script
           dangerouslySetInnerHTML={{

@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/reviews" },
 };
 
-export const dynamic = "force-dynamic";
+// ISR — 정적으로 캐시하고 5분마다 백그라운드 재생성합니다. 관리자가 후기를
+// 올리거나 고치면 revalidateReviews() 가 이 경로 캐시를 바로 비웁니다.
+export const revalidate = 300;
 
 export default async function ReviewsPage() {
   const REVIEWS = await prisma.review.findMany({

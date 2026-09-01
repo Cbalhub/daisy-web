@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { reviewSchema } from "@/lib/validation/review";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { revalidateReviews } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 
@@ -34,5 +35,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  revalidateReviews();
   return NextResponse.json({ ok: true, review });
 }

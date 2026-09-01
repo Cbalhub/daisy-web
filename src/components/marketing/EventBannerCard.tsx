@@ -54,7 +54,13 @@ export function EventBannerCard({
     return (
       <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-[var(--shadow-e2)]">
         <div className="relative aspect-[4/3] w-full bg-paper-dim">
-          <Image src={imageUrl} alt={title || "이벤트"} fill className="object-contain" />
+          <Image
+            src={imageUrl}
+            alt={title || "이벤트"}
+            fill
+            sizes="(max-width: 640px) 90vw, 384px"
+            className="object-contain"
+          />
         </div>
         <div className="p-5">
           <OpenChatButton size="md" className="w-full">

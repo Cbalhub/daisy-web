@@ -11,7 +11,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/portfolio" },
 };
 
-export const dynamic = "force-dynamic";
+// ISR — 정적으로 캐시하고 5분마다 백그라운드 재생성합니다. 관리자가 포트폴리오를
+// 올리거나 고치면 revalidatePortfolio() 가 이 경로 캐시를 바로 비웁니다.
+export const revalidate = 300;
 
 export default async function PortfolioPage() {
   const items = await prisma.portfolioItem.findMany({

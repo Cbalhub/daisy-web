@@ -3,7 +3,12 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
-import { MAX_IMAGE_BYTES, detectImageExt, randomImageFilename } from "@/lib/upload";
+import {
+  MAX_IMAGE_BYTES,
+  declaredBodyTooLarge,
+  detectImageExt,
+  randomImageFilename,
+} from "@/lib/upload";
 
 export const runtime = "nodejs";
 
@@ -17,6 +22,10 @@ export async function POST(req: NextRequest) {
   const session = await requireAdminSession();
   if (!session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (declaredBodyTooLarge(req, MAX_IMAGE_BYTES)) {
+    return NextResponse.json({ error: "파일 용량은 8MB 이하만 가능합니다." }, { status: 413 });
   }
 
   const form = await req.formData().catch(() => null);

@@ -5,7 +5,12 @@ import { requireCustomerSession } from "@/lib/customer-auth";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { limitChatUpload } from "@/lib/ratelimit";
-import { MAX_CHAT_FILE_BYTES, detectChatFileExt, randomImageFilename } from "@/lib/upload";
+import {
+  MAX_CHAT_FILE_BYTES,
+  declaredBodyTooLarge,
+  detectChatFileExt,
+  randomImageFilename,
+} from "@/lib/upload";
 
 export const runtime = "nodejs";
 
@@ -23,6 +28,11 @@ export async function POST(req: NextRequest) {
   const adminSession = customerSession?.customerId ? null : await requireAdminSession();
   if (!customerSession?.customerId && !adminSession) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // 본문을 메모리에 올리기 전에 헤더로 먼저 거릅니다(50MB 초과 파일은 파싱 안 함).
+  if (declaredBodyTooLarge(req, MAX_CHAT_FILE_BYTES)) {
+    return NextResponse.json({ error: "파일 용량은 50MB 이하만 가능합니다." }, { status: 413 });
   }
 
   // 계정 단위로 제한 — 업로드는 디스크에 그대로 쌓이는 무거운 작업이라 텍스트

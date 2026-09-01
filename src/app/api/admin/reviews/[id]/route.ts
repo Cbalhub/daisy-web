@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { reviewSchema } from "@/lib/validation/review";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { revalidateReviews } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 
@@ -36,6 +37,7 @@ export async function PATCH(
     data: { ...rest, role: role || null, rating: rating ?? null, publishedAt },
   });
 
+  revalidateReviews();
   return NextResponse.json({ ok: true, review });
 }
 
@@ -65,5 +67,6 @@ export async function DELETE(
 
   const { id } = await params;
   await prisma.review.delete({ where: { id } });
+  revalidateReviews();
   return NextResponse.json({ ok: true });
 }

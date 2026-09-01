@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import type { PortfolioItem } from "@prisma/client";
 import { ProjectMockup } from "@/components/marketing/ProjectMockup";
 import { Mark } from "@/components/brand/Mark";
@@ -12,14 +11,9 @@ import { cn } from "@/lib/utils";
 // 검색 결과 그리드는 스크롤로 처음 화면에 들어올 때 한 번만 재생되는 Reveal 대신,
 // 매번 즉시 재생되는 애니메이션을 씁니다 — 검색으로 0개였다가 다시 채워지는 경우처럼
 // 이미 화면 안에 있는 상태에서 목록이 새로 나타날 때도 항상 자연스럽게 보이도록 합니다.
-const gridVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
-};
-const cardVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, bounce: 0, duration: 0.35 } },
-};
+// key={query} 로 그리드를 리마운트해서 CSS 애니메이션(fadeup)을 매번 처음부터 재생,
+// stagger 는 카드 index 기반 animation-delay 로. (framer-motion 제거 — 이 컴포넌트가
+// /portfolio 에 있어서 그 페이지가 애니메이션 라이브러리를 통째로 받고 있었습니다.)
 
 export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
   const [query, setQuery] = useState("");
@@ -67,11 +61,8 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
           </p>
         </div>
       ) : (
-        <motion.div
+        <div
           key={query}
-          initial="hidden"
-          animate="visible"
-          variants={gridVariants}
           className={cn(
             "mt-10 grid gap-5",
             filtered.length === 1
@@ -81,12 +72,16 @@ export function PortfolioSearch({ items }: { items: PortfolioItem[] }) {
                 : "sm:grid-cols-2 lg:grid-cols-3"
           )}
         >
-          {filtered.map((item) => (
-            <motion.div key={item.slug} variants={cardVariants}>
+          {filtered.map((item, idx) => (
+            <div
+              key={item.slug}
+              className="motion-safe:animate-[fadeup_0.35s_cubic-bezier(0.22,1,0.36,1)_both]"
+              style={{ animationDelay: `${Math.min(idx * 45, 270)}ms` }}
+            >
               <PortfolioCard item={item} />
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       )}
     </div>
   );

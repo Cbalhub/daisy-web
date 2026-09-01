@@ -1,4 +1,6 @@
 import { randomUUID } from "crypto";
+import { unlink } from "fs/promises";
+import path from "path";
 
 type ImageKind = { ext: string; check: (bytes: Buffer) => boolean };
 
@@ -29,6 +31,29 @@ export function detectImageExt(mimeType: string, bytes: Buffer): string | null {
 
 export function randomImageFilename(ext: string) {
   return `${randomUUID()}.${ext}`;
+}
+
+// req.formData() 는 요청 본문 전체를 메모리에 올린 뒤에야 파싱합니다 — file.size 를
+// 그 다음에 확인해봐야 이미 거대한 파일이 RAM 에 다 올라온 뒤라, 동시에 몇 개만
+// 들어와도 작은 VPS 는 OOM 으로 죽습니다. 그래서 formData() 를 부르기 전에
+// Content-Length 헤더부터 봅니다(브라우저·curl·undici 모두 이 헤더를 붙입니다).
+// 헤더 위조/누락은 nginx client_max_body_size 가 최종 방어선입니다.
+const MULTIPART_OVERHEAD = 8 * 1024;
+
+export function declaredBodyTooLarge(req: Request, maxTotalBytes: number): boolean {
+  const len = Number(req.headers.get("content-length"));
+  return Number.isFinite(len) && len > maxTotalBytes + MULTIPART_OVERHEAD;
+}
+
+// "/uploads/…" URL 로 저장돼 있던 파일을 디스크에서 지웁니다(포트폴리오·이벤트·채팅
+// 첨부가 삭제될 때). 경로 이탈을 막으려고 public/uploads 하위만 허용하고, 이미 없는
+// 파일은 조용히 무시합니다.
+export async function deleteUploadByUrl(url: string | null | undefined): Promise<void> {
+  if (!url || !url.startsWith("/uploads/")) return;
+  const root = path.join(process.cwd(), "public", "uploads");
+  const abs = path.join(process.cwd(), "public", url.replace(/^\/+/, ""));
+  if (abs !== root && !abs.startsWith(root + path.sep)) return;
+  await unlink(abs).catch(() => {});
 }
 
 // 채팅 첨부는 이미지·PDF·ZIP까지만 허용합니다 — 실행 파일/스크립트류를 열어

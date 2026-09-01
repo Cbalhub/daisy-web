@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 type FaqItem = { question: string; answer: React.ReactNode };
 
+// 펼침 애니메이션은 grid-template-rows 0fr↔1fr 트릭으로 CSS 만. 예전엔 framer-motion
+// AnimatePresence 였는데, 이 컴포넌트가 홈(/)과 /faq 에 다 들어가서 두 페이지가
+// 애니메이션 라이브러리를 통째로 받고 있었습니다.
 export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
@@ -27,24 +30,24 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
                 height="16"
                 viewBox="0 0 20 20"
                 fill="none"
-                className={`shrink-0 text-muted transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+                className={cn(
+                  "shrink-0 text-muted transition-transform duration-200",
+                  open && "rotate-45"
+                )}
               >
                 <path d="M10 3v14M3 10h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
             </button>
-            <AnimatePresence initial={false}>
-              {open && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{item.answer}</p>
-                </motion.div>
+            <div
+              className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out",
+                open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
               )}
-            </AnimatePresence>
+            >
+              <div className="overflow-hidden">
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{item.answer}</p>
+              </div>
+            </div>
           </div>
         );
       })}

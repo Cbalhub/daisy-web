@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { portfolioSchema } from "@/lib/validation/portfolio";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { revalidatePortfolio } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
     const item = await prisma.portfolioItem.create({
       data: { ...rest, body: body || "", publishedAt: published ? new Date() : null },
     });
+    revalidatePortfolio();
     return NextResponse.json({ ok: true, item });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
