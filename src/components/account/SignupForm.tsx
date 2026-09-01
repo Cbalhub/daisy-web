@@ -61,7 +61,9 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    // method=post + action: JS 미로딩 상태에서 폼이 전송돼도 자격증명이 URL 에
+    // 남지 않도록 합니다.
+    <form onSubmit={onSubmit} method="post" action="/api/account/signup" noValidate className="space-y-5">
       <div>
         <label className="text-sm font-medium text-ink-soft">
           이름 <span className="text-muted">(실명)</span>

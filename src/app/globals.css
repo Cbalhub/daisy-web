@@ -261,6 +261,12 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* 마케팅 탭 전환 — 아주 짧게 아래에서 페이드인. */
+  @keyframes pagein {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* 포트폴리오/후기 캐러셀이 레일처럼 흐르는 애니메이션. */
   @keyframes overcook-scroll-x {
     from {

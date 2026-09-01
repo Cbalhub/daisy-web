@@ -53,7 +53,7 @@ export function ContractDocument({
       </header>
 
       <section className="grid gap-5 border-b border-line py-6 text-sm sm:grid-cols-2">
-        <div>
+        <div className="min-w-0 break-words">
           <p className="text-xs font-medium text-muted">갑 (발주자)</p>
           <p className="mt-1.5 font-medium">{view.client.name}</p>
           {view.client.bizNo && (
@@ -62,7 +62,7 @@ export function ContractDocument({
           {view.client.phone && <p className="text-xs text-muted">{view.client.phone}</p>}
           <p className="text-xs text-muted">{view.client.email}</p>
         </div>
-        <div>
+        <div className="min-w-0 break-words">
           <p className="text-xs font-medium text-muted">을 (수급자)</p>
           <p className="mt-1.5 font-medium">{view.company.name}</p>
           {view.company.repName && <p className="text-xs text-muted">대표 {view.company.repName}</p>}

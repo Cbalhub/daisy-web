@@ -1,24 +1,14 @@
-"use client";
-
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 // modern-minimal 재디자인: 페이지는 "이미 조판된" 상태로 나타나야 합니다. 전 구간
-// 스크롤 페이드는 걷어내고(→ anti-slop), 이 컴포넌트는 히어로의 1회성 등장 정도에만
-// 씁니다. 이동 폭도 8px로 줄여 거의 눈치채지 못할 만큼 절제했습니다.
-const variants: Variants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", bounce: 0, duration: 0.4, delay },
-  }),
-};
+// 스크롤 페이드는 걷어냈고, 등장은 로드 시 1회 CSS 애니메이션(fadeup)으로만 처리합니다.
+//
+// 중요: JS(하이드레이션)에 의존하지 않습니다. 예전에는 framer-motion whileInView 로
+// 처리해서, 스크립트가 늦게 뜨거나 막히면(예: dev cross-origin, JS 차단) 섹션이
+// opacity:0 인 채로 영영 안 보이는 사고가 있었습니다. 이제는 순수 CSS 라
+// 스크립트 상태와 무관하게 보이고, prefers-reduced-motion 이면 애니메이션 없이 즉시 표시됩니다.
 
-// prefers-reduced-motion 이면 이동 없이 즉시 표시합니다.
-const staticVariants: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: { opacity: 1, y: 0 },
-};
+const FADE = "motion-safe:animate-[fadeup_0.5s_cubic-bezier(0.22,1,0.36,1)_both]";
 
 export function Reveal({
   children,
@@ -31,63 +21,31 @@ export function Reveal({
   className?: string;
   as?: "div" | "span";
 }) {
-  const reduce = useReducedMotion();
-  const MotionTag = as === "span" ? motion.span : motion.div;
+  const Tag = as;
   return (
-    <MotionTag
-      className={className}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      custom={delay}
-      variants={reduce ? staticVariants : variants}
+    <Tag
+      className={cn(FADE, className)}
+      style={delay ? { animationDelay: `${delay}s` } : undefined}
     >
       {children}
-    </MotionTag>
+    </Tag>
   );
 }
-
-type RevealTag = "div" | "ul";
-
-const GROUP_TAG: Record<RevealTag, typeof motion.div | typeof motion.ul> = {
-  div: motion.div,
-  ul: motion.ul,
-};
 
 export function RevealGroup({
   children,
   className,
-  stagger = 0.08,
   as = "div",
 }: {
   children: React.ReactNode;
   className?: string;
+  // stagger 는 더 이상 쓰지 않지만(각 항목이 로드 시 함께 등장), 호출부 호환을 위해 받습니다.
   stagger?: number;
-  as?: RevealTag;
+  as?: "div" | "ul";
 }) {
-  const MotionTag = GROUP_TAG[as];
-  return (
-    <MotionTag
-      className={className}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: stagger } },
-      }}
-    >
-      {children}
-    </MotionTag>
-  );
+  const Tag = as;
+  return <Tag className={className}>{children}</Tag>;
 }
-
-type RevealItemTag = "div" | "li";
-
-const ITEM_TAG: Record<RevealItemTag, typeof motion.div | typeof motion.li> = {
-  div: motion.div,
-  li: motion.li,
-};
 
 export function RevealItem({
   children,
@@ -96,12 +54,8 @@ export function RevealItem({
 }: {
   children: React.ReactNode;
   className?: string;
-  as?: RevealItemTag;
+  as?: "div" | "li";
 }) {
-  const MotionTag = ITEM_TAG[as];
-  return (
-    <MotionTag className={className} variants={variants}>
-      {children}
-    </MotionTag>
-  );
+  const Tag = as;
+  return <Tag className={cn(FADE, className)}>{children}</Tag>;
 }

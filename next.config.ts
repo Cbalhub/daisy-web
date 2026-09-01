@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
   // 개발 중에만 뜨는 우측 하단 "N" 인디케이터(라우트 정보 표시용) — 실제 방문자에게는
   // 절대 보이지 않지만 테스트 중 거슬려서 꺼둡니다. 빌드/런타임 에러는 그대로 표시됩니다.
   devIndicators: false,
+  // 같은 와이파이의 폰 등에서 `next dev -H 0.0.0.0` 로 띄운 서버에 LAN IP로 접속할 때,
+  // Next 16 이 dev 리소스(JS 청크)를 cross-origin 으로 보고 막아 하이드레이션이 안 됩니다.
+  // 실기기 테스트용 IP만 허용합니다(dev 전용 — 프로덕션 빌드에는 영향 없음).
+  // IP가 바뀌면(DHCP 재할당) 여기 값을 갱신하고 dev 서버를 재시작하세요.
+  allowedDevOrigins: ["192.168.1.2"],
   async headers() {
     return [
       {
