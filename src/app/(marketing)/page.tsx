@@ -307,14 +307,14 @@ export default async function HomePage() {
 
             <div
               className={cn(
-                "mt-10 grid gap-x-10 gap-y-8",
+                "mt-10 grid gap-5",
                 reviews.length === 1 && "max-w-xl",
                 reviews.length === 2 && "sm:grid-cols-2",
                 reviews.length >= 3 && "sm:grid-cols-2 lg:grid-cols-3"
               )}
             >
               {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
+                <ReviewCard key={review.id} review={review} compact />
               ))}
             </div>
           </Container>

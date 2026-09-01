@@ -1,14 +1,28 @@
 import type { Review } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
-export function ReviewCard({ review }: { review: Review }) {
+export function ReviewCard({ review, compact = false }: { review: Review; compact?: boolean }) {
   return (
-    <figure className="flex h-full flex-col border-t border-line pt-6">
-      {review.rating != null && <Stars value={review.rating} />}
-      <blockquote className="mt-3 flex-1 text-[15px] leading-relaxed text-ink">
-        &ldquo;{review.quote}&rdquo;
+    <figure className="flex h-full flex-col rounded-xl border border-line bg-paper p-6 shadow-[var(--shadow-e1)]">
+      <div className="flex items-center justify-between">
+        {review.rating != null ? (
+          <Stars value={review.rating} />
+        ) : (
+          <span className="text-2xl leading-none font-display text-line" aria-hidden>
+            &ldquo;
+          </span>
+        )}
+      </div>
+      <blockquote
+        className={cn(
+          "mt-3 flex-1 text-[14.5px] leading-relaxed text-ink-soft",
+          compact && "line-clamp-6"
+        )}
+      >
+        {review.quote}
       </blockquote>
-      <figcaption className="mt-5 text-sm">
-        <span className="font-semibold">{review.company}</span>
+      <figcaption className="mt-5 border-t border-line pt-4 text-sm">
+        <span className="font-semibold text-ink">{review.company}</span>
         {review.role && <span className="text-muted"> · {review.role}</span>}
       </figcaption>
     </figure>
