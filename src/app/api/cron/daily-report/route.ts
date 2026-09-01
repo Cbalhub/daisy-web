@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
   const result = await sendSlackText(report, {
     url: `${siteUrl}/admin`,
     urlLabel: "대시보드 열기",
+    // 리포트 전용 채널 웹훅이 있으면 그쪽으로, 없으면 기본 채널로.
+    webhook: process.env.SLACK_WEBHOOK_URL_REPORT || undefined,
   });
 
   return NextResponse.json({ ok: true, slack: result });

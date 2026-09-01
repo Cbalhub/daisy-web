@@ -10,9 +10,10 @@ import "server-only";
  */
 export async function sendSlackText(
   text: string,
-  opts?: { url?: string; urlLabel?: string }
+  opts?: { url?: string; urlLabel?: string; webhook?: string }
 ): Promise<{ sent: boolean; reason?: string }> {
-  const webhook = process.env.SLACK_WEBHOOK_URL;
+  // opts.webhook 로 채널별 웹훅을 넘길 수 있습니다(예: 일일 리포트는 별도 채널).
+  const webhook = opts?.webhook || process.env.SLACK_WEBHOOK_URL;
   if (!webhook) return { sent: false, reason: "not-configured" };
 
   // 링크가 있으면 Slack mrkdwn 형식(<url|label>)으로 덧붙입니다.
