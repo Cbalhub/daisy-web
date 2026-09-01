@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/csrf";
 import { signContractSchema } from "@/lib/validation/contract";
-import { hashContractFacts, type CompanySnapshot } from "@/lib/contract";
+import { hashContractFacts, isSentContractExpired, type CompanySnapshot } from "@/lib/contract";
 import { sendSlackText } from "@/lib/slack";
 import { sendOwnerNotification } from "@/lib/email";
 
@@ -33,6 +33,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   }
   if (contract.status !== "SENT") {
     return NextResponse.json({ error: "서명할 수 없는 계약서입니다." }, { status: 400 });
+  }
+  if (isSentContractExpired(contract.sentAt)) {
+    return NextResponse.json(
+      { error: "서명 유효 기간이 지났습니다. 담당자에게 링크 재발송을 요청해 주세요." },
+      { status: 410 }
+    );
   }
 
   const { signedName, signatureDataUrl } = parsed.data;

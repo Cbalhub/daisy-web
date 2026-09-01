@@ -19,6 +19,8 @@ export type ContractRow = {
   // (클라이언트에서 Date 를 다시 포맷하면 서버/클라 결과가 어긋나 하이드레이션 오류)
   meta: string;
   integrity: "verified" | "mismatch" | "unavailable" | null;
+  // SENT 이고 서명 유효기간(발송 14일)이 지났는지
+  expired: boolean;
 };
 
 const STATUS: Record<ContractStatus, { label: string; tone: "neutral" | "blue" | "green" | "amber" }> = {
@@ -53,6 +55,7 @@ export function ContractPanel({
   const [error, setError] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [rowBusy, setRowBusy] = useState<string | null>(null);
 
   const signed = contracts.find((c) => c.status === "SIGNED") ?? null;
   const active = contracts.find((c) => c.status === "SENT") ?? null;
@@ -110,6 +113,35 @@ export function ContractPanel({
     setLoading(false);
   }
 
+  async function resend(id: string) {
+    setRowBusy(id);
+    const res = await fetch(`/api/admin/contracts/${id}/resend`, { method: "POST" });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast(body?.error ?? "재발송에 실패했어요.", "error");
+    } else if (body?.emailFailed) {
+      toast("유효기간은 갱신됐지만 이메일 발송에 실패했어요. 링크를 직접 보내주세요.", "error");
+    } else {
+      toast("계약서를 다시 보냈어요", "success");
+    }
+    router.refresh();
+    setRowBusy(null);
+  }
+
+  async function voidContract(id: string) {
+    if (!window.confirm("이 계약서를 무효 처리할까요? 되돌릴 수 없어요.")) return;
+    setRowBusy(id);
+    const res = await fetch(`/api/admin/contracts/${id}/void`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      toast(body?.error ?? "무효 처리에 실패했어요.", "error");
+    } else {
+      toast("무효 처리했어요", "success");
+    }
+    router.refresh();
+    setRowBusy(null);
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -151,10 +183,13 @@ export function ContractPanel({
                   {c.integrity === "mismatch" && (
                     <span className="text-xs font-medium text-admin-red">무결성 ⚠ 불일치</span>
                   )}
+                  {c.expired && (
+                    <span className="text-xs font-medium text-admin-amber">링크 만료</span>
+                  )}
                 </div>
                 <p className="mt-1 text-xs text-admin-muted">{c.meta}</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <a
                   href={linkFor(c.token)}
                   target="_blank"
@@ -164,6 +199,26 @@ export function ContractPanel({
                   계약서 보기
                 </a>
                 {c.status !== "VOID" && <CopyLinkButton text={linkFor(c.token)} />}
+                {c.status === "SENT" && (
+                  <button
+                    type="button"
+                    onClick={() => resend(c.id)}
+                    disabled={rowBusy === c.id}
+                    className="rounded-lg border border-admin-border bg-admin-surface px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:border-admin-blue disabled:opacity-50"
+                  >
+                    {rowBusy === c.id ? "…" : "이메일 재발송"}
+                  </button>
+                )}
+                {(c.status === "SENT" || c.status === "SIGNED") && (
+                  <button
+                    type="button"
+                    onClick={() => voidContract(c.id)}
+                    disabled={rowBusy === c.id}
+                    className="rounded-lg border border-admin-red/30 px-3 py-1.5 text-xs font-medium text-admin-red transition-colors hover:bg-admin-red-soft disabled:opacity-50"
+                  >
+                    무효 처리
+                  </button>
+                )}
               </div>
             </li>
           ))}
