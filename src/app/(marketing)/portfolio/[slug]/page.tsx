@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { PlaceholderArt } from "@/components/ui/PlaceholderArt";
+import { ProjectMockup } from "@/components/marketing/ProjectMockup";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { prisma } from "@/lib/prisma";
 import { jsonLdScript } from "@/lib/json-ld";
@@ -142,7 +142,7 @@ export default async function PortfolioDetailPage({
             />
           </div>
         ) : (
-          <PlaceholderArt label={item.category} className="aspect-[16/9] max-h-[420px] w-full" />
+          <ProjectMockup item={item} className="aspect-[16/9] max-h-[420px] w-full" />
         )}
 
         <p className="mt-10 text-xs font-medium text-muted">
@@ -272,7 +272,7 @@ export default async function PortfolioDetailPage({
                       />
                     </div>
                   ) : (
-                    <PlaceholderArt label={r.category} className="aspect-[16/10]" />
+                    <ProjectMockup item={r} className="aspect-[16/10]" />
                   )}
                   <div className="mt-3 flex items-baseline justify-between gap-3">
                     <h3 className="font-display text-[15px] font-semibold transition-colors group-hover:text-accent">

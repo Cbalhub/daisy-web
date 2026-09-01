@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { PortfolioItem } from "@prisma/client";
-import { PlaceholderArt } from "@/components/ui/PlaceholderArt";
+import { ProjectMockup } from "@/components/marketing/ProjectMockup";
 import { Mark } from "@/components/brand/Mark";
 import { cn } from "@/lib/utils";
 
@@ -109,8 +109,8 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
           />
         </div>
       ) : (
-        <PlaceholderArt
-          label={item.category}
+        <ProjectMockup
+          item={item}
           className="aspect-[16/10] shadow-[var(--shadow-e1)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-e2)]"
         />
       )}
