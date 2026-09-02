@@ -20,6 +20,33 @@ model AdminUser {
   auditLogs          AuditLog[]
   manualLedgerEntries ManualLedgerEntry[] @relation("ManualLedgerCreatedBy")
   contracts          Contract[]          @relation("ContractCreatedBy")
+  blogDrafts         BlogDraft[]         @relation("BlogDraftCreatedBy")
+}
+
+// ---------- 블로그 글 초안 (네이버 블로그·티스토리에 직접 복붙) ----------
+// 자동 포스팅은 하지 않습니다 — Claude 로 초안을 뽑아 관리자가 검토·수정한 뒤
+// "복사" 버튼으로 외부 블로그에 붙여넣는 흐름입니다.
+enum BlogPlatform {
+  NAVER
+  TISTORY
+  GENERIC
+}
+
+model BlogDraft {
+  id          String       @id @default(cuid())
+  topic       String // 입력한 주제
+  keywords    String[]     @default([])
+  platform    BlogPlatform @default(NAVER)
+  tone        String       @default("담백") // "담백" | "친근" | "전문"
+  title       String       @default("")
+  body        String       @default("") // "## 소제목 / - 목록" 마크다운
+  model       String       @default("") // 생성에 쓴 모델 ID 기록
+  createdById String?
+  createdBy   AdminUser?   @relation("BlogDraftCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([createdAt])
 }
 
 // ---------- 고객 계정 ----------
