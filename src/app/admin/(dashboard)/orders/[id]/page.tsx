@@ -107,7 +107,7 @@ export default async function OrderDetailPage({
         }
       />
 
-      <div className="grid gap-4 px-8 pt-6 lg:grid-cols-3">
+      <div className="grid gap-4 px-4 sm:px-8 pt-6 lg:grid-cols-3">
         <AdminCard className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-admin-text">주문 정보</h2>
           <dl className="mt-4 space-y-3 text-sm">
@@ -145,7 +145,7 @@ export default async function OrderDetailPage({
         </AdminCard>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard>
           <ContractPanel
             orderId={order.id}
@@ -157,7 +157,7 @@ export default async function OrderDetailPage({
         </AdminCard>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           <h2 className="px-5 pt-5 text-sm font-semibold text-admin-text">결제 시도 내역</h2>
           {order.payments.length === 0 ? (

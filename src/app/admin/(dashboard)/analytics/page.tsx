@@ -15,7 +15,7 @@ export default async function AnalyticsPage() {
         description={`최근 ${windowDays}일 동안의 방문 → 문의 → 결제 퍼널과 이탈 페이지입니다.`}
       />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <AdminCard>
           <h2 className="text-sm font-semibold text-admin-text">일별 방문(세션) 추이</h2>
           <div className="mt-6">
@@ -24,7 +24,7 @@ export default async function AnalyticsPage() {
         </AdminCard>
       </div>
 
-      <div className="grid gap-4 px-8 pt-4 lg:grid-cols-2">
+      <div className="grid gap-4 px-4 sm:px-8 pt-4 lg:grid-cols-2">
         <AdminCard>
           <h2 className="text-sm font-semibold text-admin-text">전환 퍼널</h2>
           <div className="mt-5 space-y-4">

@@ -11,7 +11,7 @@ export default async function AdminSettingsPage() {
   return (
     <div className="pb-16">
       <AdminPageHeader title="설정" description="입금 계좌와 사업자 정보를 관리합니다." />
-      <div className="space-y-8 px-8 pt-6">
+      <div className="space-y-8 px-4 sm:px-8 pt-6">
         <SettingsForm
           initial={{
             businessName: settings.businessName,

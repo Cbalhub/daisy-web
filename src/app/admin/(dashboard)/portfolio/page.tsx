@@ -26,7 +26,7 @@ export default async function AdminPortfolioPage() {
         }
       />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <AdminCard className="p-0">
           {items.length === 0 ? (
             <AdminEmptyState

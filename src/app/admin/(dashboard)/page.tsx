@@ -154,7 +154,7 @@ export default async function AdminDashboardPage() {
     <div className="pb-16">
       <AdminPageHeader title="대시보드" description="오늘의 채팅과 결제 현황입니다." />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <Reveal>
           {unreadMessages > 0 ||
           claimedOrders > 0 ||
@@ -220,7 +220,7 @@ export default async function AdminDashboardPage() {
         </Reveal>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 px-8 pt-4 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid grid-cols-1 gap-4 px-4 sm:px-8 pt-4 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
           <AdminCard className="flex h-full flex-col p-7">
             <div className="flex items-start justify-between gap-3">
@@ -306,7 +306,7 @@ export default async function AdminDashboardPage() {
         </RevealGroup>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <Reveal delay={0.08}>
           <AdminCard className="p-7">
             <div className="flex items-start justify-between gap-3">
@@ -332,7 +332,7 @@ export default async function AdminDashboardPage() {
         </Reveal>
       </div>
 
-      <RevealGroup className="grid grid-cols-2 gap-4 px-8 pt-4 sm:grid-cols-3" stagger={0.05}>
+      <RevealGroup className="grid grid-cols-2 gap-4 px-4 sm:px-8 pt-4 sm:grid-cols-3" stagger={0.05}>
         <RevealItem>
           <AdminCard className="p-5">
             <p className="text-xs font-medium text-admin-muted">진행중인 프로젝트</p>
@@ -365,7 +365,7 @@ export default async function AdminDashboardPage() {
         </RevealItem>
       </RevealGroup>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <Reveal delay={0.1}>
           <AdminCard>
             <h2 className="text-sm font-semibold text-admin-text">프로젝트 진행 현황</h2>
@@ -399,7 +399,7 @@ export default async function AdminDashboardPage() {
         </Reveal>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 px-8 pt-4 lg:grid-cols-2 lg:items-stretch">
+      <div className="grid grid-cols-1 gap-4 px-4 sm:px-8 pt-4 lg:grid-cols-2 lg:items-stretch">
         <Reveal delay={0.14} className="h-full">
         <AdminCard className="flex h-full flex-col">
           <div className="flex items-center justify-between">

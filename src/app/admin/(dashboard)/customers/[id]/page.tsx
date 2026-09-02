@@ -35,7 +35,7 @@ export default async function AdminCustomerDetailPage({
         description={`${customer.email}${customer.phone ? ` · ${customer.phone}` : ""} · ${new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" }).format(customer.createdAt)} 가입`}
       />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <AdminCard className="p-0">
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <h2 className="text-sm font-semibold text-admin-text">
@@ -72,7 +72,7 @@ export default async function AdminCustomerDetailPage({
         </AdminCard>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           <h2 className="px-5 pt-5 text-sm font-semibold text-admin-text">주문 · 결제</h2>
           {customer.orders.length === 0 ? (
@@ -105,7 +105,7 @@ export default async function AdminCustomerDetailPage({
         </AdminCard>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           <h2 className="px-5 pt-5 text-sm font-semibold text-admin-text">문의</h2>
           {customer.inquiries.length === 0 ? (

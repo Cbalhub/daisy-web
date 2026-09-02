@@ -41,11 +41,11 @@ export default async function AdminChatsPage({
     <div className="pb-16">
       <AdminPageHeader title="채팅" description="사이트 방문자와의 실시간 채팅 목록입니다." />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <SearchBox placeholder="고객 이름, 이메일로 검색" />
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           {conversations.length === 0 ? (
             <AdminEmptyState

@@ -37,11 +37,11 @@ export default async function AdminCustomersPage({
         description={`가입한 고객 계정 ${customers.length}명입니다.`}
       />
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-8 pt-6">
         <SearchBox placeholder="이름, 이메일, 연락처로 검색" />
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           {customers.length === 0 ? (
             <AdminEmptyState

@@ -10,7 +10,7 @@ export function AdminCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-admin-border bg-admin-surface p-6 shadow-[var(--shadow-e1)]",
+        "rounded-xl border border-admin-border bg-admin-surface p-4 shadow-[var(--shadow-e1)] sm:p-6",
         className
       )}
     >
@@ -29,7 +29,7 @@ export function AdminPageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4 px-8 pt-8">
+    <div className="flex flex-wrap items-start justify-between gap-4 px-4 pt-6 sm:px-4 sm:px-8 sm:pt-8">
       <div>
         <h1 className="text-2xl font-semibold text-admin-text">{title}</h1>
         {description && (

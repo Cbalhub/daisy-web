@@ -68,7 +68,7 @@ export default async function AdminChatDetailPage({
         title={conversation.customer.name || conversation.customer.email}
         description={conversation.customer.email}
       />
-      <div className="min-h-0 flex-1 px-8 pt-6">
+      <div className="min-h-0 flex-1 px-4 sm:px-8 pt-6">
         <div className="mx-auto h-full max-w-4xl">
           <AdminCard className="flex h-full flex-col">
             <ChatThread

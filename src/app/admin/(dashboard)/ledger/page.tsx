@@ -188,7 +188,7 @@ export default async function AdminLedgerPage({
     <div className="pb-16">
       <AdminPageHeader title="장부" description="결제·환불·지출을 한곳에서. 노션 결제 내역 DB 구성." />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 px-8 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-8 pt-6">
         <div className="flex items-center gap-3">
           {isCustomRange ? (
             <h2 className="text-lg font-semibold text-admin-text">{heading}</h2>
@@ -248,7 +248,7 @@ export default async function AdminLedgerPage({
         </div>
       </div>
 
-      <RevealGroup className="grid grid-cols-2 gap-4 px-8 pt-4 md:grid-cols-4" stagger={0.05}>
+      <RevealGroup className="grid grid-cols-2 gap-4 px-4 sm:px-8 pt-4 md:grid-cols-4" stagger={0.05}>
         <RevealItem>
           <AdminCard>
             <p className="text-xs font-medium text-admin-muted">매출</p>
@@ -284,7 +284,7 @@ export default async function AdminLedgerPage({
       </RevealGroup>
 
       {(monthly.length > 1 || expenseRows.length > 0) && (
-        <div className="grid gap-4 px-8 pt-4 lg:grid-cols-2">
+        <div className="grid gap-4 px-4 sm:px-8 pt-4 lg:grid-cols-2">
           {monthly.length > 1 && (
             <AdminCard>
               <h2 className="text-sm font-semibold text-admin-text">월별 매출 · 지출</h2>
@@ -355,7 +355,7 @@ export default async function AdminLedgerPage({
         </div>
       )}
 
-      <div className="px-8 pt-5">
+      <div className="px-4 sm:px-8 pt-5">
         <AddLedgerEntry conversations={conversations} />
 
         {rows.length === 0 ? (

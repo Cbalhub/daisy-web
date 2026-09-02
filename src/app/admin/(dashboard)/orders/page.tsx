@@ -81,7 +81,7 @@ export default async function OrdersPage({
         }
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-4 px-8 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 sm:px-8 pt-6">
         <Segmented
           active={activeHref}
           items={FILTERS.map((f) => ({
@@ -95,7 +95,7 @@ export default async function OrdersPage({
         </div>
       </div>
 
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <AdminCard className="p-0">
           {orders.length === 0 ? (
             <AdminEmptyState
