@@ -4,6 +4,7 @@ import { isSameOrigin } from "@/lib/csrf";
 import { signContractSchema } from "@/lib/validation/contract";
 import { hashContractFacts, isSentContractExpired, type CompanySnapshot } from "@/lib/contract";
 import { sendSlackText } from "@/lib/slack";
+import { sendTelegramText } from "@/lib/telegram";
 import { sendOwnerNotification } from "@/lib/email";
 import { clientIp } from "@/lib/request-ip";
 
@@ -119,6 +120,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
     sendSlackText(
       `✍️ 계약서 서명 완료 — ${contract.clientName} 님\n${orderTitle} · ${amountText}`,
       { url: adminUrl, urlLabel: "관리자에서 열기", username: "MOVD 계약", iconEmoji: ":writing_hand:" }
+    ),
+    sendTelegramText(
+      `✍️ 계약서 서명 완료 — ${contract.clientName} 님\n${orderTitle} · ${amountText}`,
+      { url: adminUrl, urlLabel: "관리자에서 열기" }
     ),
     sendOwnerNotification({
       subject: `[MOVD] 계약서 서명 완료 — ${orderTitle}`,

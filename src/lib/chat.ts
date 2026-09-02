@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { sendNewMessageNotification } from "@/lib/email";
 import { sendSlackText } from "@/lib/slack";
+import { sendTelegramText } from "@/lib/telegram";
 import { encryptFieldTagged, decryptFieldTagged } from "@/lib/crypto";
 
 // 채팅 메시지 본문은 검색/필터링 대상이 아니라서(이름·연락처와 달리) 부분 일치
@@ -118,6 +119,10 @@ async function notifyAdminOfNewMessage(
       webhook: process.env.SLACK_WEBHOOK_URL_CHAT || undefined,
       username: "MOVD 채팅",
       iconEmoji: ":speech_balloon:",
+    }),
+    sendTelegramText(`💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`, {
+      url: `${siteUrl}/admin/chats/${conversationId}`,
+      urlLabel: "채팅 열기",
     }),
   ]);
 }
