@@ -37,6 +37,11 @@ export function LoginForm() {
       }
 
       toast("로그인됐어요", "success");
+      try {
+        localStorage.setItem("movd-auth", "1");
+      } catch {
+        // 무시.
+      }
       window.dispatchEvent(new Event("movd-auth-change"));
       router.replace(params.get("next") || "/account");
     } catch (err) {

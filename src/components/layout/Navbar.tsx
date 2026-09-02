@@ -25,13 +25,38 @@ export function Navbar() {
   // 마케팅 페이지들이 정적 프리렌더가 안 됨). 마운트뿐 아니라 ① 경로가 바뀔 때
   // ② 로그인/로그아웃 이벤트가 올 때 다시 확인해서, 로그아웃했는데 nav 는
   // "마이페이지"로 남아있는 어긋남을 없앱니다.
+  //
+  // 새로고침마다 /api/account/me 왕복 동안 "로그인"이 잠깐 떴다 "마이페이지"로
+  // 바뀌는 깜빡임이 있어서, 마지막으로 확인된 값을 localStorage 에 캐시해 두고
+  // 마운트 직후(마이크로태스크) 즉시 반영합니다. 서버 렌더는 항상 false 라
+  // 하이드레이션 불일치가 없고, 마이크로태스크는 페인트 전에 실행돼 사용자는
+  // 깜빡임을 거의 못 봅니다. fetch 결과가 오면 캐시를 갱신·보정합니다.
+  const AUTH_CACHE_KEY = "movd-auth";
   useEffect(() => {
     let alive = true;
+
+    Promise.resolve().then(() => {
+      if (!alive) return;
+      try {
+        const cached = localStorage.getItem(AUTH_CACHE_KEY);
+        if (cached === "1" || cached === "0") setLoggedIn(cached === "1");
+      } catch {
+        // 저장소 접근 불가 — fetch 결과만 사용.
+      }
+    });
+
     const check = () => {
       fetch("/api/account/me")
         .then((res) => res.json())
         .then((data) => {
-          if (alive) setLoggedIn(Boolean(data.loggedIn));
+          if (!alive) return;
+          const value = Boolean(data.loggedIn);
+          setLoggedIn(value);
+          try {
+            localStorage.setItem(AUTH_CACHE_KEY, value ? "1" : "0");
+          } catch {
+            // 무시.
+          }
         })
         .catch(() => {});
     };

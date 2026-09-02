@@ -53,6 +53,11 @@ export function SignupForm() {
       }
 
       toast("가입이 완료됐어요", "success");
+      try {
+        localStorage.setItem("movd-auth", "1");
+      } catch {
+        // 무시.
+      }
       window.dispatchEvent(new Event("movd-auth-change"));
       router.replace("/account");
     } catch (err) {

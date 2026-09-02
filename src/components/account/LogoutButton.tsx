@@ -7,7 +7,12 @@ export function LogoutButton() {
 
   async function logout() {
     await fetch("/api/account/logout", { method: "POST" });
-    // 내비게이션 바가 즉시 "로그인"으로 바뀌도록 알림
+    // 네비게이션 바가 즉시 "로그인"으로 바뀌도록: 캐시를 먼저 지우고 이벤트로 알림.
+    try {
+      localStorage.setItem("movd-auth", "0");
+    } catch {
+      // 무시.
+    }
     window.dispatchEvent(new Event("movd-auth-change"));
     router.replace("/");
   }
