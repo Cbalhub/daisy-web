@@ -33,6 +33,10 @@ export async function logAnalyticsEvent(input: {
   path: string;
   sessionId: string;
   referrer?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  referrerHost?: string | null;
 }) {
   try {
     await prisma.analyticsEvent.create({
@@ -41,6 +45,10 @@ export async function logAnalyticsEvent(input: {
         path: input.path.slice(0, 500),
         sessionId: input.sessionId,
         referrer: input.referrer?.slice(0, 500) || null,
+        utmSource: input.utmSource?.slice(0, 120) || null,
+        utmMedium: input.utmMedium?.slice(0, 120) || null,
+        utmCampaign: input.utmCampaign?.slice(0, 120) || null,
+        referrerHost: input.referrerHost?.slice(0, 120) || null,
       },
     });
   } catch {

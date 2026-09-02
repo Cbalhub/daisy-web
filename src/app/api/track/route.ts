@@ -16,6 +16,10 @@ function getClientIp(req: NextRequest) {
 const trackSchema = z.object({
   type: z.enum(["PAGE_VIEW", "CHECKOUT_STARTED"]),
   path: z.string().min(1).max(500),
+  utmSource: z.string().trim().max(120).optional(),
+  utmMedium: z.string().trim().max(120).optional(),
+  utmCampaign: z.string().trim().max(120).optional(),
+  referrerHost: z.string().trim().max(120).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -36,6 +40,10 @@ export async function POST(req: NextRequest) {
     path: parsed.data.path,
     sessionId,
     referrer: req.headers.get("referer"),
+    utmSource: parsed.data.utmSource,
+    utmMedium: parsed.data.utmMedium,
+    utmCampaign: parsed.data.utmCampaign,
+    referrerHost: parsed.data.referrerHost,
   });
 
   return NextResponse.json({ ok: true });

@@ -7,6 +7,12 @@ const DAILY_CHART_DAYS = 14;
 export type FunnelStep = { label: string; count: number };
 export type ExitPage = { path: string; count: number };
 export type DailyPoint = { label: string; value: number };
+export type ChannelRow = {
+  channel: string;
+  visits: number;
+  inquiries: number;
+  checkouts: number;
+};
 
 /**
  * 방문→문의→결제 퍼널과 세션별 마지막 방문 페이지(이탈 페이지)를 집계합니다.
@@ -34,6 +40,74 @@ export async function getFunnelOverview() {
   ];
 
   return { funnel, exitPages, dailyPageViews, windowDays: FUNNEL_WINDOW_DAYS };
+}
+
+// 리퍼러 호스트를 사람이 읽는 채널명으로.
+function channelName(utmSource: string | null, referrerHost: string | null): string {
+  if (utmSource) return utmSource;
+  if (!referrerHost) return "직접 유입";
+  const h = referrerHost.toLowerCase();
+  if (h.includes("naver")) return "네이버";
+  if (h.includes("google")) return "구글";
+  if (h.includes("daum") || h.includes("kakao")) return "다음·카카오";
+  if (h.includes("bing")) return "빙";
+  if (h.includes("instagram")) return "인스타그램";
+  if (h.includes("facebook")) return "페이스북";
+  if (h.includes("tistory")) return "티스토리";
+  if (h.includes("youtube")) return "유튜브";
+  return referrerHost.replace(/^www\./, "");
+}
+
+/**
+ * 최근 30일 세션을 유입 채널별로 나눠 방문·문의·결제 세션 수를 집계합니다.
+ * 세션의 채널은 그 세션의 "가장 이른 이벤트" 기준(첫 랜딩)으로 판정합니다.
+ */
+export async function getChannelBreakdown(): Promise<ChannelRow[]> {
+  const since = new Date(Date.now() - FUNNEL_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const events = await prisma.analyticsEvent.findMany({
+    where: { createdAt: { gte: since } },
+    select: {
+      type: true,
+      sessionId: true,
+      utmSource: true,
+      referrerHost: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const sessionChannel = new Map<string, string>();
+  for (const e of events) {
+    if (!sessionChannel.has(e.sessionId)) {
+      sessionChannel.set(e.sessionId, channelName(e.utmSource, e.referrerHost));
+    }
+  }
+
+  const agg = new Map<string, { visits: Set<string>; inquiries: Set<string>; checkouts: Set<string> }>();
+  const bucket = (ch: string) => {
+    let b = agg.get(ch);
+    if (!b) {
+      b = { visits: new Set(), inquiries: new Set(), checkouts: new Set() };
+      agg.set(ch, b);
+    }
+    return b;
+  };
+  for (const e of events) {
+    const ch = sessionChannel.get(e.sessionId)!;
+    const b = bucket(ch);
+    if (e.type === "PAGE_VIEW") b.visits.add(e.sessionId);
+    else if (e.type === "CONTACT_SUBMITTED") b.inquiries.add(e.sessionId);
+    else if (e.type === "CHECKOUT_COMPLETED") b.checkouts.add(e.sessionId);
+  }
+
+  return [...agg.entries()]
+    .map(([channel, b]) => ({
+      channel,
+      visits: b.visits.size,
+      inquiries: b.inquiries.size,
+      checkouts: b.checkouts.size,
+    }))
+    .sort((a, b) => b.visits - a.visits);
 }
 
 type RawEvent = { type: string; path: string; sessionId: string; createdAt: Date };

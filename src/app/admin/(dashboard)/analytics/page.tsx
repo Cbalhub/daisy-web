@@ -1,11 +1,14 @@
 import { AdminCard, AdminPageHeader } from "@/components/admin/ui/Card";
 import { Sparkline } from "@/components/admin/ui/Sparkline";
-import { getFunnelOverview } from "@/lib/admin/funnel";
+import { getFunnelOverview, getChannelBreakdown } from "@/lib/admin/funnel";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  const { funnel, exitPages, dailyPageViews, windowDays } = await getFunnelOverview();
+  const [{ funnel, exitPages, dailyPageViews, windowDays }, channels] = await Promise.all([
+    getFunnelOverview(),
+    getChannelBreakdown(),
+  ]);
   const topOfFunnel = funnel[0]?.count || 1;
 
   return (
@@ -71,6 +74,47 @@ export default async function AnalyticsPage() {
               </li>
             ))}
           </ul>
+        </AdminCard>
+      </div>
+
+      <div className="px-4 sm:px-8 pt-4">
+        <AdminCard>
+          <h2 className="text-sm font-semibold text-admin-text">유입 채널</h2>
+          <p className="mt-1 text-xs text-admin-muted">
+            세션의 첫 방문 기준(utm_source 우선, 없으면 리퍼러). 최근 {windowDays}일.
+          </p>
+          {channels.length === 0 ? (
+            <p className="py-8 text-center text-sm text-admin-muted">데이터가 아직 없습니다.</p>
+          ) : (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[28rem] text-sm">
+                <thead>
+                  <tr className="border-b border-admin-border text-xs text-admin-muted">
+                    <th className="py-2 text-left font-medium">채널</th>
+                    <th className="py-2 text-right font-medium">방문</th>
+                    <th className="py-2 text-right font-medium">문의</th>
+                    <th className="py-2 text-right font-medium">결제</th>
+                    <th className="py-2 text-right font-medium">문의 전환</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {channels.map((c) => (
+                    <tr key={c.channel} className="border-b border-admin-border/60 last:border-0">
+                      <td className="py-2 font-medium text-admin-text">{c.channel}</td>
+                      <td className="py-2 text-right tabular-nums text-admin-text">
+                        {c.visits.toLocaleString("ko-KR")}
+                      </td>
+                      <td className="py-2 text-right tabular-nums text-admin-text">{c.inquiries}</td>
+                      <td className="py-2 text-right tabular-nums text-admin-text">{c.checkouts}</td>
+                      <td className="py-2 text-right tabular-nums text-admin-muted">
+                        {c.visits > 0 ? `${Math.round((c.inquiries / c.visits) * 100)}%` : "–"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </AdminCard>
       </div>
     </div>
