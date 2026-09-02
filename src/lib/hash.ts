@@ -20,3 +20,10 @@ export function hashPassword(plain: string): Promise<string> {
 export function verifyPassword(plain: string, hashed: string): Promise<boolean> {
   return verify(plain, hashed);
 }
+
+// 저장된 해시가 현재 cost 와 다르면 true — 로그인 성공 시 조용히 다시 해싱해
+// 다음 로그인부터 빨라지게 합니다(예: 예전 cost 12 해시 → 10 으로 승급).
+export function needsRehash(hashed: string): boolean {
+  const m = hashed.match(/^\$2[aby]\$(\d{2})\$/);
+  return !m || Number(m[1]) !== BCRYPT_COST;
+}

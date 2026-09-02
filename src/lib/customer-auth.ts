@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCustomerSession } from "@/lib/customer-session";
-import { hashPassword, verifyPassword, DUMMY_HASH } from "@/lib/hash";
+import { hashPassword, verifyPassword, needsRehash, DUMMY_HASH } from "@/lib/hash";
 
 export async function createCustomer(input: {
   email: string;
@@ -41,7 +41,13 @@ export async function verifyCustomerCredentials(email: string, password: string)
     return null;
   }
   const valid = await verifyPassword(password, customer.passwordHash);
-  return valid ? customer : null;
+  if (!valid) return null;
+  if (needsRehash(customer.passwordHash)) {
+    void hashPassword(password)
+      .then((h) => prisma.customer.update({ where: { id: customer.id }, data: { passwordHash: h } }))
+      .catch(() => {});
+  }
+  return customer;
 }
 
 export async function requireCustomerSession() {

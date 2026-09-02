@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { verifyPassword, DUMMY_HASH } from "@/lib/hash";
+import { verifyPassword, hashPassword, needsRehash, DUMMY_HASH } from "@/lib/hash";
 
 export async function verifyAdminCredentials(email: string, password: string) {
   // 이메일은 대소문자를 구분하지 않는 것이 사용자 기대에 맞습니다 — 브라우저 자동완성이나
@@ -14,7 +14,13 @@ export async function verifyAdminCredentials(email: string, password: string) {
     return null;
   }
   const valid = await verifyPassword(password, admin.passwordHash);
-  return valid ? admin : null;
+  if (!valid) return null;
+  if (needsRehash(admin.passwordHash)) {
+    void hashPassword(password)
+      .then((h) => prisma.adminUser.update({ where: { id: admin.id }, data: { passwordHash: h } }))
+      .catch(() => {});
+  }
+  return admin;
 }
 
 export async function requireAdminSession() {
