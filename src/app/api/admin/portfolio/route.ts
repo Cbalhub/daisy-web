@@ -26,11 +26,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { published, body, ...rest } = parsed.data;
+  const { published, body, mockup, ...rest } = parsed.data;
 
   try {
     const item = await prisma.portfolioItem.create({
-      data: { ...rest, body: body || "", publishedAt: published ? new Date() : null },
+      data: {
+        ...rest,
+        body: body || "",
+        // Prisma Json? 필드는 JS null 을 직접 못 받습니다 — 비면 DbNull.
+        mockup: mockup ?? Prisma.DbNull,
+        publishedAt: published ? new Date() : null,
+      },
     });
     revalidatePortfolio();
     return NextResponse.json({ ok: true, item });

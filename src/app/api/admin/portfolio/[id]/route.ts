@@ -31,7 +31,7 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { published, body, ...rest } = parsed.data;
+  const { published, body, mockup, ...rest } = parsed.data;
   const publishedAt = await resolvePublishedAt(id, published);
 
   const before = await prisma.portfolioItem.findUnique({
@@ -42,7 +42,13 @@ export async function PATCH(
   try {
     const item = await prisma.portfolioItem.update({
       where: { id },
-      data: { ...rest, body: body || "", publishedAt },
+      data: {
+        ...rest,
+        body: body || "",
+        // undefined = 폼이 안 보냄(그대로), null = 목업 지움, 객체 = 저장.
+        mockup: mockup === undefined ? undefined : (mockup ?? Prisma.DbNull),
+        publishedAt,
+      },
     });
     // 이번 저장에서 빠진 이미지 파일은 디스크에서도 지웁니다(안 그러면 교체할 때마다
     // 옛 파일이 public/uploads 에 영영 쌓입니다).

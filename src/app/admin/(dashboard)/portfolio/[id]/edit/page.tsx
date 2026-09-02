@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AdminPageHeader } from "@/components/admin/ui/Card";
 import { PortfolioForm } from "@/components/admin/PortfolioForm";
+import { normalizeMockup } from "@/lib/mockup";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function EditPortfolioPage({
               duration: item.duration ?? "",
               cost: item.cost ?? "",
               images: item.images,
+              mockup: normalizeMockup(item.mockup),
               published: Boolean(item.publishedAt),
             }}
           />

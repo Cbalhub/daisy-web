@@ -65,6 +65,9 @@ model Inquiry {
 
 // ---------- 포트폴리오 ----------
 
+// PortfolioItem.mockup — 관리자가 항목마다 채우는 플랫폼 목업 설정(JSON).
+// { platform: "telegram"|"discord"|"program", name, scenes: [{ chat?, buttons?, logs?, caption? }] }
+// 비어 있으면 슬러그·features 기반 기본 목업으로 폴백. shape 은 src/lib/mockup.ts.
 model PortfolioItem {
   id          String    @id @default(cuid())
   slug        String    @unique
@@ -74,6 +77,7 @@ model PortfolioItem {
   body        String    @default("")
   tags        String[]  @default([])
   images      String[]  @default([])
+  mockup      Json?     // 플랫폼 목업 설정 — 위 모델 주석 참고
   // 케이스 스터디 카드에 표시하는 요약 정보 — 전부 선택 입력이라 비워두면
   // 해당 항목만 카드에서 자연스럽게 빠집니다.
   industry    String? // 업종, 예: "이커머스"

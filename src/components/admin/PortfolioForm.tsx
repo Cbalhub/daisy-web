@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AdminCard } from "@/components/admin/ui/Card";
 import { useToast } from "@/components/ui/Toast";
+import { MockupEditor } from "@/components/admin/MockupEditor";
+import type { MockupConfig } from "@/lib/mockup";
 
 type Initial = {
   id?: string;
@@ -19,6 +21,7 @@ type Initial = {
   duration: string;
   cost: string;
   images: string[];
+  mockup: MockupConfig | null;
   published: boolean;
 };
 
@@ -34,6 +37,7 @@ const EMPTY: Initial = {
   duration: "",
   cost: "",
   images: [],
+  mockup: null,
   published: false,
 };
 
@@ -46,6 +50,7 @@ export function PortfolioForm({ initial }: { initial?: Initial }) {
   const isEdit = Boolean(data.id);
 
   const [images, setImages] = useState<string[]>(data.images);
+  const [mockup, setMockup] = useState<MockupConfig | null>(data.mockup);
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -111,6 +116,7 @@ export function PortfolioForm({ initial }: { initial?: Initial }) {
       duration: String(form.get("duration") ?? ""),
       cost: String(form.get("cost") ?? ""),
       images,
+      mockup,
       published: form.get("published") === "on",
     };
 
@@ -238,6 +244,12 @@ export function PortfolioForm({ initial }: { initial?: Initial }) {
             </p>
           )}
           {imageError && <p className="mt-2 text-xs text-admin-red">{imageError}</p>}
+        </div>
+        <div>
+          <label className="text-xs font-medium text-admin-muted">화면 목업</label>
+          <div className="mt-1.5">
+            <MockupEditor value={mockup} onChange={setMockup} />
+          </div>
         </div>
         <div>
           <label className="text-xs font-medium text-admin-muted">

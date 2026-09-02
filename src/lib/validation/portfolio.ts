@@ -4,6 +4,23 @@ import { z } from "zod";
 // 자동으로 퍼센트 인코딩되어 문제없이 동작합니다.
 const slugPattern = /^[a-z0-9가-힣]+(?:-[a-z0-9가-힣]+)*$/;
 
+// 항목별 플랫폼 목업 설정. 비어 있으면(null) 슬러그·features 기반 기본 목업으로 폴백.
+const mockupSceneSchema = z.object({
+  chat: z
+    .array(z.object({ from: z.enum(["user", "bot"]), text: z.string().max(600) }))
+    .max(16)
+    .optional(),
+  buttons: z.array(z.string().trim().min(1).max(30)).max(8).optional(),
+  logs: z.array(z.string().trim().min(1).max(160)).max(16).optional(),
+  caption: z.string().trim().max(100).optional(),
+});
+
+export const mockupConfigSchema = z.object({
+  platform: z.enum(["telegram", "discord", "program"]),
+  name: z.string().trim().min(1).max(50),
+  scenes: z.array(mockupSceneSchema).min(1).max(4),
+});
+
 export const portfolioSchema = z.object({
   title: z.string().trim().min(1).max(150),
   slug: z
@@ -25,5 +42,6 @@ export const portfolioSchema = z.object({
     .array(z.string().regex(/^\/uploads\/portfolio\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif)$/))
     .max(8)
     .default([]),
+  mockup: mockupConfigSchema.nullable().optional(),
   published: z.boolean().default(false),
 });

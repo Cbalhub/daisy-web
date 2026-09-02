@@ -1,6 +1,7 @@
 import type { PortfolioItem } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { MockupCarousel } from "@/components/marketing/MockupCarousel";
+import { normalizeMockup, type MockupConfig } from "@/lib/mockup";
 
 // 포트폴리오 이미지가 없을 때(실제 납품물은 대개 비공개), 프로젝트가 돌아가는
 // 플랫폼의 화면을 코드로 흉내 냅니다. 여기서는 사이트 무채색 규칙의 예외로
@@ -541,7 +542,40 @@ const DISCORD: Record<
   },
 };
 
+// 관리자가 항목에 직접 채운 목업 설정(PortfolioItem.mockup)이 있으면 그걸로 렌더.
+function scenesFromConfig(m: MockupConfig): React.ReactNode[] {
+  return m.scenes.map((s, i) => {
+    if (m.platform === "telegram") {
+      if (s.buttons?.length && !s.chat?.length) {
+        return <TelegramMenu key={i} name={m.name} buttons={s.buttons} />;
+      }
+      const rows = (s.chat ?? []).map((c) => ({
+        from: c.from === "user" ? ("out" as const) : ("in" as const),
+        text: c.text,
+      }));
+      return <TelegramChat key={i} name={m.name} rows={rows} />;
+    }
+    if (m.platform === "discord") {
+      const msgs = (s.chat ?? []).map((c) =>
+        c.from === "bot"
+          ? { author: m.name, bot: true, text: c.text }
+          : { author: "고객", text: c.text }
+      );
+      return <DiscordChat key={i} channel={m.name} msgs={msgs} />;
+    }
+    // program — "HH:MM 메시지" 형태면 시각/본문 분리, 아니면 · 로.
+    const logs = (s.logs ?? []).map((line) => {
+      const mm = line.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s+(.*)$/);
+      return mm ? { t: mm[1], msg: mm[2] } : { t: "·", msg: line };
+    });
+    return <ProgramLog key={i} title={m.name} logs={logs} />;
+  });
+}
+
 function scenesFor(item: PortfolioItem): React.ReactNode[] {
+  const configured = normalizeMockup(item.mockup);
+  if (configured) return scenesFromConfig(configured);
+
   const p = platformOf(item);
 
   if (p === "telegram") {
