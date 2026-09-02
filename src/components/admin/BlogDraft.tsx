@@ -165,6 +165,10 @@ export function BlogDraftEditor({
   const [copyMode, setCopyMode] = useState<"plain" | "markdown">(
     draft.platform === "TISTORY" ? "markdown" : "plain"
   );
+  // 본문 복사할 때 맨 끝에 붙는 한 줄 CTA(홍보 문구+링크). AI 본문은 홍보를 안 넣게
+  // 해서, 홍보는 여기서 딱 한 줄만 통제합니다. 클라이언트 전용(저장 안 함).
+  const [ctaOn, setCtaOn] = useState(true);
+  const [cta, setCta] = useState("챗봇·업무 자동화·관리자 도구 개발 문의는 movd.co.kr");
 
   const tags = tagsText
     .split(/[,\n]/)
@@ -232,7 +236,9 @@ export function BlogDraftEditor({
     if (what === "tags") {
       text = tags.join(", ");
     } else {
-      text = (title ? `${title}\n\n` : "") + (copyMode === "plain" ? toPlainText(body) : body.trim());
+      const main = copyMode === "plain" ? toPlainText(body) : body.trim();
+      const tail = ctaOn && cta.trim() ? `\n\n${cta.trim()}` : "";
+      text = (title ? `${title}\n\n` : "") + main + tail;
     }
     try {
       await navigator.clipboard.writeText(text);
@@ -325,6 +331,25 @@ export function BlogDraftEditor({
             className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-surface px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-blue"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="flex items-center gap-2 text-xs font-medium text-admin-muted">
+          <input type="checkbox" checked={ctaOn} onChange={(e) => setCtaOn(e.target.checked)} />
+          본문 복사 시 맨 끝에 홍보 한 줄 붙이기
+          <span className="text-admin-muted/70">(AI 본문엔 홍보 없음 — 여기서만 통제)</span>
+        </label>
+        <input
+          value={cta}
+          onChange={(e) => setCta(e.target.value)}
+          disabled={!ctaOn}
+          className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-surface px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-blue disabled:opacity-40"
+        />
+        {isNaver && (
+          <p className="mt-1 text-[11px] text-admin-muted">
+            네이버는 본문 링크가 1개 넘으면 저품질 위험 — 이 한 줄만. 링크는 프로필 대표링크에도 걸어두세요.
+          </p>
+        )}
       </div>
 
       <div>
