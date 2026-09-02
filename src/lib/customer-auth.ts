@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getCustomerSession } from "@/lib/customer-session";
+import { BCRYPT_COST } from "@/lib/hash";
 
 export async function createCustomer(input: {
   email: string;
@@ -9,7 +10,7 @@ export async function createCustomer(input: {
   phone?: string;
 }) {
   const email = input.email.trim().toLowerCase();
-  const passwordHash = await bcrypt.hash(input.password, 12);
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
 
   const customer = await prisma.customer.create({
     data: { email, passwordHash, name: input.name, phone: input.phone },

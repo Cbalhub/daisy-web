@@ -10,7 +10,7 @@ async function main() {
   const email = (process.env.SEED_ADMIN_EMAIL ?? "admin@movd.co.kr").trim().toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD ?? "changeme123!";
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, 10); // src/lib/hash.ts BCRYPT_COST 와 동일
 
   await prisma.adminUser.upsert({
     where: { email },

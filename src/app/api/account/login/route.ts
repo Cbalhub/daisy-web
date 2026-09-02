@@ -40,14 +40,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await prisma.auditLog.create({
-    data: {
-      action: "customer.login",
-      targetType: "Customer",
-      targetId: customer.id,
-      metadata: { ip },
-    },
-  });
+  // 로그인 감사 로그는 응답을 붙잡지 않도록 기다리지 않습니다(부가 기록).
+  void prisma.auditLog
+    .create({
+      data: { action: "customer.login", targetType: "Customer", targetId: customer.id, metadata: { ip } },
+    })
+    .catch((err) => console.error("[account/login] audit log 실패:", err));
 
   const session = await getCustomerSession();
   session.customerId = customer.id;

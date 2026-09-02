@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { BCRYPT_COST } from "@/lib/hash";
 
 export const runtime = "nodejs";
 
@@ -43,7 +44,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "새 비밀번호가 현재와 같습니다." }, { status: 400 });
   }
 
-  const passwordHash = await bcrypt.hash(parsed.data.newPassword, 12);
+  const passwordHash = await bcrypt.hash(parsed.data.newPassword, BCRYPT_COST);
   await prisma.$transaction([
     prisma.adminUser.update({ where: { id: admin.id }, data: { passwordHash } }),
     prisma.auditLog.create({
