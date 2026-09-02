@@ -11,6 +11,9 @@ const EMAIL_FROM = process.env.RESEND_FROM || "MOVD <onboarding@resend.dev>";
 // 사이트와 같은 무채색 톤 — 파란 액센트를 쓰지 않습니다(색은 로고 전용).
 const BRAND = { ink: "#191919", paper: "#ffffff", accent: "#191919", muted: "#8c8c8c" };
 
+// 이메일 헤더 워드마크 이미지의 절대 URL. 이미지 차단 클라이언트는 alt="MOVD" 로 폴백.
+const LOGO_URL = `${process.env.SITE_URL || "https://movd.co.kr"}/email-logo`;
+
 // 고객명·주문명·메시지 미리보기처럼 사용자가 입력한 값을 HTML 템플릿에 그대로
 // 꽂으면, 그 값에 <script>나 <img onerror=...> 같은 마크업이 섞여 있을 때
 // 수신자의 메일 클라이언트에서 그대로 렌더링될 수 있습니다. text(plain) 필드는
@@ -35,8 +38,9 @@ function emailShell(bodyHtml: string) {
   <body style="margin:0;padding:32px 16px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
     <table role="presentation" width="100%" style="max-width:480px;margin:0 auto;background:${BRAND.paper};border-radius:16px;overflow:hidden;">
       <tr>
-        <td style="padding:32px 32px 8px;">
-          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.ink};letter-spacing:-0.01em;">MOVD</p>
+        <td style="padding:28px 32px 6px;">
+          <img src="${LOGO_URL}" width="84" height="31" alt="MOVD"
+               style="display:block;border:0;outline:none;text-decoration:none;font-size:15px;font-weight:700;color:${BRAND.ink};" />
         </td>
       </tr>
       <tr>
