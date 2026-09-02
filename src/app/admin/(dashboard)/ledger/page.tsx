@@ -6,7 +6,11 @@ import { DateRangeFilter } from "@/components/admin/ui/DateRangeFilter";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDownload } from "@/components/admin/icons";
 import { PROJECT_STAGE_LABEL, PROOF_TYPE_LABEL, EXPENSE_CATEGORY_LABEL } from "@/lib/admin/status";
-import { AddLedgerEntry, ManualEntryActions } from "@/components/admin/ManualLedgerEntry";
+import {
+  AddLedgerEntry,
+  ManualEntryActions,
+  AutoEntryProof,
+} from "@/components/admin/ManualLedgerEntry";
 import {
   getLedgerEntries,
   listConversationsForPicker,
@@ -365,6 +369,16 @@ export default async function AdminLedgerPage({
                               taxInvoiceIssuedAt: e.taxInvoiceIssuedAt,
                               memo: e.memo,
                               conversationId: e.conversationId,
+                            }}
+                          />
+                        )}
+                        {e.source === "auto" && (
+                          <AutoEntryProof
+                            entry={{
+                              id: e.id,
+                              proofType: e.proofType,
+                              taxInvoiceIssuedAt: e.taxInvoiceIssuedAt,
+                              memo: e.memo,
                             }}
                           />
                         )}

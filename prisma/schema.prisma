@@ -251,6 +251,13 @@ model Payment {
   virtualAccountHolder    String?
   virtualAccountExpiredAt DateTime?
 
+  // 장부·세금 신고용 — 관리자가 /admin/ledger 에서 채웁니다. 금액·날짜·고객은 결제
+  // 사실이라 못 고치지만, 이 세 칸(증빙 수단·세금계산서 발행일·비고)은 결제 뒤에
+  // 별도로 정해지므로 나중에 입력합니다.
+  ledgerProofType          ProofType?
+  ledgerTaxInvoiceIssuedAt DateTime?
+  ledgerMemo               String?
+
   refunds Refund[]
 
   @@index([orderId])
@@ -267,6 +274,11 @@ model Refund {
   adminId     String?
   admin       AdminUser? @relation(fields: [adminId], references: [id])
   cancelledAt DateTime   @default(now())
+
+  // 장부·세금 신고용 (환불 증빙·비고). Payment 와 동일한 이유로 사후 입력.
+  ledgerProofType          ProofType?
+  ledgerTaxInvoiceIssuedAt DateTime?
+  ledgerMemo               String?
 }
 
 // 포트원 웹훅 원본 로그 — 서명 검증 및 재처리 방지(idempotency)에 사용

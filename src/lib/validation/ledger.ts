@@ -41,3 +41,21 @@ export const manualLedgerEntrySchema = z.object({
 });
 
 export type ManualLedgerEntryInput = z.infer<typeof manualLedgerEntrySchema>;
+
+// 사이트 결제/환불(자동 집계 행)에 붙이는 증빙 정보. 금액·날짜·고객은 결제 사실이라
+// 못 고치고, 이 세 칸만 사후에 채웁니다.
+export const ledgerProofSchema = z.object({
+  source: z.enum(["payment", "refund"]),
+  id: z.string().trim().min(1).max(40),
+  proofType: z
+    .enum(["TAX_INVOICE", "CASH_RECEIPT", "TRANSFER_RECORD", "NONE"])
+    .optional()
+    .or(z.literal("")),
+  taxInvoiceIssuedAt: z
+    .string()
+    .trim()
+    .refine((s) => s === "" || !Number.isNaN(Date.parse(s)), "날짜 형식이 올바르지 않습니다.")
+    .optional()
+    .or(z.literal("")),
+  memo: z.string().trim().max(1000).optional().or(z.literal("")),
+});
