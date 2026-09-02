@@ -8,7 +8,7 @@ import { AdminEmptyState } from "@/components/admin/ui/EmptyState";
 import { IconChat, IconCard } from "@/components/admin/icons";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { ORDER_STATUS_LABEL } from "@/lib/admin/status";
-import { getDailyRevenue } from "@/lib/admin/revenue";
+import { getDailyRevenue, getDailyConversations } from "@/lib/admin/revenue";
 import { decryptFieldTagged } from "@/lib/crypto";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +37,10 @@ async function getOverview() {
     recentConversations,
     recentOrders,
     dailyRevenue,
+    dailyConversations,
+    sentContracts,
+    stalePendingOrders,
+    unpublishedReviews,
   ] = await Promise.all([
     prisma.chatConversation.count({ where: { createdAt: { gte: startOfMonth } } }),
     prisma.payment.aggregate({
@@ -68,6 +72,15 @@ async function getOverview() {
     }),
     prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
     getDailyRevenue(),
+    getDailyConversations(),
+    prisma.contract.count({ where: { status: "SENT" } }),
+    prisma.order.count({
+      where: {
+        status: "PENDING",
+        createdAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+      },
+    }),
+    prisma.review.count({ where: { publishedAt: null, orderId: { not: null } } }),
   ]);
 
   return {
@@ -85,6 +98,10 @@ async function getOverview() {
     recentConversations,
     recentOrders,
     dailyRevenue,
+    dailyConversations,
+    sentContracts,
+    stalePendingOrders,
+    unpublishedReviews,
   };
 }
 
@@ -104,7 +121,13 @@ export default async function AdminDashboardPage() {
     recentConversations,
     recentOrders,
     dailyRevenue,
+    dailyConversations,
+    sentContracts,
+    stalePendingOrders,
+    unpublishedReviews,
   } = await getOverview();
+
+  const hasConversationTrend = dailyConversations.some((d) => d.value > 0);
 
   const totalActive = stageReceived + stageInProgress + stageDelivered;
   const STAGE_BREAKDOWN = [
@@ -133,7 +156,11 @@ export default async function AdminDashboardPage() {
 
       <div className="px-8 pt-6">
         <Reveal>
-          {unreadMessages > 0 || claimedOrders > 0 ? (
+          {unreadMessages > 0 ||
+          claimedOrders > 0 ||
+          sentContracts > 0 ||
+          stalePendingOrders > 0 ||
+          unpublishedReviews > 0 ? (
             <AdminCard className="flex flex-wrap items-center gap-3 border border-admin-blue/20 bg-admin-blue-soft p-4">
               <p className="text-sm font-semibold text-admin-blue">지금 확인할 게 있어요</p>
               <div className="flex flex-wrap gap-2">
@@ -153,6 +180,33 @@ export default async function AdminDashboardPage() {
                   >
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-admin-amber" />
                     입금 확인 대기 {claimedOrders}건
+                  </Link>
+                )}
+                {sentContracts > 0 && (
+                  <Link
+                    href="/admin/orders"
+                    className="flex items-center gap-1.5 rounded-full bg-admin-surface px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:bg-white"
+                  >
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-admin-blue" />
+                    서명 대기 계약 {sentContracts}건
+                  </Link>
+                )}
+                {stalePendingOrders > 0 && (
+                  <Link
+                    href="/admin/orders?status=PENDING"
+                    className="flex items-center gap-1.5 rounded-full bg-admin-surface px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:bg-white"
+                  >
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-admin-amber" />
+                    7일+ 미결제 주문 {stalePendingOrders}건
+                  </Link>
+                )}
+                {unpublishedReviews > 0 && (
+                  <Link
+                    href="/admin/reviews"
+                    className="flex items-center gap-1.5 rounded-full bg-admin-surface px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:bg-white"
+                  >
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-admin-green" />
+                    미게시 후기 {unpublishedReviews}건
                   </Link>
                 )}
               </div>
@@ -250,6 +304,32 @@ export default async function AdminDashboardPage() {
             </Link>
           </RevealItem>
         </RevealGroup>
+      </div>
+
+      <div className="px-8 pt-4">
+        <Reveal delay={0.08}>
+          <AdminCard className="p-7">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-admin-muted">최근 14일 신규 문의(대화)</p>
+                <CountUp
+                  value={dailyConversations.reduce((sum, d) => sum + d.value, 0)}
+                  suffix="건"
+                  className="mt-2 block text-3xl font-semibold tracking-tight text-admin-text tabular-nums"
+                />
+              </div>
+            </div>
+            {hasConversationTrend ? (
+              <div className="mt-6">
+                <Sparkline data={dailyConversations} />
+              </div>
+            ) : (
+              <div className="mt-6 flex items-center justify-center rounded-xl bg-admin-content py-8">
+                <p className="text-xs text-admin-muted">최근 14일간 새 문의가 없습니다.</p>
+              </div>
+            )}
+          </AdminCard>
+        </Reveal>
       </div>
 
       <RevealGroup className="grid grid-cols-2 gap-4 px-8 pt-4 sm:grid-cols-3" stagger={0.05}>
