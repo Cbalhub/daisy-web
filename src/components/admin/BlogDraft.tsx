@@ -150,8 +150,10 @@ export function BlogDraftEditor({
     tags: string[];
     topic: string;
     model: string;
+    platform: BlogPlatform;
   };
 }) {
+  const isNaver = draft.platform === "NAVER";
   const router = useRouter();
   const toast = useToast();
   const [title, setTitle] = useState(draft.title);
@@ -160,7 +162,9 @@ export function BlogDraftEditor({
   const [tagsText, setTagsText] = useState(draft.tags.join(", "));
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
-  const [copyMode, setCopyMode] = useState<"plain" | "markdown">("plain");
+  const [copyMode, setCopyMode] = useState<"plain" | "markdown">(
+    draft.platform === "TISTORY" ? "markdown" : "plain"
+  );
 
   const tags = tagsText
     .split(/[,\n]/)
@@ -287,7 +291,10 @@ export function BlogDraftEditor({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="text-xs font-medium text-admin-muted">
-            메타 설명 <span className="text-admin-muted/70">(검색결과 미리보기 · 70~110자)</span>
+            메타 설명{" "}
+            <span className="text-admin-muted/70">
+              {isNaver ? "(네이버는 칸이 없음 — 본문 첫 문단에 반영됨)" : "(티스토리 '설명' 칸에 붙여넣기 · 70~110자)"}
+            </span>
           </label>
           <textarea
             value={metaDescription}
@@ -322,7 +329,10 @@ export function BlogDraftEditor({
 
       <div>
         <label className="text-xs font-medium text-admin-muted">
-          본문 <span className="text-admin-muted/70">(&quot;## 소제목&quot;, &quot;- 목록&quot; 마크다운)</span>
+          본문{" "}
+          <span className="text-admin-muted/70">
+            {isNaver ? "(소제목은 \"■ \" 한 줄. 마크다운 기호 없음)" : "(\"## 소제목\", \"- 목록\" 마크다운)"}
+          </span>
         </label>
         <textarea
           value={body}
@@ -330,6 +340,22 @@ export function BlogDraftEditor({
           rows={24}
           className="mt-1.5 w-full resize-y rounded-lg border border-admin-border bg-admin-surface px-3.5 py-3 font-mono text-[13px] leading-relaxed text-admin-text outline-none focus:border-admin-blue"
         />
+      </div>
+
+      <div className="rounded-lg border border-admin-border bg-admin-content px-4 py-3 text-xs leading-relaxed text-admin-muted">
+        {isNaver ? (
+          <>
+            <b className="text-admin-text">네이버 블로그 발행</b> — 제목·본문 붙여넣기 → 소제목은 에디터에서
+            굵게/색으로 강조 → <b className="text-admin-text">태그</b> 칸에 태그 붙여넣기 →
+            발행창에서 <b className="text-admin-text">&ldquo;검색 허용&rdquo; 체크 필수</b>. (메타 설명 칸은 없음)
+          </>
+        ) : (
+          <>
+            <b className="text-admin-text">티스토리 발행</b> — 본문(마크다운) 붙여넣기 →
+            우측 설정에서 <b className="text-admin-text">&ldquo;설명&rdquo;</b> 칸에 메타 설명,
+            <b className="text-admin-text"> 태그</b> 칸에 태그 붙여넣기.
+          </>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-admin-border pt-4">

@@ -38,6 +38,7 @@ export default async function BlogDraftPage({ params }: { params: Promise<{ id: 
             tags: draft.tags,
             topic: draft.topic,
             model: draft.model,
+            platform: draft.platform,
           }}
         />
       </div>

@@ -26,7 +26,7 @@ export default async function AdminBlogPage() {
     <div className="pb-16">
       <AdminPageHeader
         title="블로그 초안"
-        description="주제를 넣으면 Claude 가 SEO 블로그 글 초안을 씁니다. 검토·수정한 뒤 복사해서 네이버 블로그·티스토리에 붙여넣으세요."
+        description="주제를 넣으면 AI가 SEO 블로그 글 초안을 씁니다. 검토·수정한 뒤 복사해서 네이버 블로그·티스토리에 붙여넣으세요."
       />
 
       <div className="px-4 sm:px-8 pt-6">
