@@ -191,10 +191,6 @@ export function ChatPageView({
     setConversations((prev) => prev.map((c) => (c.id === id ? { ...c, unreadCount: 0 } : c)));
   }
 
-  function startDraftConversation(title: string) {
-    setDraftTitle(title.trim() || "일반 문의");
-  }
-
   // 초안 상태였다면 실제 대화를 서버에 만들고 목록에 반영합니다. 이미 만들어진
   // 대화라면 아무 것도 하지 않고 그 id를 그대로 돌려줍니다.
   async function resolveActiveConversation(): Promise<string> {
@@ -317,7 +313,6 @@ export function ChatPageView({
         draftTitle={draftTitle}
         adminOnline={adminOnline}
         onSelect={switchConversation}
-        onStartDraft={startDraftConversation}
       />
 
       <div ref={listRef} onScroll={handleScroll} className="flex-1 space-y-4 overflow-y-auto py-6">
@@ -589,18 +584,14 @@ function ConversationTabs({
   draftTitle,
   adminOnline,
   onSelect,
-  onStartDraft,
 }: {
   conversations: ConversationSummary[];
   activeId: string;
   draftTitle: string | null;
   adminOnline: boolean;
   onSelect: (id: string) => void;
-  onStartDraft: (title: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [showNewForm, setShowNewForm] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const active = conversations.find((c) => c.id === activeId) ?? conversations[0];
   const headerTitle = draftTitle ?? active?.title ?? "대화";
@@ -611,7 +602,6 @@ function ConversationTabs({
     function onClickOutside(e: MouseEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
         setOpen(false);
-        setShowNewForm(false);
       }
     }
     document.addEventListener("mousedown", onClickOutside);
@@ -706,56 +696,16 @@ function ConversationTabs({
             </ul>
 
             <div className="border-t border-line p-2">
-              {!showNewForm ? (
-                <button
-                  onClick={() => setShowNewForm(true)}
-                  className="flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left text-sm font-medium text-accent transition-colors hover:bg-paper-dim"
-                >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-soft text-accent">
-                    +
-                  </span>
-                  새 프로젝트 대화 시작
-                </button>
-              ) : (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!newTitle.trim()) return;
-                    onStartDraft(newTitle);
-                    setNewTitle("");
-                    setShowNewForm(false);
-                    setOpen(false);
-                  }}
-                  className="flex items-center gap-1 rounded-2xl bg-paper-dim p-1 pl-3"
-                >
-                  <input
-                    autoFocus
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Escape") setShowNewForm(false);
-                    }}
-                    placeholder="새 프로젝트 이름 (예: 쇼핑몰 챗봇)"
-                    className="flex-1 bg-transparent py-1.5 text-xs text-ink outline-none placeholder:text-muted"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!newTitle.trim()}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-opacity disabled:opacity-30"
-                    aria-label="대화 시작"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M3 10h13M10 4l7 6-7 6"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </form>
-              )}
+              <Link
+                href="/chat?new=1"
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left text-sm font-medium text-accent transition-colors hover:bg-paper-dim"
+              >
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-soft text-accent">
+                  +
+                </span>
+                새 프로젝트 문의
+              </Link>
             </div>
           </motion.div>
         )}
