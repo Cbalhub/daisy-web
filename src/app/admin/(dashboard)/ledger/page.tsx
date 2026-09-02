@@ -127,6 +127,31 @@ export default async function AdminLedgerPage({
   ]);
   const rows = [...entries].reverse();
 
+  // 기간을 월 단위로 쪼갠 매출/지출(환불 포함) 대비. 조회 구간이 한 달이면 한 칸,
+  // 분기·연이면 3·12칸. 총계 카드 숫자와 정확히 일치하도록 같은 entries 로 계산합니다.
+  const monthlyMap = new Map<string, { revenue: number; outflow: number }>();
+  for (const e of entries) {
+    const key = `${e.date.getFullYear()}-${String(e.date.getMonth() + 1).padStart(2, "0")}`;
+    const cur = monthlyMap.get(key) ?? { revenue: 0, outflow: 0 };
+    if (e.type === "REVENUE") cur.revenue += Math.abs(e.amount);
+    else cur.outflow += Math.abs(e.amount);
+    monthlyMap.set(key, cur);
+  }
+  const monthly = [...monthlyMap.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([key, v]) => ({ key, ...v, net: v.revenue - v.outflow }));
+  const monthlyPeak = Math.max(1, ...monthly.map((m) => Math.max(m.revenue, m.outflow)));
+
+  // 경비(지출) 항목별 합계 — 세무 신고 시 어디에 돈이 나갔는지 한눈에.
+  const expenseByCategory = new Map<string, number>();
+  for (const e of entries) {
+    if (e.type !== "EXPENSE") continue;
+    const key = e.expenseCategory ?? "ETC";
+    expenseByCategory.set(key, (expenseByCategory.get(key) ?? 0) + Math.abs(e.amount));
+  }
+  const expenseRows = [...expenseByCategory.entries()].sort((a, b) => b[1] - a[1]);
+  const expensePeak = Math.max(1, ...expenseRows.map(([, v]) => v));
+
   const typeParam = customerType ? `&type=${customerType}` : "";
 
   // 이전/다음 이동 링크
@@ -257,6 +282,78 @@ export default async function AdminLedgerPage({
           </AdminCard>
         </RevealItem>
       </RevealGroup>
+
+      {(monthly.length > 1 || expenseRows.length > 0) && (
+        <div className="grid gap-4 px-8 pt-4 lg:grid-cols-2">
+          {monthly.length > 1 && (
+            <AdminCard>
+              <h2 className="text-sm font-semibold text-admin-text">월별 매출 · 지출</h2>
+              <ul className="mt-4 space-y-3">
+                {monthly.map((m) => (
+                  <li key={m.key} className="text-xs">
+                    <div className="flex items-center justify-between text-admin-muted">
+                      <span className="tabular-nums">{m.key}</span>
+                      <span
+                        className={`tabular-nums font-medium ${m.net < 0 ? "text-admin-red" : "text-admin-text"}`}
+                      >
+                        {amountText(m.net)}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 space-y-1">
+                      <div className="h-1.5 rounded-full bg-admin-content">
+                        <div
+                          className="h-1.5 rounded-full bg-admin-green"
+                          style={{ width: `${(m.revenue / monthlyPeak) * 100}%` }}
+                        />
+                      </div>
+                      <div className="h-1.5 rounded-full bg-admin-content">
+                        <div
+                          className="h-1.5 rounded-full bg-admin-red"
+                          style={{ width: `${(m.outflow / monthlyPeak) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 flex gap-4 text-[11px] text-admin-muted">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-admin-green" />매출
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-admin-red" />지출 · 환불
+                </span>
+              </div>
+            </AdminCard>
+          )}
+          {expenseRows.length > 0 && (
+            <AdminCard>
+              <h2 className="text-sm font-semibold text-admin-text">경비 항목별 지출</h2>
+              <ul className="mt-4 space-y-3">
+                {expenseRows.map(([cat, value]) => {
+                  const meta = EXPENSE_CATEGORY_LABEL[cat as keyof typeof EXPENSE_CATEGORY_LABEL];
+                  return (
+                    <li key={cat} className="text-xs">
+                      <div className="flex items-center justify-between">
+                        <Pill tone={meta?.tone ?? "neutral"}>{meta?.label ?? cat}</Pill>
+                        <span className="tabular-nums font-medium text-admin-text">
+                          {amountText(value)}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 rounded-full bg-admin-content">
+                        <div
+                          className="h-1.5 rounded-full bg-admin-amber"
+                          style={{ width: `${(value / expensePeak) * 100}%` }}
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </AdminCard>
+          )}
+        </div>
+      )}
 
       <div className="px-8 pt-5">
         <AddLedgerEntry conversations={conversations} />
