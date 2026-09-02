@@ -3,6 +3,11 @@ import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// 발신 주소 — movd.co.kr 을 Resend 에서 인증(SPF·DKIM DNS 레코드 추가)한 뒤에만
+// 실제 고객에게 발송됩니다. 인증 전에는 RESEND_FROM 을 비워 두면 Resend 샌드박스
+// 발신자(onboarding@resend.dev)로 폴백해 관리자 본인 이메일로만 보냅니다.
+const EMAIL_FROM = process.env.RESEND_FROM || "MOVD <onboarding@resend.dev>";
+
 // 사이트와 같은 무채색 톤 — 파란 액센트를 쓰지 않습니다(색은 로고 전용).
 const BRAND = { ink: "#191919", paper: "#ffffff", accent: "#191919", muted: "#8c8c8c" };
 
@@ -66,11 +71,7 @@ export async function sendNewMessageNotification(input: {
   const chatUrl = `${siteUrl}/admin/chats/${input.conversationId}`;
 
   const { error } = await resend.emails.send({
-    // TODO: overcook.kr 도메인을 Resend에서 인증하면 아래를
-    // "MOVD 웹사이트 <notify@overcook.kr>"로 되돌리세요. 그 전까지는 미인증
-    // 도메인 발송이 막혀 있어, 관리자 본인 이메일로만 보낼 수 있는 Resend
-    // 기본(sandbox) 발신자를 임시로 씁니다.
-    from: "MOVD 웹사이트 <onboarding@resend.dev>",
+    from: EMAIL_FROM,
     to,
     subject: `[새 메시지] ${input.customerName}`,
     text: [
@@ -115,11 +116,7 @@ export async function sendContractRequestEmail(input: {
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
   const { error } = await resend.emails.send({
-    // TODO: overcook.kr 도메인을 Resend에서 인증하면 "MOVD 웹사이트 <notify@overcook.kr>"로
-    // 되돌리세요. 그 전까지는 미인증 도메인 발송이 막혀 있어, Resend 계정 소유자(대표님)
-    // 이메일로만 보낼 수 있는 sandbox 발신자를 씁니다. 다른 고객에게 보낼 땐 발송이 실패하고,
-    // 계약서 라우트가 emailFailed 로 응답해 관리자 패널에서 링크를 직접 복사하도록 안내합니다.
-    from: "MOVD 웹사이트 <onboarding@resend.dev>",
+    from: EMAIL_FROM,
     to: input.customerEmail,
     subject: `[MOVD] 용역계약서 확인 및 서명 요청 — ${input.orderTitle}`,
     text: [
@@ -167,7 +164,7 @@ export async function sendPaymentConfirmedEmail(input: {
   const amountText = `₩${input.amount.toLocaleString("ko-KR")}`;
 
   const { error } = await resend.emails.send({
-    from: "MOVD 웹사이트 <notify@overcook.kr>",
+    from: EMAIL_FROM,
     to: input.customerEmail,
     subject: `[MOVD] 결제가 완료됐어요 — ${input.orderTitle}`,
     text: [
@@ -216,7 +213,7 @@ export async function sendReviewRequestEmail(input: {
   const reviewUrl = `${siteUrl}/review/${input.orderToken}`;
 
   const { error } = await resend.emails.send({
-    from: "MOVD 웹사이트 <notify@overcook.kr>",
+    from: EMAIL_FROM,
     to: input.customerEmail,
     subject: `[MOVD] "${input.orderTitle}" 프로젝트, 어떠셨나요?`,
     text: [
@@ -249,7 +246,7 @@ export async function sendOwnerNotification(input: { subject: string; bodyText: 
   if (!resend || !to) return { sent: false, reason: "not-configured" as const };
 
   const { error } = await resend.emails.send({
-    from: "MOVD 웹사이트 <onboarding@resend.dev>",
+    from: EMAIL_FROM,
     to,
     subject: input.subject,
     text: input.bodyText,

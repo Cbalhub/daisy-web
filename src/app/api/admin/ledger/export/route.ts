@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="overcook-ledger-${filenameSuffix}.csv"`,
+      "Content-Disposition": `attachment; filename="movd-ledger-${filenameSuffix}.csv"`,
     },
   });
 }

@@ -74,7 +74,7 @@ export const PRIVACY_POLICY_SECTIONS = [
   {
     title: "10. 개인정보 보호책임자",
     body: [
-      "담당: 황준성 · 이메일: privacy@overcook.kr",
+      "담당: 황준성 · 이메일: privacy@movd.co.kr",
       "개인정보 처리에 관한 문의·불만·피해 구제는 위 연락처로 접수할 수 있습니다.",
     ],
   },

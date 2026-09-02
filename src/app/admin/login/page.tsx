@@ -58,7 +58,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-content px-3.5 py-2.5 text-sm text-admin-text outline-none transition-colors focus:border-admin-blue"
-            placeholder="admin@overcook.kr"
+            placeholder="admin@movd.co.kr"
           />
         </div>
         <div>
