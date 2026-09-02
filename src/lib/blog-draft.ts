@@ -1,11 +1,11 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import type { BlogPlatform } from "@prisma/client";
 
-// 블로그 글 초안 생성 — Claude 에게 SEO 블로그 초안을 부탁하고, 첫 줄 "# 제목" 규칙으로
+// 블로그 글 초안 생성 — Gemini 에게 SEO 블로그 초안을 부탁하고, 첫 줄 "# 제목" 규칙으로
 // 제목/본문을 나눠 돌려줍니다. 자동 포스팅이 아니라 관리자가 검토·수정할 초안입니다.
 
-const DEFAULT_MODEL = "claude-opus-5";
+const DEFAULT_MODEL = "gemini-3.6-flash";
 
 export class BlogDraftError extends Error {}
 
@@ -32,7 +32,7 @@ const TONE_NOTE: Record<string, string> = {
 
 function buildSystemPrompt(input: BlogDraftInput): string {
   return [
-    "당신은 소프트웨어 개발 외주 회사 'MOVD'의 블로그 글을 쓰는 한국어 SEO 카피라이터입니다.",
+    "당신은 소프트웨어 개발 외주 회사 MOVD의 블로그 글을 쓰는 한국어 SEO 카피라이터입니다.",
     "MOVD는 카카오톡·텔레그램 챗봇, 업무 자동화 프로그램, 관리자 대시보드를 만드는 1인 중심 개발 외주입니다. 예산을 먼저 듣고 그 안에서 설계하며, 상담부터 배포·유지보수까지 대표가 직접 합니다.",
     "",
     "검색 상위 노출을 목표로 합니다. 규칙:",
@@ -59,18 +59,19 @@ function buildSystemPrompt(input: BlogDraftInput): string {
 }
 
 /**
- * 초안을 생성합니다. ANTHROPIC_API_KEY 가 없거나 API 오류면 BlogDraftError 를 던집니다
+ * 초안을 생성합니다. GEMINI_API_KEY 가 없거나 API 오류면 BlogDraftError 를 던집니다
  * — 호출하는 라우트에서 502 + 사람이 읽는 메시지로 변환합니다.
  */
 export async function generateBlogDraft(
   input: BlogDraftInput
 ): Promise<{ title: string; body: string; metaDescription: string; tags: string[]; model: string }> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new BlogDraftError("ANTHROPIC_API_KEY 가 설정되지 않았습니다. 서버 .env 를 확인하세요.");
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new BlogDraftError("GEMINI_API_KEY 가 설정되지 않았습니다. 서버 .env 를 확인하세요.");
   }
 
   const model = process.env.BLOG_DRAFT_MODEL || DEFAULT_MODEL;
-  const client = new Anthropic();
+  const ai = new GoogleGenAI({ apiKey });
 
   const userPrompt = [
     `주제: ${input.topic}`,
@@ -81,27 +82,27 @@ export async function generateBlogDraft(
 
   let text: string;
   try {
-    const res = await client.messages.create({
+    const res = await ai.models.generateContent({
       model,
-      max_tokens: 10000,
-      system: buildSystemPrompt(input),
-      messages: [{ role: "user", content: userPrompt }],
+      contents: userPrompt,
+      config: {
+        systemInstruction: buildSystemPrompt(input),
+        maxOutputTokens: 12000,
+        temperature: 0.9,
+      },
     });
-    if (res.stop_reason === "refusal") {
+    text = (res.text ?? "").trim();
+    if (!text && res.promptFeedback?.blockReason) {
       throw new BlogDraftError("모델이 이 주제에 대한 작성을 거절했습니다. 주제를 바꿔서 다시 시도해 주세요.");
     }
-    text = res.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("")
-      .trim();
   } catch (err) {
     if (err instanceof BlogDraftError) throw err;
-    if (err instanceof Anthropic.AuthenticationError) {
-      throw new BlogDraftError("ANTHROPIC_API_KEY 가 유효하지 않습니다.");
+    const status = (err as { status?: number })?.status;
+    if (status === 400 || status === 401 || status === 403) {
+      throw new BlogDraftError("GEMINI_API_KEY 가 유효하지 않거나 권한이 없습니다.");
     }
-    if (err instanceof Anthropic.RateLimitError) {
-      throw new BlogDraftError("요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.");
+    if (status === 429) {
+      throw new BlogDraftError("요청이 너무 많습니다(무료 한도 초과일 수 있음). 잠시 후 다시 시도해 주세요.");
     }
     console.error("[blog-draft] 생성 실패:", err);
     throw new BlogDraftError("초안 생성 중 오류가 발생했습니다.");
