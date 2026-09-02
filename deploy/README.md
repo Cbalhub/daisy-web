@@ -10,11 +10,14 @@
 git archive --format=tar.gz -o /tmp/movd-app.tar.gz redesign/movd-sage
 scp /tmp/movd-app.tar.gz ubuntu@<서버>:/tmp/movd-app.tar.gz
 
-# 서버 (연결 끊겨도 살아남게 transient unit 으로)
-sudo systemd-run --unit=movd-deploy --collect -p Type=oneshot -p User=ubuntu \
+# 서버 (연결 끊겨도 살아남게 transient unit 으로 — --no-block 필수, 없으면 호출이 빌드 내내 블록)
+sudo systemctl reset-failed movd-deploy 2>/dev/null
+sudo systemd-run --unit=movd-deploy --collect --no-block \
+  -p Type=oneshot -p User=ubuntu -p TimeoutStartSec=1200 \
   bash /opt/deploy.sh /tmp/movd-app.tar.gz
 # 진행상황
 sudo journalctl -u movd-deploy -f
+# 끝났는지: systemctl is-active movd-deploy  (inactive = 완료), systemctl show movd-deploy -p Result
 ```
 
 deploy.sh 가 하는 일: 새 릴리스를 별도 디렉터리에 풀어 그 안에서 `npm ci` +
