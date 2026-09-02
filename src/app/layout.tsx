@@ -44,6 +44,24 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "technology",
+  // 구글은 keywords 를 무시하지만 네이버·빙은 아직 약하게 참고합니다 — 국내 유입
+  // 비중이 커서 넣어 둡니다.
+  keywords: [
+    "챗봇 개발",
+    "카카오톡 챗봇",
+    "텔레그램 봇 개발",
+    "업무 자동화",
+    "관리자 페이지 개발",
+    "관리자 대시보드 제작",
+    "API 연동 개발",
+    "소프트웨어 외주",
+    "프로그램 개발 외주",
+    "MOVD",
+  ],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

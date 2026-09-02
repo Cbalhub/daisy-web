@@ -3,6 +3,8 @@ import { Container } from "@/components/ui/Container";
 import { PortfolioSearch } from "@/components/marketing/PortfolioSearch";
 import { Mark } from "@/components/brand/Mark";
 import { prisma } from "@/lib/prisma";
+import { jsonLdScript, breadcrumbJsonLd } from "@/lib/json-ld";
+import { absoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "포트폴리오",
@@ -21,8 +23,32 @@ export default async function PortfolioPage() {
     orderBy: { publishedAt: "desc" },
   });
 
+  const listJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      breadcrumbJsonLd([
+        ["홈", absoluteUrl("/")],
+        ["포트폴리오", absoluteUrl("/portfolio")],
+      ]),
+      {
+        "@type": "CollectionPage",
+        name: "포트폴리오",
+        url: absoluteUrl("/portfolio"),
+        hasPart: items.map((item) => ({
+          "@type": "CreativeWork",
+          name: item.title,
+          url: absoluteUrl(`/portfolio/${item.slug}`),
+        })),
+      },
+    ],
+  };
+
   return (
     <section className="pt-20 pb-24 md:pt-28">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(listJsonLd) }}
+      />
       <Container>
         <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">
           지금까지 만든 것들

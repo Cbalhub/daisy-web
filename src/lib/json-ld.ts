@@ -7,3 +7,21 @@
 export function jsonLdScript(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
+
+/**
+ * BreadcrumbList 구조화 데이터. 검색결과에 "홈 › 포트폴리오 › 프로젝트명" 형태의
+ * 이동 경로가 노출되고, 크롤러가 사이트 계층을 이해하는 데 도움이 됩니다.
+ * items 는 [표시명, 절대 URL] 쌍의 배열입니다.
+ */
+export function breadcrumbJsonLd(items: [name: string, url: string][]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, url], i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name,
+      item: url,
+    })),
+  };
+}

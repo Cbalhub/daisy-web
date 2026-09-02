@@ -4,8 +4,8 @@ import { Mark } from "@/components/brand/Mark";
 import { ReviewCard } from "@/components/marketing/ReviewCard";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { prisma } from "@/lib/prisma";
-import { jsonLdScript } from "@/lib/json-ld";
-import { absoluteUrl } from "@/lib/site";
+import { jsonLdScript, breadcrumbJsonLd } from "@/lib/json-ld";
+import { absoluteUrl, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "고객 후기",
@@ -27,41 +27,45 @@ export default async function ReviewsPage() {
   const rated = REVIEWS.filter(
     (r): r is typeof r & { rating: number } => r.rating != null
   );
-  const reviewsJsonLd =
-    rated.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "ProfessionalService",
-          name: "MOVD",
-          "@id": `${absoluteUrl("/")}#org`,
-          url: absoluteUrl("/"),
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: (rated.reduce((sum, r) => sum + r.rating, 0) / rated.length).toFixed(1),
-            reviewCount: rated.length,
-          },
-          review: rated.map((r) => ({
-            "@type": "Review",
-            author: { "@type": "Organization", name: r.company },
-            reviewBody: r.quote,
-            reviewRating: {
-              "@type": "Rating",
-              ratingValue: r.rating,
-              bestRating: 5,
-              worstRating: 1,
-            },
-          })),
-        }
-      : null;
+  const orgRef = { "@type": "ProfessionalService", name: "MOVD", "@id": `${SITE_URL}/#org` };
+  const graph: Record<string, unknown>[] = [
+    breadcrumbJsonLd([
+      ["홈", absoluteUrl("/")],
+      ["고객 후기", absoluteUrl("/reviews")],
+    ]),
+  ];
+  if (rated.length > 0) {
+    graph.push({
+      ...orgRef,
+      url: absoluteUrl("/"),
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: (rated.reduce((sum, r) => sum + r.rating, 0) / rated.length).toFixed(1),
+        reviewCount: rated.length,
+      },
+      review: rated.map((r) => ({
+        "@type": "Review",
+        author: { "@type": "Organization", name: r.company },
+        datePublished: r.createdAt.toISOString().slice(0, 10),
+        reviewBody: r.quote,
+        itemReviewed: orgRef,
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: r.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      })),
+    });
+  }
+  const reviewsJsonLd = { "@context": "https://schema.org", "@graph": graph };
 
   return (
     <>
-      {reviewsJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(reviewsJsonLd) }}
-        />
-      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(reviewsJsonLd) }}
+      />
       <section className="pt-20 pb-16 md:pt-28">
         <Container>
           <h1 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight md:text-4xl">

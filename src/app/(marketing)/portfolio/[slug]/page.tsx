@@ -6,8 +6,8 @@ import { Container } from "@/components/ui/Container";
 import { ProjectMockup, ProjectMockupGallery } from "@/components/marketing/ProjectMockup";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { prisma } from "@/lib/prisma";
-import { jsonLdScript } from "@/lib/json-ld";
-import { absoluteUrl } from "@/lib/site";
+import { jsonLdScript, breadcrumbJsonLd } from "@/lib/json-ld";
+import { absoluteUrl, SITE_URL, SITE_NAME } from "@/lib/site";
 
 // 본문을 "## 섹션명" 기준으로 나눠 헤딩+문단+목록으로 구조화합니다. 관리자가
 // "## 설계", "## 작업 방식", "## 품목" 처럼 적으면 그대로 소제목이 되고,
@@ -84,9 +84,16 @@ export async function generateMetadata({
     title: item.title,
     description: item.summary,
     alternates: { canonical: `/portfolio/${item.slug}` },
-    openGraph: item.images[0]
-      ? { title: item.title, description: item.summary, images: [item.images[0]] }
-      : undefined,
+    keywords: item.tags.length > 0 ? item.tags : undefined,
+    openGraph: {
+      type: "article",
+      title: item.title,
+      description: item.summary,
+      url: `/portfolio/${item.slug}`,
+      publishedTime: item.publishedAt?.toISOString(),
+      modifiedTime: item.updatedAt.toISOString(),
+      images: item.images[0] ? [item.images[0]] : undefined,
+    },
   };
 }
 
@@ -117,17 +124,34 @@ export default async function PortfolioDetailPage({
     .slice(0, 3)
     .map((r) => r.item);
 
-  const breadcrumbJsonLd = {
+  // 케이스 스터디 = 우리가 만든 결과물에 대한 글. CreativeWork 로 표현하고
+  // 게시·수정일, 제작자(MOVD), 업종·태그를 함께 실어 검색엔진이 "누가, 언제,
+  // 무엇을 만들었는지" 이해하도록 합니다. 이동 경로도 같은 스크립트에 함께.
+  const pageUrl = absoluteUrl(`/portfolio/${item.slug}`);
+  const structuredData = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "홈", item: absoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "포트폴리오", item: absoluteUrl("/portfolio") },
+    "@graph": [
+      breadcrumbJsonLd([
+        ["홈", absoluteUrl("/")],
+        ["포트폴리오", absoluteUrl("/portfolio")],
+        [item.title, pageUrl],
+      ]),
       {
-        "@type": "ListItem",
-        position: 3,
+        "@type": "CreativeWork",
+        "@id": `${pageUrl}#work`,
         name: item.title,
-        item: absoluteUrl(`/portfolio/${item.slug}`),
+        headline: item.title,
+        description: item.summary,
+        url: pageUrl,
+        inLanguage: "ko-KR",
+        datePublished: item.publishedAt?.toISOString(),
+        dateModified: item.updatedAt.toISOString(),
+        image: item.images[0] ? absoluteUrl(item.images[0]) : `${SITE_URL}/opengraph-image`,
+        creator: { "@type": "Organization", name: SITE_NAME, "@id": `${SITE_URL}/#org` },
+        publisher: { "@id": `${SITE_URL}/#org` },
+        ...(item.industry ? { about: item.industry } : {}),
+        ...(item.tags.length > 0 ? { keywords: item.tags.join(", ") } : {}),
+        ...(item.category ? { genre: item.category } : {}),
       },
     ],
   };
@@ -136,7 +160,7 @@ export default async function PortfolioDetailPage({
     <section className="pt-20 pb-24 md:pt-28">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(structuredData) }}
       />
       <Container>
         <nav aria-label="이동 경로" className="mb-6 flex items-center gap-1.5 text-xs text-muted">

@@ -19,15 +19,35 @@ const STATIC_ROUTES = [
 // 리다이렉트만 하므로 제외합니다 — 크롤러에게 리다이렉트 URL을 색인하라고
 // 안내하는 건 크롤 예산 낭비이자 혼란스러운 신호입니다.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const portfolioItems = await prisma.portfolioItem.findMany({
-    where: { publishedAt: { not: null } },
-    select: { slug: true, updatedAt: true },
-  });
+  const [portfolioItems, lastReview] = await Promise.all([
+    prisma.portfolioItem.findMany({
+      where: { publishedAt: { not: null } },
+      select: { slug: true, updatedAt: true },
+    }),
+    prisma.review.findFirst({
+      where: { publishedAt: { not: null } },
+      orderBy: { updatedAt: "desc" },
+      select: { updatedAt: true },
+    }),
+  ]);
+
+  // 콘텐츠가 실제로 바뀐 시점을 lastModified 로 씁니다 — 매번 "지금"으로 찍으면
+  // 크롤러가 신호를 신뢰하지 않게 됩니다.
+  const latestPortfolio =
+    portfolioItems.reduce<Date | null>(
+      (max, i) => (!max || i.updatedAt > max ? i.updatedAt : max),
+      null
+    ) ?? new Date();
+  const lastModByPath: Record<string, Date> = {
+    "/": latestPortfolio,
+    "/portfolio": latestPortfolio,
+    "/reviews": lastReview?.updatedAt ?? new Date(),
+  };
 
   return [
     ...STATIC_ROUTES.map((route) => ({
       url: `${BASE_URL}${route.path}`,
-      lastModified: new Date(),
+      lastModified: lastModByPath[route.path] ?? new Date(),
       changeFrequency: route.changeFrequency,
       priority: route.priority,
     })),

@@ -11,8 +11,8 @@ import {
   MonitorCard,
 } from "@/components/marketing/ProductMocks";
 import { SERVICES, PROCESS_STEPS } from "@/lib/content";
-import { jsonLdScript } from "@/lib/json-ld";
-import { absoluteUrl } from "@/lib/site";
+import { jsonLdScript, breadcrumbJsonLd } from "@/lib/json-ld";
+import { absoluteUrl, SITE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const VISUALS: Record<string, React.ReactNode> = {
@@ -31,19 +31,28 @@ export const metadata: Metadata = {
 
 const SERVICES_JSON_LD = {
   "@context": "https://schema.org",
-  "@type": "ItemList",
-  itemListElement: SERVICES.map((service, i) => ({
-    "@type": "ListItem",
-    position: i + 1,
-    item: {
-      "@type": "Service",
-      name: service.title,
-      description: service.description,
-      url: absoluteUrl(`/services#${service.slug}`),
-      provider: { "@type": "ProfessionalService", name: "MOVD" },
-      areaServed: "KR",
+  "@graph": [
+    breadcrumbJsonLd([
+      ["홈", absoluteUrl("/")],
+      ["서비스", absoluteUrl("/services")],
+    ]),
+    {
+      "@type": "ItemList",
+      itemListElement: SERVICES.map((service, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Service",
+          name: service.title,
+          serviceType: service.title,
+          description: service.description,
+          url: absoluteUrl(`/services#${service.slug}`),
+          provider: { "@type": "ProfessionalService", name: "MOVD", "@id": `${SITE_URL}/#org` },
+          areaServed: { "@type": "Country", name: "대한민국" },
+        },
+      })),
     },
-  })),
+  ],
 };
 
 export default function ServicesPage() {

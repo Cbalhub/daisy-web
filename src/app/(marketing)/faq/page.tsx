@@ -5,7 +5,8 @@ import { Container } from "@/components/ui/Container";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { FAQ_ITEMS } from "@/lib/content";
-import { jsonLdScript } from "@/lib/json-ld";
+import { jsonLdScript, breadcrumbJsonLd } from "@/lib/json-ld";
+import { absoluteUrl } from "@/lib/site";
 import { getBusinessSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
@@ -17,12 +18,20 @@ export const metadata: Metadata = {
 
 const faqJsonLd = {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQ_ITEMS.map((f) => ({
-    "@type": "Question",
-    name: f.question,
-    acceptedAnswer: { "@type": "Answer", text: f.answer },
-  })),
+  "@graph": [
+    breadcrumbJsonLd([
+      ["홈", absoluteUrl("/")],
+      ["자주 묻는 질문", absoluteUrl("/faq")],
+    ]),
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map((f) => ({
+        "@type": "Question",
+        name: f.question,
+        acceptedAnswer: { "@type": "Answer", text: f.answer },
+      })),
+    },
+  ],
 };
 
 export default async function FaqPage() {
