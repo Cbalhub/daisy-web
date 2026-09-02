@@ -1,5 +1,5 @@
 import "dotenv/config";
-import bcrypt from "bcryptjs";
+import { hash } from "@node-rs/bcrypt";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -10,7 +10,7 @@ async function main() {
   const email = (process.env.SEED_ADMIN_EMAIL ?? "admin@movd.co.kr").trim().toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD ?? "changeme123!";
 
-  const passwordHash = await bcrypt.hash(password, 10); // src/lib/hash.ts BCRYPT_COST 와 동일
+  const passwordHash = await hash(password, 10); // src/lib/hash.ts BCRYPT_COST 와 동일
 
   await prisma.adminUser.upsert({
     where: { email },

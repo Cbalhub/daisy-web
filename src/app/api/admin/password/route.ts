@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
-import { BCRYPT_COST } from "@/lib/hash";
+import { hashPassword, verifyPassword } from "@/lib/hash";
 
 export const runtime = "nodejs";
 
@@ -36,7 +35,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const ok = await bcrypt.compare(parsed.data.currentPassword, admin.passwordHash);
+  const ok = await verifyPassword(parsed.data.currentPassword, admin.passwordHash);
   if (!ok) {
     return NextResponse.json({ error: "현재 비밀번호가 올바르지 않습니다." }, { status: 400 });
   }
@@ -44,7 +43,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "새 비밀번호가 현재와 같습니다." }, { status: 400 });
   }
 
-  const passwordHash = await bcrypt.hash(parsed.data.newPassword, BCRYPT_COST);
+  const passwordHash = await hashPassword(parsed.data.newPassword);
   await prisma.$transaction([
     prisma.adminUser.update({ where: { id: admin.id }, data: { passwordHash } }),
     prisma.auditLog.create({

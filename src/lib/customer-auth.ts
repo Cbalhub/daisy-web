@@ -1,7 +1,6 @@
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getCustomerSession } from "@/lib/customer-session";
-import { BCRYPT_COST } from "@/lib/hash";
+import { hashPassword, verifyPassword, DUMMY_HASH } from "@/lib/hash";
 
 export async function createCustomer(input: {
   email: string;
@@ -10,7 +9,7 @@ export async function createCustomer(input: {
   phone?: string;
 }) {
   const email = input.email.trim().toLowerCase();
-  const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
+  const passwordHash = await hashPassword(input.password);
 
   const customer = await prisma.customer.create({
     data: { email, passwordHash, name: input.name, phone: input.phone },
@@ -38,10 +37,10 @@ export async function verifyCustomerCredentials(email: string, password: string)
   });
   if (!customer) {
     // 타이밍 공격 방지를 위해 존재하지 않는 계정에도 동일한 시간이 걸리는 더미 비교 수행
-    await bcrypt.compare(password, "$2a$10$invalidsaltinvalidsaltinvalidsal");
+    await verifyPassword(password, DUMMY_HASH);
     return null;
   }
-  const valid = await bcrypt.compare(password, customer.passwordHash);
+  const valid = await verifyPassword(password, customer.passwordHash);
   return valid ? customer : null;
 }
 
