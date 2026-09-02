@@ -32,22 +32,29 @@ const TONE_NOTE: Record<string, string> = {
 
 function buildSystemPrompt(input: BlogDraftInput): string {
   return [
-    "당신은 소프트웨어 개발 외주 회사 'MOVD'의 블로그 글을 쓰는 한국어 카피라이터입니다.",
+    "당신은 소프트웨어 개발 외주 회사 'MOVD'의 블로그 글을 쓰는 한국어 SEO 카피라이터입니다.",
     "MOVD는 카카오톡·텔레그램 챗봇, 업무 자동화 프로그램, 관리자 대시보드를 만드는 1인 중심 개발 외주입니다. 예산을 먼저 듣고 그 안에서 설계하며, 상담부터 배포·유지보수까지 대표가 직접 합니다.",
     "",
-    "글 작성 규칙:",
-    "- 검색으로 들어온 사람에게 실제로 도움이 되는 정보를 씁니다. 키워드를 부자연스럽게 반복하지 않습니다.",
-    "- 분량은 공백 포함 1500~2500자.",
-    "- \"## 소제목\"으로 3~5개 섹션으로 구조화합니다.",
+    "검색 상위 노출을 목표로 합니다. 규칙:",
+    "- 제목(H1)에 핵심 키워드를 앞쪽에 자연스럽게 넣습니다. 32자 내외, 숫자·구체어로 클릭을 유도하되 낚시성은 피합니다.",
+    "- 첫 문단(80~120자) 안에 핵심 키워드와 이 글이 답하는 질문을 명확히 씁니다.",
+    "- 검색으로 들어온 사람에게 실제로 도움이 되는 정보를 씁니다. 키워드를 부자연스럽게 반복하지 않고, 연관어·동의어를 섞습니다.",
+    "- 분량은 공백 포함 1800~2800자.",
+    "- \"## 소제목\"으로 4~6개 섹션. 소제목에도 관련 키워드를 자연스럽게 넣습니다.",
+    "- 가능하면 한 섹션은 \"자주 묻는 질문\" 형태(질문을 ### 또는 굵은 문장으로, 바로 아래 2~4문장 답)로 구성합니다 — 검색 FAQ 노출에 유리합니다.",
+    "- 구체적 숫자·기간·비용 범위·체크리스트를 넣어 정보 밀도를 높입니다(지어내지 말고 일반적으로 통용되는 범위로).",
     "- 자연스러운 한국어 존댓말. AI가 쓴 티가 나는 상투적 표현(\"~에 대해 알아보겠습니다\", \"결론적으로\", 불필요한 요약 반복)을 피합니다.",
     "- 마지막 섹션은 MOVD가 이 주제로 어떻게 도와줄 수 있는지 1문단으로 자연스럽게 안내합니다(과한 홍보 금지).",
     `- 톤: ${TONE_NOTE[input.tone] ?? TONE_NOTE["담백"]}`,
     `- ${PLATFORM_NOTE[input.platform]}`,
     "",
-    "출력 형식(반드시 지킬 것):",
-    "- 첫 줄은 \"# \" 로 시작하는 제목 한 줄.",
-    "- 그 다음 빈 줄, 이어서 본문. 본문에는 \"# \"(H1)를 다시 쓰지 않습니다.",
-    "- 제목·본문 외에 다른 설명이나 메타 코멘트를 붙이지 않습니다.",
+    "출력 형식(반드시 이 순서·형식을 지킬 것):",
+    "1) 첫 줄: \"# \" 로 시작하는 제목 한 줄.",
+    "2) 빈 줄 뒤 본문. 본문에는 \"# \"(H1)를 다시 쓰지 않습니다.",
+    "3) 본문이 끝나면 한 줄에 \"---META---\" 를 적고, 그 아래에:",
+    "   설명: (검색결과에 뜰 한 줄 요약, 공백 포함 70~110자, 핵심 키워드 포함)",
+    "   태그: (쉼표로 구분한 태그 5개 — 검색량 있을 법한 짧은 키워드 위주)",
+    "4) \"---META---\" 앞뒤로 다른 설명·코멘트를 붙이지 않습니다.",
   ].join("\n");
 }
 
@@ -57,7 +64,7 @@ function buildSystemPrompt(input: BlogDraftInput): string {
  */
 export async function generateBlogDraft(
   input: BlogDraftInput
-): Promise<{ title: string; body: string; model: string }> {
+): Promise<{ title: string; body: string; metaDescription: string; tags: string[]; model: string }> {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new BlogDraftError("ANTHROPIC_API_KEY 가 설정되지 않았습니다. 서버 .env 를 확인하세요.");
   }
@@ -76,7 +83,7 @@ export async function generateBlogDraft(
   try {
     const res = await client.messages.create({
       model,
-      max_tokens: 8000,
+      max_tokens: 10000,
       system: buildSystemPrompt(input),
       messages: [{ role: "user", content: userPrompt }],
     });
@@ -102,8 +109,28 @@ export async function generateBlogDraft(
 
   if (!text) throw new BlogDraftError("빈 응답을 받았습니다. 다시 시도해 주세요.");
 
+  // "---META---" 뒤의 설명·태그를 분리합니다.
+  let metaDescription = "";
+  let tags: string[] = [];
+  const metaSplit = text.split(/\n-{2,}\s*META\s*-{2,}\s*\n/i);
+  let mainText = text;
+  if (metaSplit.length > 1) {
+    mainText = metaSplit[0].trim();
+    const metaBlock = metaSplit.slice(1).join("\n");
+    const descMatch = metaBlock.match(/설명\s*[:：]\s*(.+)/);
+    if (descMatch) metaDescription = descMatch[1].trim().slice(0, 200);
+    const tagMatch = metaBlock.match(/태그\s*[:：]\s*(.+)/);
+    if (tagMatch) {
+      tags = tagMatch[1]
+        .split(/[,、·#]/)
+        .map((t) => t.trim().replace(/^#/, ""))
+        .filter(Boolean)
+        .slice(0, 8);
+    }
+  }
+
   // 첫 "# 제목" 줄을 뽑고 나머지를 본문으로. 규칙을 안 지켰으면 첫 줄을 제목으로.
-  const lines = text.split("\n");
+  const lines = mainText.split("\n");
   let title = "";
   let bodyStart = 0;
   for (let i = 0; i < lines.length; i++) {
@@ -115,5 +142,5 @@ export async function generateBlogDraft(
   }
   const body = lines.slice(bodyStart).join("\n").trim();
 
-  return { title: title.slice(0, 150), body, model };
+  return { title: title.slice(0, 150), body, metaDescription, tags, model };
 }

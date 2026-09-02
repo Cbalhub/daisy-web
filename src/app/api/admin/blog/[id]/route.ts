@@ -71,7 +71,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const draft = await prisma.blogDraft.update({
     where: { id },
-    data: { title: generated.title, body: generated.body, model: generated.model },
+    data: {
+      title: generated.title,
+      body: generated.body,
+      metaDescription: generated.metaDescription,
+      tags: generated.tags,
+      model: generated.model,
+    },
   });
   return NextResponse.json({ ok: true, draft });
 }

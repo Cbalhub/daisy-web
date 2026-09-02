@@ -13,7 +13,7 @@ export const blogUpdateSchema = z
   .object({
     title: z.string().trim().max(150).optional(),
     body: z.string().max(20000).optional(),
+    metaDescription: z.string().trim().max(200).optional(),
+    tags: z.array(z.string().trim().min(1).max(30)).max(10).optional(),
   })
-  .refine((v) => v.title !== undefined || v.body !== undefined, {
-    message: "변경할 내용이 없습니다.",
-  });
+  .refine((v) => Object.keys(v).length > 0, { message: "변경할 내용이 없습니다." });

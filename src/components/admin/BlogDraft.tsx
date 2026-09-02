@@ -142,17 +142,35 @@ function toPlainText(body: string): string {
 export function BlogDraftEditor({
   draft,
 }: {
-  draft: { id: string; title: string; body: string; topic: string; model: string };
+  draft: {
+    id: string;
+    title: string;
+    body: string;
+    metaDescription: string;
+    tags: string[];
+    topic: string;
+    model: string;
+  };
 }) {
   const router = useRouter();
   const toast = useToast();
   const [title, setTitle] = useState(draft.title);
   const [body, setBody] = useState(draft.body);
+  const [metaDescription, setMetaDescription] = useState(draft.metaDescription);
+  const [tagsText, setTagsText] = useState(draft.tags.join(", "));
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [copyMode, setCopyMode] = useState<"plain" | "markdown">("plain");
 
-  const dirty = title !== draft.title || body !== draft.body;
+  const tags = tagsText
+    .split(/[,\n]/)
+    .map((t) => t.trim().replace(/^#/, ""))
+    .filter(Boolean);
+  const dirty =
+    title !== draft.title ||
+    body !== draft.body ||
+    metaDescription !== draft.metaDescription ||
+    tagsText !== draft.tags.join(", ");
 
   async function save() {
     if (saving) return;
@@ -161,7 +179,7 @@ export function BlogDraftEditor({
       const res = await fetch(`/api/admin/blog/${draft.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, body }),
+        body: JSON.stringify({ title, body, metaDescription, tags }),
       });
       const b = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(b?.error ?? "저장에 실패했습니다.");
@@ -183,6 +201,8 @@ export function BlogDraftEditor({
       if (!res.ok) throw new Error(b?.error ?? "재생성에 실패했습니다.");
       setTitle(b.draft.title);
       setBody(b.draft.body);
+      setMetaDescription(b.draft.metaDescription ?? "");
+      setTagsText((b.draft.tags ?? []).join(", "));
       toast("다시 생성했어요", "success");
       router.refresh();
     } catch (err) {
@@ -203,12 +223,16 @@ export function BlogDraftEditor({
     }
   }
 
-  async function copyOut() {
-    const text =
-      (title ? `${title}\n\n` : "") + (copyMode === "plain" ? toPlainText(body) : body.trim());
+  async function copyOut(what: "post" | "tags") {
+    let text: string;
+    if (what === "tags") {
+      text = tags.join(", ");
+    } else {
+      text = (title ? `${title}\n\n` : "") + (copyMode === "plain" ? toPlainText(body) : body.trim());
+    }
     try {
       await navigator.clipboard.writeText(text);
-      toast(copyMode === "plain" ? "일반 텍스트로 복사했어요" : "마크다운으로 복사했어요", "success");
+      toast(what === "tags" ? "태그를 복사했어요" : "본문을 복사했어요", "success");
     } catch {
       toast("복사에 실패했어요. 직접 선택해서 복사해 주세요.", "error");
     }
@@ -224,7 +248,7 @@ export function BlogDraftEditor({
         >
           {saving ? "저장 중…" : "저장"}
         </button>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
           <div className="inline-flex rounded-full bg-admin-content p-1 text-xs">
             {(["plain", "markdown"] as const).map((m) => (
               <button
@@ -242,10 +266,10 @@ export function BlogDraftEditor({
             ))}
           </div>
           <button
-            onClick={copyOut}
+            onClick={() => copyOut("post")}
             className="rounded-lg border border-admin-border px-3.5 py-2 text-sm font-medium text-admin-text transition-colors hover:border-admin-blue hover:text-admin-blue"
           >
-            복사
+            본문 복사
           </button>
         </div>
       </div>
@@ -258,6 +282,42 @@ export function BlogDraftEditor({
           maxLength={150}
           className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-surface px-3.5 py-2.5 text-sm font-medium text-admin-text outline-none focus:border-admin-blue"
         />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="text-xs font-medium text-admin-muted">
+            메타 설명 <span className="text-admin-muted/70">(검색결과 미리보기 · 70~110자)</span>
+          </label>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value)}
+            rows={2}
+            maxLength={200}
+            className="mt-1.5 w-full resize-y rounded-lg border border-admin-border bg-admin-surface px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-blue"
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-admin-muted">
+              태그 <span className="text-admin-muted/70">(쉼표 구분)</span>
+            </label>
+            {tags.length > 0 && (
+              <button
+                type="button"
+                onClick={() => copyOut("tags")}
+                className="text-xs font-medium text-admin-blue hover:underline"
+              >
+                태그 복사
+              </button>
+            )}
+          </div>
+          <input
+            value={tagsText}
+            onChange={(e) => setTagsText(e.target.value)}
+            className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-surface px-3.5 py-2.5 text-sm text-admin-text outline-none focus:border-admin-blue"
+          />
+        </div>
       </div>
 
       <div>

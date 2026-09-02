@@ -19,7 +19,7 @@ export default async function BlogDraftPage({ params }: { params: Promise<{ id: 
         title="초안 편집"
         description={`${BLOG_PLATFORM_LABEL[draft.platform]} · ${draft.tone}`}
       />
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <Link
           href="/admin/blog"
           className="inline-flex items-center gap-1 text-xs text-admin-muted transition-colors hover:text-admin-text"
@@ -28,12 +28,14 @@ export default async function BlogDraftPage({ params }: { params: Promise<{ id: 
           초안 목록
         </Link>
       </div>
-      <div className="px-8 pt-4">
+      <div className="px-4 sm:px-8 pt-4">
         <BlogDraftEditor
           draft={{
             id: draft.id,
             title: draft.title,
             body: draft.body,
+            metaDescription: draft.metaDescription,
+            tags: draft.tags,
             topic: draft.topic,
             model: draft.model,
           }}

@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
       tone: parsed.data.tone,
       title: generated.title,
       body: generated.body,
+      metaDescription: generated.metaDescription,
+      tags: generated.tags,
       model: generated.model,
       createdById: session.adminId,
     },
