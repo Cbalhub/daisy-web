@@ -136,7 +136,11 @@ export async function confirmManualPayment(input: {
 
   await sendSlackText(
     `✅ 결제 완료 처리 — ${order.title}\n₩${order.amount.toLocaleString("ko-KR")} · ${order.customerName}`,
-    { webhook: process.env.SLACK_WEBHOOK_URL_PAYMENT || undefined }
+    {
+      webhook: process.env.SLACK_WEBHOOK_URL_PAYMENT || undefined,
+      username: "MOVD 결제",
+      iconEmoji: ":white_check_mark:",
+    }
   ).catch(() => {});
 
   return { ok: true };

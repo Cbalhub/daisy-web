@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
     urlLabel: "대시보드 열기",
     // 리포트 전용 채널 웹훅이 있으면 그쪽으로, 없으면 기본 채널로.
     webhook: process.env.SLACK_WEBHOOK_URL_REPORT || undefined,
+    username: "MOVD 리포트",
+    iconEmoji: ":bar_chart:",
   });
 
   return NextResponse.json({ ok: true, slack: result });

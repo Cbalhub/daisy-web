@@ -67,6 +67,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ord
       url: `${siteUrl}/admin/orders/${order.id}`,
       urlLabel: "입금 확인하기",
       webhook: process.env.SLACK_WEBHOOK_URL_PAYMENT || undefined,
+      username: "MOVD 결제",
+      iconEmoji: ":moneybag:",
     }
   );
 

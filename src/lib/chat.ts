@@ -116,6 +116,8 @@ async function notifyAdminOfNewMessage(
       url: `${siteUrl}/admin/chats/${conversationId}`,
       urlLabel: "채팅 열기",
       webhook: process.env.SLACK_WEBHOOK_URL_CHAT || undefined,
+      username: "MOVD 채팅",
+      iconEmoji: ":speech_balloon:",
     }),
   ]);
 }

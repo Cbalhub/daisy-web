@@ -118,7 +118,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   await Promise.allSettled([
     sendSlackText(
       `✍️ 계약서 서명 완료 — ${contract.clientName} 님\n${orderTitle} · ${amountText}`,
-      { url: adminUrl, urlLabel: "관리자에서 열기" }
+      { url: adminUrl, urlLabel: "관리자에서 열기", username: "MOVD 계약", iconEmoji: ":writing_hand:" }
     ),
     sendOwnerNotification({
       subject: `[MOVD] 계약서 서명 완료 — ${orderTitle}`,

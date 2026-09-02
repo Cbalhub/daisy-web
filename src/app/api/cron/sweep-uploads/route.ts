@@ -26,7 +26,11 @@ export async function GET(req: NextRequest) {
     await sendSlackText(
       `🧹 업로드 정리 — 고아 파일 ${result.deleted}개 삭제 (${mb}MB 확보). ` +
         `스캔 ${result.scanned}개, 최근 파일 ${result.keptRecent}개 보존.`,
-      { webhook: process.env.SLACK_WEBHOOK_URL_REPORT || undefined }
+      {
+        webhook: process.env.SLACK_WEBHOOK_URL_REPORT || undefined,
+        username: "MOVD 리포트",
+        iconEmoji: ":broom:",
+      }
     ).catch(() => {});
   }
 
