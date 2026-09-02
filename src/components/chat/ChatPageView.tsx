@@ -411,6 +411,9 @@ export function ChatPageView({
       {attachError && (
         <p className="shrink-0 pb-2 text-xs text-accent">{attachError}</p>
       )}
+      {visibleMessages.filter((m) => m.sender === "VISITOR").length === 0 && (
+        <QuickInfoBar draft={draft} setDraft={setDraft} />
+      )}
       <div className="flex shrink-0 items-center gap-2 border-t border-line py-4">
         <label
           className={cn(
@@ -468,6 +471,61 @@ export function ChatPageView({
             />
           </svg>
         </motion.button>
+      </div>
+    </div>
+  );
+}
+
+// 새 대화를 시작할 때(아직 내가 보낸 메시지가 없을 때) 입력창 위에 뜨는 빠른 정보
+// 칩. 예산·희망 일정을 고르면 입력창에 "[예산: …]" 한 줄이 채워집니다 — 담당자가
+// 첫 응대 전에 프로젝트 규모를 가늠할 수 있게. 순수 클라이언트(서버 저장 없음).
+const BUDGET_OPTIONS = ["300만 이하", "300–700만", "700–1500만", "1500만 이상", "미정"];
+const TIMELINE_OPTIONS = ["2주 내", "1개월", "2–3개월", "미정"];
+
+function QuickInfoBar({
+  draft,
+  setDraft,
+}: {
+  draft: string;
+  setDraft: (v: string) => void;
+}) {
+  function applyTag(prefix: string, value: string) {
+    const line = `[${prefix}: ${value}]`;
+    // 같은 접두사의 기존 줄이 있으면 교체, 없으면 맨 앞에 추가.
+    const pattern = new RegExp(`^\\[${prefix}: .*\\]\\n?`, "m");
+    const next = pattern.test(draft)
+      ? draft.replace(pattern, `${line}\n`)
+      : `${line}\n${draft}`;
+    setDraft(next);
+  }
+
+  return (
+    <div className="shrink-0 space-y-2 pb-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] font-medium text-muted">예산</span>
+        {BUDGET_OPTIONS.map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => applyTag("예산", v)}
+            className="rounded-full border border-line px-2.5 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] font-medium text-muted">일정</span>
+        {TIMELINE_OPTIONS.map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => applyTag("일정", v)}
+            className="rounded-full border border-line px-2.5 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
+          >
+            {v}
+          </button>
+        ))}
       </div>
     </div>
   );
