@@ -99,11 +99,23 @@ export default async function PortfolioDetailPage({
   const item = await prisma.portfolioItem.findUnique({ where: { slug } });
   if (!item || !item.publishedAt) notFound();
 
-  const related = await prisma.portfolioItem.findMany({
+  // 관련 프로젝트: 같은 카테고리 + 공유 태그 수로 점수를 매겨 상위 3개를 고릅니다.
+  // 아무것도 안 겹치면 최신순으로 채워집니다. 게시된 항목 수가 많지 않아 전체를
+  // 가져와 메모리에서 정렬합니다.
+  const relatedPool = await prisma.portfolioItem.findMany({
     where: { publishedAt: { not: null }, slug: { not: slug } },
     orderBy: { publishedAt: "desc" },
-    take: 3,
   });
+  const related = relatedPool
+    .map((r) => ({
+      item: r,
+      score:
+        (r.category === item.category ? 2 : 0) +
+        r.tags.filter((t) => item.tags.includes(t)).length,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((r) => r.item);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
