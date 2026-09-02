@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-export const BLOG_TONES = ["담백", "친근", "전문"] as const;
+export const BLOG_TONES = ["뼈때리기", "실무 가이드", "경험담"] as const;
 
 export const blogGenerateSchema = z.object({
   topic: z.string().trim().min(3, "주제를 조금 더 구체적으로 적어주세요.").max(200),
   keywords: z.array(z.string().trim().min(1).max(30)).max(8).default([]),
   platform: z.enum(["NAVER", "TISTORY", "GENERIC"]).default("NAVER"),
-  tone: z.enum(BLOG_TONES).default("담백"),
+  tone: z.enum(BLOG_TONES).default("뼈때리기"),
 });
 
 export const blogUpdateSchema = z

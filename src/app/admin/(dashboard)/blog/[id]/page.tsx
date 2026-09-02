@@ -36,6 +36,7 @@ export default async function BlogDraftPage({ params }: { params: Promise<{ id: 
             body: draft.body,
             metaDescription: draft.metaDescription,
             tags: draft.tags,
+            keywords: draft.keywords,
             topic: draft.topic,
             model: draft.model,
             platform: draft.platform,

@@ -6,9 +6,14 @@ import { AdminCard } from "@/components/admin/ui/Card";
 import { useToast } from "@/components/ui/Toast";
 import { BLOG_PLATFORM_OPTIONS } from "@/lib/admin/blog-labels";
 import { BLOG_TONES } from "@/lib/validation/blog";
+import { analyzeSeo } from "@/lib/blog-seo";
 import type { BlogPlatform } from "@prisma/client";
 
-const TONE_LABEL: Record<string, string> = { 담백: "담백", 친근: "친근", 전문: "전문" };
+const TONE_LABEL: Record<string, string> = {
+  뼈때리기: "뼈때리기",
+  "실무 가이드": "실무 가이드",
+  경험담: "경험담",
+};
 
 // ── 새 초안 생성 폼 ───────────────────────────────────────────────
 export function AddBlogDraft() {
@@ -18,7 +23,7 @@ export function AddBlogDraft() {
   const [topic, setTopic] = useState("");
   const [keywords, setKeywords] = useState("");
   const [platform, setPlatform] = useState<BlogPlatform>("NAVER");
-  const [tone, setTone] = useState<string>("담백");
+  const [tone, setTone] = useState<string>("뼈때리기");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,7 +100,7 @@ export function AddBlogDraft() {
             </div>
           </div>
           <div>
-            <label className="text-xs font-medium text-admin-muted">톤</label>
+            <label className="text-xs font-medium text-admin-muted">관점</label>
             <div className="mt-1.5 inline-flex rounded-full bg-admin-content p-1">
               {BLOG_TONES.map((t) => (
                 <button
@@ -148,6 +153,7 @@ export function BlogDraftEditor({
     body: string;
     metaDescription: string;
     tags: string[];
+    keywords: string[];
     topic: string;
     model: string;
     platform: BlogPlatform;
@@ -179,6 +185,8 @@ export function BlogDraftEditor({
     body !== draft.body ||
     metaDescription !== draft.metaDescription ||
     tagsText !== draft.tags.join(", ");
+
+  const seo = analyzeSeo({ title, body, metaDescription, tags, keywords: draft.keywords });
 
   async function save() {
     if (saving) return;
@@ -350,6 +358,49 @@ export function BlogDraftEditor({
             네이버는 본문 링크가 1개 넘으면 저품질 위험 — 이 한 줄만. 링크는 프로필 대표링크에도 걸어두세요.
           </p>
         )}
+      </div>
+
+      <div className="rounded-lg border border-admin-border bg-admin-surface p-4">
+        <div className="flex items-center gap-3">
+          <span
+            className={`inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-bold tabular-nums ${
+              seo.score >= 80
+                ? "bg-admin-green-soft text-admin-green"
+                : seo.score >= 55
+                  ? "bg-admin-amber-soft text-admin-amber"
+                  : "bg-admin-red-soft text-admin-red"
+            }`}
+          >
+            {seo.score}
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-admin-text">SEO 점검</p>
+            <p className="text-[11px] text-admin-muted">
+              검색엔진 실제 점수가 아니라, 빠지기 쉬운 항목 체크입니다. 저장하면 갱신돼요.
+            </p>
+          </div>
+        </div>
+        <ul className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+          {seo.checks.map((c) => (
+            <li key={c.label} className="flex items-start gap-2 text-xs">
+              <span
+                className={
+                  c.status === "ok"
+                    ? "text-admin-green"
+                    : c.status === "warn"
+                      ? "text-admin-amber"
+                      : "text-admin-red"
+                }
+              >
+                {c.status === "ok" ? "✓" : c.status === "warn" ? "!" : "✕"}
+              </span>
+              <span className="min-w-0">
+                <span className="font-medium text-admin-text">{c.label}</span>{" "}
+                <span className="text-admin-muted">— {c.detail}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div>
