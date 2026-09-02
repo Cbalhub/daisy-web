@@ -219,3 +219,12 @@ export function IconDownload({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconEdit({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className}>
+      <path d="M13.5 3.5l3 3L7 16l-3.5.5.5-3.5 9.5-9.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.5 5.5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}

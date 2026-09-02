@@ -23,6 +23,7 @@ import {
   IconSettings,
   IconTag,
   IconHelp,
+  IconEdit,
 } from "@/components/admin/icons";
 
 const NAV = [
@@ -32,6 +33,7 @@ const NAV = [
   { href: "/admin/ledger", label: "장부", icon: IconCalendar },
   { href: "/admin/customers", label: "고객", icon: IconUsers },
   { href: "/admin/portfolio", label: "포트폴리오", icon: IconImage },
+  { href: "/admin/blog", label: "블로그 초안", icon: IconEdit },
   { href: "/admin/reviews", label: "후기", icon: IconStar },
   { href: "/admin/event", label: "이벤트", icon: IconTag },
   { href: "/admin/quick-replies", label: "빠른 답변", icon: IconBolt },
