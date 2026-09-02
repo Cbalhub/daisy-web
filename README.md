@@ -110,14 +110,15 @@ npm run dev
 - `X-Real-IP` 를 실제 접속 IP로 세팅 (`proxy_set_header X-Real-IP $remote_addr;`).
   계약서 서명 증거·레이트리밋이 이 값을 신뢰합니다.
 
-**crontab** (`CRON_SECRET` 설정 후):
+**crontab** (`CRON_SECRET` 설정 후) — 시간은 **서버(UTC) 기준**. 리포트 창은 코드가 KST 로 계산하므로,
+한국시간 자정에 보내려면 `15:00 UTC` 에 실행합니다(서버가 `Asia/Seoul` 이면 `0 0`).
 
 ```
-0  0 * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" https://<도메인>/api/cron/daily-report
-30 4 * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" https://<도메인>/api/cron/sweep-uploads
+0  15 * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" http://127.0.0.1:3000/api/cron/daily-report
+30 4  * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" http://127.0.0.1:3000/api/cron/sweep-uploads
 ```
 
-- `daily-report` — 전날 방문 요약을 슬랙으로.
+- `daily-report` — 전날(KST) 방문 요약을 슬랙으로. 한국시간 00:00 발송.
 - `sweep-uploads` — `public/uploads` 에서 DB 미참조 고아 파일 정리(24h 유예).
   첫 실행은 `?dryRun=1` 로 확인.
 
