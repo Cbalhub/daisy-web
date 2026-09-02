@@ -79,7 +79,11 @@ function OrderCard({ order }: { order: OrderWithMeta }) {
             href={`/contract/${contract.token}`}
             emphasis={contract.status === "SENT"}
           >
-            {contract.status === "SENT" ? "계약서 서명하기" : "계약서"}
+            {contract.status === "SENT"
+              ? "계약서 서명하기"
+              : contract.status === "SIGNED"
+                ? "계약서(서명본)"
+                : "계약서"}
           </DocLink>
         )}
 

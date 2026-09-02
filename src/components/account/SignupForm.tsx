@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ButtonEl } from "@/components/ui/Button";
 import { PrivacyConsent } from "@/components/ui/PrivacyConsent";
 import { isValidEmail } from "@/lib/isValidEmail";
 import { useToast } from "@/components/ui/Toast";
 
 export function SignupForm() {
-  const router = useRouter();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -52,14 +50,17 @@ export function SignupForm() {
         throw new Error(body?.error ?? "가입에 실패했어요.");
       }
 
-      toast("가입이 완료됐어요", "success");
       try {
         localStorage.setItem("movd-auth", "1");
       } catch {
         // 무시.
       }
       window.dispatchEvent(new Event("movd-auth-change"));
-      router.replace("/account");
+      // 전체 문서 로드로 넘겨 서버가 /account 스켈레톤(loading.tsx)을 즉시 스트리밍하게
+      // 합니다 — SPA 전환은 RSC 페이로드를 한 번 더 기다려 체감이 느립니다. 의도된 하드 이동.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = "/account";
+      return;
     } catch (err) {
       toast(err instanceof Error ? err.message : "가입에 실패했습니다.", "error");
       setLoading(false);

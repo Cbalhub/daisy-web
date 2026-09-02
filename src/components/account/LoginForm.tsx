@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { ButtonEl } from "@/components/ui/Button";
 import { isValidEmail } from "@/lib/isValidEmail";
 import { useToast } from "@/components/ui/Toast";
 
 export function LoginForm() {
-  const router = useRouter();
   const params = useSearchParams();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -36,14 +35,17 @@ export function LoginForm() {
         throw new Error(body?.error ?? "로그인에 실패했습니다.");
       }
 
-      toast("로그인됐어요", "success");
       try {
         localStorage.setItem("movd-auth", "1");
       } catch {
         // 무시.
       }
       window.dispatchEvent(new Event("movd-auth-change"));
-      router.replace(params.get("next") || "/account");
+      // SPA 전환(router.replace)은 /account 의 RSC 페이로드를 클라이언트에서 한 번
+      // 더 기다리게 해 체감이 느립니다. 전체 문서 로드로 넘기면 서버가 loading.tsx
+      // 스켈레톤을 즉시 스트리밍해 훨씬 빠르게 느껴집니다.
+      window.location.href = params.get("next") || "/account";
+      return;
     } catch (err) {
       toast(err instanceof Error ? err.message : "로그인에 실패했습니다.", "error");
       setLoading(false);

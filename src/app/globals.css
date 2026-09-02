@@ -458,3 +458,24 @@
     );
   }
 }
+
+/* 영수증·계약서·견적서를 "PDF로 저장 / 인쇄" 할 때 — A4 한 장에 흰 배경으로 깔끔히
+   떨어지도록. 각 문서 페이지는 이미 print:hidden 등으로 버튼/네비를 숨깁니다. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
