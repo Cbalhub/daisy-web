@@ -14,6 +14,9 @@ import {
   type CompanySnapshot,
 } from "@/lib/contract";
 import { formatSeoulDateTime } from "@/lib/utils";
+import { decryptFieldTagged } from "@/lib/crypto";
+import { buildOrderTimeline } from "@/lib/order-timeline";
+import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL, PROJECT_STAGE_LABEL } from "@/lib/admin/status";
 
 export const dynamic = "force-dynamic";
@@ -29,10 +32,24 @@ export default async function OrderDetailPage({
     include: {
       payments: { orderBy: { createdAt: "desc" } },
       contracts: { orderBy: { createdAt: "desc" } },
+      chatMessages: {
+        where: { type: "PROGRESS_UPDATE" },
+        orderBy: { createdAt: "asc" },
+        select: { body: true, createdAt: true },
+      },
     },
   });
 
   if (!order) notFound();
+
+  const timeline = buildOrderTimeline(order, {
+    signedAt: order.contracts.find((c) => c.status === "SIGNED")?.signedAt ?? null,
+    paidAt: order.payments.find((p) => p.status === "PAID")?.approvedAt ?? null,
+    progressMessages: order.chatMessages.map((m) => ({
+      body: decryptFieldTagged(m.body),
+      createdAt: m.createdAt,
+    })),
+  });
 
   const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
   const payLink = `${siteUrl}/pay/${order.orderToken}`;
@@ -144,6 +161,15 @@ export default async function OrderDetailPage({
           </div>
         </AdminCard>
       </div>
+
+      {timeline.length > 1 && (
+        <div className="px-4 sm:px-8 pt-4">
+          <AdminCard>
+            <h2 className="text-sm font-semibold text-admin-text">진행 타임라인</h2>
+            <OrderTimeline events={timeline} />
+          </AdminCard>
+        </div>
+      )}
 
       <div className="px-4 sm:px-8 pt-4">
         <AdminCard>

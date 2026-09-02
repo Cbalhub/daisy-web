@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUS_LABEL, PROJECT_STAGE_LABEL, PROJECT_STAGE_ORDER } from "@/lib/admin/status";
+import { OrderTimeline } from "@/components/account/OrderTimeline";
+import type { TimelineEvent } from "@/lib/order-timeline";
 import type { Order, ProjectStage, ContractStatus } from "@prisma/client";
 
 type OrderWithMeta = Order & {
@@ -16,17 +18,23 @@ const TONE_TEXT: Record<string, string> = {
   red: "bg-error-soft text-error",
 };
 
-export function OrderList({ orders }: { orders: OrderWithMeta[] }) {
+export function OrderList({
+  orders,
+  timelines = {},
+}: {
+  orders: OrderWithMeta[];
+  timelines?: Record<string, TimelineEvent[]>;
+}) {
   return (
     <ul className="mt-5 space-y-4">
       {orders.map((order) => (
-        <OrderCard key={order.id} order={order} />
+        <OrderCard key={order.id} order={order} timeline={timelines[order.id] ?? []} />
       ))}
     </ul>
   );
 }
 
-function OrderCard({ order }: { order: OrderWithMeta }) {
+function OrderCard({ order, timeline }: { order: OrderWithMeta; timeline: TimelineEvent[] }) {
   const isPaid = order.status === "PAID";
   const isPayable = order.status === "DRAFT" || order.status === "PENDING";
   const contract = order.contracts[0] ?? null;
@@ -66,6 +74,16 @@ function OrderCard({ order }: { order: OrderWithMeta }) {
       )}
 
       {isPaid && <ProgressTracker stage={order.progressStage} />}
+
+      {timeline.length > 1 && (
+        <details className="mt-3 group">
+          <summary className="cursor-pointer list-none text-xs font-medium text-accent hover:opacity-70">
+            진행 상황 자세히 <span className="text-muted group-open:hidden">▾</span>
+            <span className="hidden text-muted group-open:inline">▴</span>
+          </summary>
+          <OrderTimeline events={timeline} />
+        </details>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
         <span className="mr-1 text-xs text-muted">문서</span>
