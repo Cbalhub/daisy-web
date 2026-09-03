@@ -21,11 +21,11 @@ tar xzf "$TARBALL" -C "$NEW"
 cp "$CURRENT/.env" "$NEW/.env"
 chmod 600 "$NEW/.env"   # 시크릿 — 릴리스 디렉터리마다 소유자만 읽기
 
-# 업로드는 릴리스 밖 영속 경로(/opt/movd-uploads)에 저장하고 nginx 가 /uploads/ 를
-# 거기서 직접 서빙합니다(.env 의 UPLOADS_DIR + nginx location). release 안에
-# public/uploads 를 두거나 심링크하면 배포마다 파일이 사라지거나 next build 가
-# 프로젝트 밖 심링크를 못 따라가 실패합니다.
-mkdir -p /opt/movd-uploads/chat /opt/movd-uploads/portfolio /opt/movd-uploads/events
+# 업로드는 릴리스 밖 영속 경로(UPLOADS_DIR=/opt/movd-www/uploads)에 저장하고 nginx 가
+# /uploads/ 를 root /opt/movd-www 로 직접 서빙합니다. release 안에 public/uploads 를
+# 두거나 심링크하면 배포마다 파일이 사라지거나 next build 가 프로젝트 밖 심링크를
+# 못 따라가 실패합니다.
+mkdir -p /opt/movd-www/uploads/chat /opt/movd-www/uploads/portfolio /opt/movd-www/uploads/events
 
 cd "$NEW"
 echo "==> npm ci"
