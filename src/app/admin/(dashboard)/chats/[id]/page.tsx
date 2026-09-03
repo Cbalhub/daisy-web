@@ -65,12 +65,13 @@ export default async function AdminChatDetailPage({
   return (
     <div className="flex h-full flex-col pb-4">
       <AdminPageHeader
+        compact
         title={conversation.customer.name || conversation.customer.email}
         description={conversation.customer.email}
       />
-      <div className="min-h-0 flex-1 px-4 sm:px-8 pt-6">
+      <div className="min-h-0 flex-1 px-3 pt-3 sm:px-8 sm:pt-6">
         <div className="mx-auto h-full max-w-4xl">
-          <AdminCard className="flex h-full flex-col">
+          <AdminCard className="flex h-full flex-col p-3 sm:p-5">
             <ChatThread
               conversationId={conversation.id}
               conversationTitle={conversation.title || "일반 문의"}

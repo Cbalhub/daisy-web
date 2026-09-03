@@ -431,7 +431,7 @@ export function ChatPageView({
               tab/Enter로는 여전히 접근 가능하게 둡니다. */}
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/zip,application/x-zip-compressed"
+            accept="image/*,application/pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp,.hwpx,.txt,.csv"
             className="sr-only"
             disabled={uploading}
             onChange={onFileSelected}

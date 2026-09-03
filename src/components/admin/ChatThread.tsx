@@ -305,70 +305,72 @@ export function ChatThread({
       )}
 
       {attachError && <p className="mt-3 text-xs text-admin-red">{attachError}</p>}
-      <div className="mt-3 flex items-center gap-2 border-t border-admin-border pt-3">
-        <button
-          onClick={() => setShowPaymentForm((v) => !v)}
-          className="shrink-0 rounded-full border border-admin-border px-3 py-2.5 text-xs font-medium text-admin-text transition-colors hover:border-admin-blue"
-        >
-          + 결제 요청
-        </button>
-        {orders.length > 0 && (
+      <div className="mt-3 border-t border-admin-border pt-3">
+        {/* 액션 버튼 — 좁은 화면에서 입력창을 밀어내지 않도록 별도 줄로 분리 + 줄바꿈 허용 */}
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
           <button
-            onClick={() => setShowProgressForm((v) => !v)}
-            className="shrink-0 rounded-full border border-admin-border px-3 py-2.5 text-xs font-medium text-admin-text transition-colors hover:border-admin-blue"
+            onClick={() => setShowPaymentForm((v) => !v)}
+            className="shrink-0 rounded-full border border-admin-border px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:border-admin-blue"
           >
-            + 진행 상황
+            + 결제 요청
           </button>
-        )}
-        {quickReplies.length > 0 && (
-          <QuickReplyPicker replies={quickReplies} onPick={(body) => setDraft(body)} />
-        )}
-        <label
-          className={cn(
-            "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-admin-border text-admin-muted transition-colors hover:border-admin-blue hover:text-admin-text focus-within:ring-2 focus-within:ring-admin-blue",
-            uploading && "pointer-events-none opacity-40"
+          {orders.length > 0 && (
+            <button
+              onClick={() => setShowProgressForm((v) => !v)}
+              className="shrink-0 rounded-full border border-admin-border px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:border-admin-blue"
+            >
+              + 진행 상황
+            </button>
           )}
-          aria-label="파일 첨부"
-        >
-          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M13.5 6.5l-6 6a2.1 2.1 0 0 0 3 3l6.2-6.2a3.5 3.5 0 0 0-5-5L5.3 10.7a4.9 4.9 0 0 0 7 7"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {quickReplies.length > 0 && (
+            <QuickReplyPicker replies={quickReplies} onPick={(body) => setDraft(body)} />
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <label
+            className={cn(
+              "flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-admin-border text-admin-muted transition-colors hover:border-admin-blue hover:text-admin-text focus-within:ring-2 focus-within:ring-admin-blue",
+              uploading && "pointer-events-none opacity-40"
+            )}
+            aria-label="파일 첨부"
+          >
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M13.5 6.5l-6 6a2.1 2.1 0 0 0 3 3l6.2-6.2a3.5 3.5 0 0 0-5-5L5.3 10.7a4.9 4.9 0 0 0 7 7"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <input
+              type="file"
+              accept="image/*,application/pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp,.hwpx,.txt,.csv"
+              className="sr-only"
+              disabled={uploading}
+              onChange={onFileSelected}
             />
-          </svg>
-          {/* display:none이면 키보드 tab 순서에서 완전히 빠져서 파일 첨부를
-              키보드로는 아예 열 수 없었습니다 — sr-only로 시각적으로만 숨기고
-              tab/Enter로는 여전히 접근 가능하게 둡니다. */}
+          </label>
           <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/zip,application/x-zip-compressed"
-            className="sr-only"
-            disabled={uploading}
-            onChange={onFileSelected}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
+            placeholder="답장 입력..."
+            className="min-w-0 flex-1 rounded-full border border-admin-border bg-admin-content px-4 py-2.5 text-sm outline-none focus:border-admin-blue"
           />
-        </label>
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send();
-            }
-          }}
-          placeholder="답장 입력..."
-          className="flex-1 rounded-full border border-admin-border bg-admin-content px-4 py-2.5 text-sm outline-none focus:border-admin-blue"
-        />
-        <button
-          onClick={send}
-          disabled={!draft.trim() || sending}
-          className="shrink-0 rounded-full bg-admin-blue px-5 py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-40"
-        >
-          전송
-        </button>
+          <button
+            onClick={send}
+            disabled={!draft.trim() || sending}
+            className="shrink-0 rounded-full bg-admin-blue px-4 py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-40"
+          >
+            전송
+          </button>
+        </div>
       </div>
     </div>
   );

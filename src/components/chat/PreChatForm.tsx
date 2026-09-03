@@ -135,7 +135,7 @@ export function PreChatForm({ hasExisting = false }: { hasExisting?: boolean }) 
           <span className="truncate">{file ? file.name : "기획서·캡처 등 (선택)"}</span>
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/zip,application/x-zip-compressed"
+            accept="image/*,application/pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp,.hwpx,.txt,.csv"
             className="sr-only"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />

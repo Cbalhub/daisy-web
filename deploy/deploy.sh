@@ -21,6 +21,13 @@ tar xzf "$TARBALL" -C "$NEW"
 cp "$CURRENT/.env" "$NEW/.env"
 chmod 600 "$NEW/.env"   # 시크릿 — 릴리스 디렉터리마다 소유자만 읽기
 
+# 업로드는 릴리스 밖(영속 위치)에 두고 심링크로 연결합니다 — 안 그러면 배포마다
+# 새 릴리스 디렉터리가 생겨 이전에 올린 채팅 첨부·포트폴리오 이미지가 사라집니다.
+UPLOADS=/opt/movd-uploads
+mkdir -p "$UPLOADS"
+rm -rf "$NEW/public/uploads"
+ln -sfn "$UPLOADS" "$NEW/public/uploads"
+
 cd "$NEW"
 echo "==> npm ci"
 npm ci --no-audit --no-fund

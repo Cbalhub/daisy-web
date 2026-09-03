@@ -4,13 +4,14 @@ import { postCustomerAttachment } from "@/lib/chat";
 import { requireCustomerSession } from "@/lib/customer-auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { limitChatMessage } from "@/lib/ratelimit";
+import { CHAT_UPLOAD_URL_RE } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
 // /api/chat/upload가 반환한 경로만 허용 — 임의의 외부 URL을 그대로 저장하지 않습니다.
 const schema = z.object({
   conversationId: z.string().min(1),
-  url: z.string().regex(/^\/uploads\/chat\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|pdf|zip)$/),
+  url: z.string().regex(CHAT_UPLOAD_URL_RE),
   name: z.string().trim().min(1).max(200),
   mime: z.string().trim().min(1).max(100),
 });

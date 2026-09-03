@@ -3,11 +3,12 @@ import { z } from "zod";
 import { postAdminAttachment } from "@/lib/chat";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
+import { CHAT_UPLOAD_URL_RE } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
 const schema = z.object({
-  url: z.string().regex(/^\/uploads\/chat\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|pdf|zip)$/),
+  url: z.string().regex(CHAT_UPLOAD_URL_RE),
   name: z.string().trim().min(1).max(200),
   mime: z.string().trim().min(1).max(100),
 });

@@ -56,20 +56,52 @@ export async function deleteUploadByUrl(url: string | null | undefined): Promise
   await unlink(abs).catch(() => {});
 }
 
-// 채팅 첨부는 이미지·PDF·ZIP까지만 허용합니다 — 실행 파일/스크립트류를 열어
-// 서버에 저장하는 경로를 만들지 않기 위해 화이트리스트를 의도적으로 좁게 둡니다.
-// (docx/pptx 등도 내부적으로 ZIP 포맷이라 이 시그니처로 함께 통과합니다.)
+// 채팅 첨부 화이트리스트 — 고객이 기획서·캡처·문서를 보내야 하므로 사무용 문서
+// 포맷까지 넓게 받되, 확장자는 클라이언트 값이 아니라 실제 매직 넘버로 결정합니다
+// (실행 파일/스크립트가 이미지·문서로 위장해 저장되는 경로 차단).
 const isZip = (b: Buffer) =>
   b[0] === 0x50 && b[1] === 0x4b && (b[2] === 0x03 || b[2] === 0x05 || b[2] === 0x07);
+// OLE2 복합 문서 — 구버전 한글(.hwp 5.0)·구버전 오피스(.doc/.xls/.ppt)의 시그니처.
+const isOle2 = (b: Buffer) =>
+  b[0] === 0xd0 && b[1] === 0xcf && b[2] === 0x11 && b[3] === 0xe0;
+// ISO-BMFF (ftyp) — HEIC/HEIF(아이폰 사진). offset 4 에 "ftyp".
+const isHeic = (b: Buffer) => {
+  if (b.toString("ascii", 4, 8) !== "ftyp") return false;
+  const brand = b.toString("ascii", 8, 12);
+  return ["heic", "heix", "hevc", "hevx", "mif1", "msf1", "heif"].includes(brand);
+};
 
 const CHAT_FILE_TYPES: Record<string, ImageKind> = {
   ...IMAGE_TYPES,
+  "image/heic": { ext: "heic", check: isHeic },
+  "image/heif": { ext: "heic", check: isHeic },
   "application/pdf": { ext: "pdf", check: (b) => b.toString("ascii", 0, 4) === "%PDF" },
   "application/zip": { ext: "zip", check: isZip },
   "application/x-zip-compressed": { ext: "zip", check: isZip },
+  // 최신 오피스·한글 (내부적으로 zip)
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { ext: "docx", check: isZip },
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { ext: "xlsx", check: isZip },
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": { ext: "pptx", check: isZip },
+  "application/haansofthwpx": { ext: "hwpx", check: isZip },
+  "application/vnd.hancom.hwpx": { ext: "hwpx", check: isZip },
+  // 구버전 오피스·한글 (OLE2)
+  "application/msword": { ext: "doc", check: isOle2 },
+  "application/vnd.ms-excel": { ext: "xls", check: isOle2 },
+  "application/vnd.ms-powerpoint": { ext: "ppt", check: isOle2 },
+  "application/x-hwp": { ext: "hwp", check: isOle2 },
+  "application/haansofthwp": { ext: "hwp", check: isOle2 },
+  "application/vnd.hancom.hwp": { ext: "hwp", check: isOle2 },
+  // 텍스트 (매직 넘버 없음 — 사이즈·타입만)
+  "text/plain": { ext: "txt", check: () => true },
+  "text/csv": { ext: "csv", check: () => true },
 };
 
 export const MAX_CHAT_FILE_BYTES = 50 * 1024 * 1024;
+
+// /api/chat/upload 가 돌려준 경로만 첨부로 받도록 검증하는 정규식(단일 소스).
+// 확장자는 위 CHAT_FILE_TYPES 에서 나올 수 있는 것만.
+export const CHAT_UPLOAD_URL_RE =
+  /^\/uploads\/chat\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|heic|pdf|zip|docx|xlsx|pptx|hwpx|doc|xls|ppt|hwp|txt|csv)$/;
 
 export function detectChatFileExt(mimeType: string, bytes: Buffer): string | null {
   const kind = CHAT_FILE_TYPES[mimeType];
