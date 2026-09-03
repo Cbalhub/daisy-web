@@ -42,13 +42,19 @@ const NAV = [
   { href: "/admin/settings", label: "설정", icon: IconSettings },
 ];
 
+// STAFF 는 대시보드·채팅만.
+const STAFF_HREFS = new Set(["/admin", "/admin/chats"]);
+
 export function Sidebar({
   email,
+  role = "OWNER",
   unreadBadge,
 }: {
   email: string;
+  role?: "OWNER" | "STAFF";
   unreadBadge?: React.ReactNode;
 }) {
+  const nav = role === "STAFF" ? NAV.filter((n) => STAFF_HREFS.has(n.href)) : NAV;
   const pathname = usePathname();
   const router = useRouter();
   // 좁은 화면에서는 사이드바가 콘텐츠 영역을 다 차지해버리므로, md 미만에서는
@@ -69,7 +75,7 @@ export function Sidebar({
         <p className="px-2.5 pb-2 pt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-admin-sidebar-text">
           Menu
         </p>
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = item.exact
             ? pathname === item.href
             : pathname.startsWith(item.href);

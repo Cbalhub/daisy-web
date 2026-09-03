@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   session.adminId = admin.id;
   session.email = admin.email;
+  session.role = admin.role === "STAFF" ? "STAFF" : "OWNER";
   await session.save();
 
   return NextResponse.json({ ok: true });

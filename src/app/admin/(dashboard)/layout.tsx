@@ -27,6 +27,7 @@ export default async function DashboardLayout({
       <AdminLivePoller />
       <Sidebar
         email={session.email ?? ""}
+        role={session.role === "STAFF" ? "STAFF" : "OWNER"}
         unreadBadge={
           <Suspense fallback={null}>
             <UnreadChatBadge />

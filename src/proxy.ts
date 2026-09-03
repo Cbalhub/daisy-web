@@ -17,6 +17,31 @@ async function readSealedId<T extends { customerId?: string } | { adminId?: stri
   }
 }
 
+async function readAdminSession(
+  req: NextRequest
+): Promise<{ adminId: string; role: string } | null> {
+  const cookieValue = req.cookies.get(sessionOptions.cookieName)?.value;
+  if (!cookieValue) return null;
+  try {
+    const data = await unsealData<SessionData>(cookieValue, {
+      password: sessionOptions.password as string,
+    });
+    if (!data.adminId) return null;
+    return { adminId: data.adminId, role: data.role ?? "OWNER" };
+  } catch {
+    return null;
+  }
+}
+
+// STAFF 역할이 접근할 수 있는 경로 — 채팅과 대시보드만.
+function staffAllowed(pathname: string): boolean {
+  if (pathname === "/admin" || pathname === "/admin/") return true;
+  if (pathname === "/admin/chats" || pathname.startsWith("/admin/chats/")) return true;
+  if (pathname.startsWith("/api/admin/chats/")) return true;
+  if (pathname === "/api/admin/logout" || pathname === "/api/admin/password") return true;
+  return false;
+}
+
 async function getCustomerId(req: NextRequest) {
   return readSealedId<CustomerSessionData>(
     req.cookies.get(customerSessionOptions.cookieName)?.value,
@@ -44,12 +69,12 @@ export async function proxy(req: NextRequest) {
     pathname !== "/api/admin/login" &&
     pathname !== "/api/admin/logout"
   ) {
-    const adminId = await readSealedId<SessionData>(
-      req.cookies.get(sessionOptions.cookieName)?.value,
-      sessionOptions.password as string
-    );
-    if (!adminId) {
+    const session = await readAdminSession(req);
+    if (!session) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    if (session.role === "STAFF" && !staffAllowed(pathname)) {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
     }
     return NextResponse.next();
   }
@@ -57,15 +82,15 @@ export async function proxy(req: NextRequest) {
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
 
-    const adminId = await readSealedId<SessionData>(
-      req.cookies.get(sessionOptions.cookieName)?.value,
-      sessionOptions.password as string
-    );
-
-    if (!adminId) {
+    const session = await readAdminSession(req);
+    if (!session) {
       const loginUrl = new URL("/admin/login", req.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
+    }
+    if (session.role === "STAFF" && !staffAllowed(pathname)) {
+      // 접근 불가 페이지는 대시보드로 돌려보냅니다.
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
     return NextResponse.next();
   }

@@ -13,6 +13,8 @@ model AdminUser {
   email        String   @unique
   passwordHash String
   name         String?
+  // "OWNER" = 전체 권한(대표). "STAFF" = 채팅·대시보드만 (직원 공유 계정 등).
+  role         String   @default("OWNER")
   createdAt    DateTime @default(now())
 
   orders             Order[]             @relation("OrderCreatedBy")

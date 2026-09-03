@@ -9,11 +9,12 @@ import {
   declaredBodyTooLarge,
   detectImageExt,
   randomImageFilename,
+  uploadsDir,
 } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "portfolio");
+const UPLOAD_DIR = uploadsDir("portfolio");
 
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) {

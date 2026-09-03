@@ -2,6 +2,15 @@ import { randomUUID } from "crypto";
 import { unlink } from "fs/promises";
 import path from "path";
 
+// 업로드 파일의 물리적 저장 위치. 배포마다 릴리스 디렉터리가 새로 생기므로
+// 프로덕션에서는 릴리스 밖 영속 경로를 UPLOADS_DIR 로 지정하고, nginx 가
+// /uploads/ 를 그 경로에서 직접 서빙합니다(deploy/README 참고).
+// 미설정(로컬 개발)이면 public/uploads — Next 가 정적으로 서빙합니다.
+export function uploadsDir(...sub: string[]): string {
+  const base = process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads");
+  return path.join(base, ...sub);
+}
+
 type ImageKind = { ext: string; check: (bytes: Buffer) => boolean };
 
 // 확장자는 클라이언트가 보낸 파일명이나 Content-Type 헤더가 아니라, 실제 파일 내용의
@@ -50,65 +59,28 @@ export function declaredBodyTooLarge(req: Request, maxTotalBytes: number): boole
 // 파일은 조용히 무시합니다.
 export async function deleteUploadByUrl(url: string | null | undefined): Promise<void> {
   if (!url || !url.startsWith("/uploads/")) return;
-  const root = path.join(process.cwd(), "public", "uploads");
-  const abs = path.join(process.cwd(), "public", url.replace(/^\/+/, ""));
+  const root = uploadsDir();
+  const abs = path.join(root, url.replace(/^\/uploads\/+/, ""));
   if (abs !== root && !abs.startsWith(root + path.sep)) return;
   await unlink(abs).catch(() => {});
 }
 
-// 채팅 첨부 화이트리스트 — 고객이 기획서·캡처·문서를 보내야 하므로 사무용 문서
-// 포맷까지 넓게 받되, 확장자는 클라이언트 값이 아니라 실제 매직 넘버로 결정합니다
-// (실행 파일/스크립트가 이미지·문서로 위장해 저장되는 경로 차단).
-const isZip = (b: Buffer) =>
-  b[0] === 0x50 && b[1] === 0x4b && (b[2] === 0x03 || b[2] === 0x05 || b[2] === 0x07);
-// OLE2 복합 문서 — 구버전 한글(.hwp 5.0)·구버전 오피스(.doc/.xls/.ppt)의 시그니처.
-const isOle2 = (b: Buffer) =>
-  b[0] === 0xd0 && b[1] === 0xcf && b[2] === 0x11 && b[3] === 0xe0;
-// ISO-BMFF (ftyp) — HEIC/HEIF(아이폰 사진). offset 4 에 "ftyp".
-const isHeic = (b: Buffer) => {
-  if (b.toString("ascii", 4, 8) !== "ftyp") return false;
-  const brand = b.toString("ascii", 8, 12);
-  return ["heic", "heix", "hevc", "hevx", "mif1", "msf1", "heif"].includes(brand);
-};
-
-const CHAT_FILE_TYPES: Record<string, ImageKind> = {
-  ...IMAGE_TYPES,
-  "image/heic": { ext: "heic", check: isHeic },
-  "image/heif": { ext: "heic", check: isHeic },
-  "application/pdf": { ext: "pdf", check: (b) => b.toString("ascii", 0, 4) === "%PDF" },
-  "application/zip": { ext: "zip", check: isZip },
-  "application/x-zip-compressed": { ext: "zip", check: isZip },
-  // 최신 오피스·한글 (내부적으로 zip)
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { ext: "docx", check: isZip },
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { ext: "xlsx", check: isZip },
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation": { ext: "pptx", check: isZip },
-  "application/haansofthwpx": { ext: "hwpx", check: isZip },
-  "application/vnd.hancom.hwpx": { ext: "hwpx", check: isZip },
-  // 구버전 오피스·한글 (OLE2)
-  "application/msword": { ext: "doc", check: isOle2 },
-  "application/vnd.ms-excel": { ext: "xls", check: isOle2 },
-  "application/vnd.ms-powerpoint": { ext: "ppt", check: isOle2 },
-  "application/x-hwp": { ext: "hwp", check: isOle2 },
-  "application/haansofthwp": { ext: "hwp", check: isOle2 },
-  "application/vnd.hancom.hwp": { ext: "hwp", check: isOle2 },
-  // 텍스트 (매직 넘버 없음 — 사이즈·타입만)
-  "text/plain": { ext: "txt", check: () => true },
-  "text/csv": { ext: "csv", check: () => true },
-};
-
 export const MAX_CHAT_FILE_BYTES = 50 * 1024 * 1024;
 
 // /api/chat/upload 가 돌려준 경로만 첨부로 받도록 검증하는 정규식(단일 소스).
-// 확장자는 위 CHAT_FILE_TYPES 에서 나올 수 있는 것만.
-export const CHAT_UPLOAD_URL_RE =
-  /^\/uploads\/chat\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|heic|pdf|zip|docx|xlsx|pptx|hwpx|doc|xls|ppt|hwp|txt|csv)$/;
+// UUID 파일명 + 선택적 확장자(영문숫자 1~12자). 임의 경로 주입 차단용.
+export const CHAT_UPLOAD_URL_RE = /^\/uploads\/chat\/[a-zA-Z0-9_-]+(\.[a-z0-9]{1,12})?$/;
 
-export function detectChatFileExt(mimeType: string, bytes: Buffer): string | null {
-  const kind = CHAT_FILE_TYPES[mimeType];
-  if (!kind) return null;
-  return kind.check(bytes) ? kind.ext : null;
+// 채팅 첨부는 파일 형식을 제한하지 않습니다 — 고객이 어떤 자료든 보낼 수 있어야 하고,
+// 저장된 파일은 nginx 가 Content-Disposition: attachment + octet-stream 으로만 서빙해
+// 브라우저에서 실행/렌더되지 않습니다(HTML·SVG 도 다운로드만). 서버에서 이 파일을
+// 실행하는 경로는 어디에도 없습니다.
+// 원본 파일명에서 안전한 확장자만 뽑아 저장 파일명에 붙입니다(표시·다운로드 편의용).
+export function safeExtFromName(name: string): string | null {
+  const m = /\.([a-zA-Z0-9]{1,12})$/.exec(name.trim());
+  return m ? m[1].toLowerCase() : null;
 }
 
-export function isChatImage(mimeType: string) {
-  return mimeType in IMAGE_TYPES;
+export function isImageMime(mimeType: string) {
+  return mimeType.startsWith("image/");
 }

@@ -1,9 +1,12 @@
 import { getIronSession, type SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
 
+export type AdminRole = "OWNER" | "STAFF";
+
 export type SessionData = {
   adminId?: string;
   email?: string;
+  role?: AdminRole;
 };
 
 const sessionSecret = process.env.SESSION_SECRET;

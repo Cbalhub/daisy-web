@@ -109,6 +109,11 @@ npm run dev
 - `gzip on;` (가능하면 `brotli on;`) — JS/CSS/HTML. `.woff2`는 이미 압축본이라 제외.
 - `X-Real-IP` 를 실제 접속 IP로 세팅 (`proxy_set_header X-Real-IP $remote_addr;`).
   계약서 서명 증거·레이트리밋이 이 값을 신뢰합니다.
+- **업로드 서빙** — `.env` 에 `UPLOADS_DIR=/opt/movd-www/uploads` (릴리스 밖 영속 경로).
+  nginx 가 `/uploads/` 를 `root /opt/movd-www` 로 직접 서빙: 이미지 확장자는 원래
+  타입 + inline, 나머지는 `application/octet-stream` + `Content-Disposition: attachment`
+  (HTML·SVG 포함 어떤 파일도 실행/렌더 안 됨). `src/app/uploads/[...path]/route.ts` 는
+  로컬 개발·next/image 최적화기용 폴백.
 
 **crontab** (`CRON_SECRET` 설정 후) — 시간은 **서버(UTC) 기준**. 리포트 창은 코드가 KST 로 계산하므로,
 한국시간 자정에 보내려면 `15:00 UTC` 에 실행합니다(서버가 `Asia/Seoul` 이면 `0 0`).
@@ -128,5 +133,10 @@ npm run dev
 - `sweep-uploads` — `public/uploads` 에서 DB 미참조 고아 파일 정리(24h 유예).
   첫 실행은 `?dryRun=1` 로 확인.
 
-PostgreSQL은 같은 VPS 또는 Neon/Supabase 등 관리형. 업로드 파일은 로컬 디스크
-(`public/uploads`)에 저장되므로 VPS 재배포 시 볼륨을 유지해야 합니다.
+PostgreSQL은 같은 VPS 또는 Neon/Supabase 등 관리형. 업로드 파일은
+`UPLOADS_DIR`(릴리스 밖 `/opt/movd-www/uploads`)에 저장돼 재배포에도 유지됩니다.
+
+**관리자 역할**: `AdminUser.role` — `OWNER`(전체) / `STAFF`(대시보드·채팅만).
+직원 계정을 STAFF 로 만들려면 `UPDATE "AdminUser" SET role='STAFF' WHERE email='…'`.
+proxy.ts 가 STAFF 의 다른 `/admin/*`·`/api/admin/*` 접근을 차단(페이지는 대시보드로
+리다이렉트, API 는 403). 사이드바도 역할에 따라 메뉴를 걸러줍니다.

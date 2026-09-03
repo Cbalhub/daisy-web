@@ -19,9 +19,7 @@ export const chatStartSchema = z.object({
   // 이 파일은 클라이언트에서도 import 하므로 node 전용 모듈을 끌어오지 않으려고 복제.)
   attachmentUrl: z
     .string()
-    .regex(
-      /^\/uploads\/chat\/[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|heic|pdf|zip|docx|xlsx|pptx|hwpx|doc|xls|ppt|hwp|txt|csv)$/
-    )
+    .regex(/^\/uploads\/chat\/[a-zA-Z0-9_-]+(\.[a-z0-9]{1,12})?$/)
     .optional(),
   attachmentName: z.string().trim().min(1).max(200).optional(),
   attachmentMime: z.string().trim().min(1).max(100).optional(),
