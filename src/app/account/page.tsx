@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { OrderList } from "@/components/account/OrderList";
+import { DefaultAvatar } from "@/components/account/DefaultAvatar";
 import { Mark } from "@/components/brand/Mark";
 import { OpenChatButton } from "@/components/chat/OpenChatButton";
 import { requireCustomerSession } from "@/lib/customer-auth";
@@ -47,8 +48,6 @@ export default async function AccountDashboardPage() {
   });
   if (!customer) redirect("/account/login");
 
-  const initial = (customer.name?.trim()[0] || customer.email[0] || "?").toUpperCase();
-
   const paidOrders = customer.orders.filter((o) => o.status === "PAID");
   const inProgress = paidOrders.filter((o) => o.progressStage !== "DELIVERED").length;
   const totalPaid = paidOrders.reduce((sum, o) => sum + o.amount, 0);
@@ -83,13 +82,8 @@ export default async function AccountDashboardPage() {
     <section className="pt-16 pb-24 md:pt-20">
       <Container>
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span
-              aria-hidden
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-paper-dim font-display text-lg font-extrabold text-ink"
-            >
-              {initial}
-            </span>
+          <div className="flex items-center gap-4">
+            <DefaultAvatar className="h-14 w-14 shrink-0" />
             <div>
               <h1 className="font-display text-2xl font-extrabold tracking-tight md:text-[2rem]">
                 {customer.name ? `${customer.name} 님` : "내 프로젝트"}
