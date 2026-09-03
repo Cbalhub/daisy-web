@@ -118,7 +118,13 @@ npm run dev
 30 4  * * *  curl -sf -H "Authorization: Bearer $CRON_SECRET" http://127.0.0.1:3000/api/cron/sweep-uploads
 ```
 
+```
+20 3 * * *  /opt/pg-backup.sh >> /var/log/movd-backup.log 2>&1
+```
+
 - `daily-report` — 전날(KST) 방문 요약을 슬랙으로. 한국시간 00:00 발송.
+- `pg-backup` — PostgreSQL 일일 덤프(`deploy/pg-backup.sh` → VPS `/opt/pg-backup.sh`).
+  `/opt/backups/` 에 14일치 보관. `.env` 에 `R2_REMOTE="r2:버킷명"` + rclone 설정하면 R2 로도 업로드.
 - `sweep-uploads` — `public/uploads` 에서 DB 미참조 고아 파일 정리(24h 유예).
   첫 실행은 `?dryRun=1` 로 확인.
 
