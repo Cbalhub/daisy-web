@@ -41,7 +41,6 @@ async function getOverview() {
     sentContracts,
     stalePendingOrders,
     unpublishedReviews,
-    newInquiries,
   ] = await Promise.all([
     prisma.chatConversation.count({ where: { createdAt: { gte: startOfMonth } } }),
     prisma.payment.aggregate({
@@ -82,7 +81,6 @@ async function getOverview() {
       },
     }),
     prisma.review.count({ where: { publishedAt: null, orderId: { not: null } } }),
-    prisma.inquiry.count({ where: { status: "NEW" } }),
   ]);
 
   return {
@@ -104,7 +102,6 @@ async function getOverview() {
     sentContracts,
     stalePendingOrders,
     unpublishedReviews,
-    newInquiries,
   };
 }
 
@@ -128,7 +125,6 @@ export default async function AdminDashboardPage() {
     sentContracts,
     stalePendingOrders,
     unpublishedReviews,
-    newInquiries,
   } = await getOverview();
 
   const hasConversationTrend = dailyConversations.some((d) => d.value > 0);
@@ -164,20 +160,10 @@ export default async function AdminDashboardPage() {
           claimedOrders > 0 ||
           sentContracts > 0 ||
           stalePendingOrders > 0 ||
-          unpublishedReviews > 0 ||
-          newInquiries > 0 ? (
+          unpublishedReviews > 0 ? (
             <AdminCard className="flex flex-wrap items-center gap-3 border border-admin-blue/20 bg-admin-blue-soft p-4">
               <p className="text-sm font-semibold text-admin-blue">지금 확인할 게 있어요</p>
               <div className="flex flex-wrap gap-2">
-                {newInquiries > 0 && (
-                  <Link
-                    href="/admin/inquiries?status=NEW"
-                    className="flex items-center gap-1.5 rounded-full bg-admin-surface px-3 py-1.5 text-xs font-medium text-admin-text transition-colors hover:bg-white"
-                  >
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-admin-blue" />
-                    새 문의 {newInquiries}건
-                  </Link>
-                )}
                 {unreadMessages > 0 && (
                   <Link
                     href="/admin/chats"

@@ -82,23 +82,14 @@ model Inquiry {
   email      String
   phone      String?
   budget     String?
-  // 채팅 진입 전 문의 폼에서 받는 값들 — 전부 선택 입력.
-  preferredTimeline String?
-  attachmentUrl     String?
-  attachmentName    String?
-  attachmentMime    String?
   message    String
   status     InquiryStatus @default(NEW)
   customerId String?
   customer   Customer?     @relation(fields: [customerId], references: [id])
-  // 이 문의로 만들어진 채팅 대화. 대화가 삭제되면 연결만 끊고 문의는 남깁니다.
-  conversationId String?
-  conversation   ChatConversation? @relation("InquiryConversation", fields: [conversationId], references: [id], onDelete: SetNull)
   createdAt  DateTime      @default(now())
 
   @@index([createdAt])
   @@index([status])
-  @@index([status, createdAt])
 }
 
 // ---------- 포트폴리오 ----------
@@ -497,7 +488,6 @@ model ChatConversation {
   messages     ChatMessage[]
   orders       Order[]
   ledgerEntries ManualLedgerEntry[] @relation("LedgerConversation")
-  inquiries    Inquiry[]          @relation("InquiryConversation")
 
   @@index([customerId, lastMessageAt])
   @@index([status, lastMessageAt])

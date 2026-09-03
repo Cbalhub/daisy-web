@@ -26,7 +26,9 @@ echo "==> npm ci"
 npm ci --no-audit --no-fund
 echo "==> prisma generate + db push (추가형 스키마만)"
 npx prisma generate
-npx prisma db push
+# 이 워크플로는 스키마 변경을 관리자가 통제하며(추가/삭제 모두 의도적),
+# 배포는 비대화형이라 --accept-data-loss 로 확인 프롬프트를 건너뜁니다.
+npx prisma db push --accept-data-loss
 echo "==> next build"
 NODE_OPTIONS="--max-old-space-size=3072" npm run build
 

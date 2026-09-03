@@ -113,28 +113,8 @@ export default async function AdminCustomerDetailPage({
           ) : (
             <ul className="mt-3 divide-y divide-admin-border">
               {customer.inquiries.map((inquiry) => (
-                <li key={inquiry.id} className="flex items-start justify-between gap-4 px-5 py-4">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {inquiry.budget && <AdminBadge tone="neutral">예산 {inquiry.budget}</AdminBadge>}
-                      {inquiry.preferredTimeline && (
-                        <AdminBadge tone="neutral">일정 {inquiry.preferredTimeline}</AdminBadge>
-                      )}
-                      {inquiry.attachmentUrl && (
-                        <a
-                          href={inquiry.attachmentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-admin-blue hover:underline"
-                        >
-                          📎 첨부
-                        </a>
-                      )}
-                    </div>
-                    <p className="mt-1 line-clamp-2 whitespace-pre-line text-sm text-admin-text">
-                      {inquiry.message}
-                    </p>
-                  </div>
+                <li key={inquiry.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                  <p className="min-w-0 truncate text-sm text-admin-text">{inquiry.message}</p>
                   <AdminBadge tone={INQUIRY_STATUS_LABEL[inquiry.status].tone}>
                     {INQUIRY_STATUS_LABEL[inquiry.status].label}
                   </AdminBadge>

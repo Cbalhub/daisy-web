@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireCustomerSession } from "@/lib/customer-auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { limitChatMessage } from "@/lib/ratelimit";
@@ -34,33 +33,11 @@ export async function POST(req: NextRequest) {
   const { message, budget, preferredTimeline, attachmentUrl, attachmentName, attachmentMime } =
     parsed.data;
 
-  const customer = await prisma.customer.findUnique({
-    where: { id: session.customerId },
-    select: { name: true, email: true },
-  });
-  if (!customer) {
-    return NextResponse.json({ error: "계정을 찾을 수 없습니다." }, { status: 401 });
-  }
-
   const title = message.replace(/\s+/g, " ").trim().slice(0, 24) || "프로젝트 문의";
   const conversation = await createConversation(session.customerId, title);
 
-  await prisma.inquiry.create({
-    data: {
-      name: customer.name ?? customer.email,
-      email: customer.email,
-      message,
-      budget: budget ?? null,
-      preferredTimeline: preferredTimeline ?? null,
-      attachmentUrl: attachmentUrl ?? null,
-      attachmentName: attachmentName ?? null,
-      attachmentMime: attachmentMime ?? null,
-      customerId: session.customerId,
-      conversationId: conversation.id,
-    },
-  });
-
-  // 첫 채팅 메시지로 요약을 남깁니다 — 관리자 알림(이메일·Slack·텔레그램)은 이 경로에서 자동 발송.
+  // 문의 내용은 별도 저장 없이 채팅 첫 메시지로만 남깁니다 — 관리자 알림
+  // (이메일·Slack·텔레그램)은 postCustomerMessage 경로에서 자동 발송됩니다.
   const summary = [
     budget ? `예산: ${budget}` : null,
     preferredTimeline ? `희망 일정: ${preferredTimeline}` : null,
