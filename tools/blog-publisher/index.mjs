@@ -87,7 +87,9 @@ function parseCmd(cmd) {
 
 async function withMcp(cmd, fn) {
   const { command, args } = parseCmd(cmd);
-  const transport = new StdioClientTransport({ command, args, stderr: "inherit" });
+  // env 를 넘기지 않으면 SDK 가 화이트리스트 최소 env 만 전달해서 TISTORY_STATE_FILE 등
+  // 커스텀 변수가 MCP 서버에 안 들어감 → 전체 env 를 그대로 넘긴다.
+  const transport = new StdioClientTransport({ command, args, stderr: "inherit", env: { ...process.env } });
   const client = new Client({ name: "movd-blog-publisher", version: "1.0.0" });
   await client.connect(transport);
   try {

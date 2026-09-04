@@ -5,6 +5,7 @@
 /tools/blog-publisher/node_modules
 /tools/blog-publisher/run.log
 /tools/blog-publisher/package-lock.json
+/tools/blog-publisher/*-tistory-state.json
 /.pnp
 .pnp.*
 .yarn/*

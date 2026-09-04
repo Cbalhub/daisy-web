@@ -55,6 +55,27 @@ npm start          # 5분마다 대기열 확인 (계속 실행)
 npm run once       # 대기열 1회만 처리하고 종료 (스케줄러용)
 ```
 
+## 리눅스 서버 배포 (티스토리 전용, PC 불필요)
+
+티스토리는 데이터센터 IP 에서도 되므로 movd VPS 에서 돌릴 수 있습니다. 카카오
+로그인만 PC 에서 1회 하고 그 쿠키를 서버로 옮깁니다.
+
+```bash
+# 1) PC 에서: 카카오 로그인 후 쿠키 추출
+node tistory-login.bat           # (이미 했으면 생략)
+node export-tistory-state.mjs    # -> movd-tistory-state.json
+
+# 2) 서버(/opt/movd-blog-publisher)에서:
+sudo apt-get install -y libsecret-1-0     # keytar 로드용 (호출은 안 함)
+npm install --omit=dev
+node patch-tistory-mcp.mjs                # keytar -> TISTORY_STATE_FILE 폴백
+#   .env 에 TISTORY_STATE_FILE=/opt/movd-blog-publisher/movd-tistory-state.json
+#   crontab: */10 * * * * cd /opt/movd-blog-publisher && node index.mjs --once
+```
+
+쿠키는 2027-10 만료 → 그때 PC 에서 1·2 단계 다시.
+브라우저(chromium) 불필요 — 발행은 `POST /manage/post.json` 직접 호출.
+
 ### Windows 작업 스케줄러 (1일 1회 권장)
 
 1. 작업 스케줄러 → 작업 만들기
