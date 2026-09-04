@@ -19,12 +19,15 @@ const MOVD_API = (process.env.MOVD_API || "https://movd.co.kr").replace(/\/$/, "
 const SECRET = process.env.PUBLISHER_SECRET || "";
 const POLL_MS = Number(process.env.POLL_INTERVAL_MS || 5 * 60 * 1000);
 const ONCE = process.argv.includes("--once");
+const TISTORY_LOGIN = process.argv.includes("--tistory-login");
 
 // MCP 실행 명령 — 공백으로 쪼개 argv 로. 예:
-//   NAVER_MCP_CMD="uv --directory C:/dev/naver-blog-mcp run naver-blog-mcp"
-//   TISTORY_MCP_CMD="npx -y kim-se-hee-tistory-mcp"
+//   NAVER_MCP_CMD="uv --directory C:/movd-tools/naver-blog-mcp run naver-blog-mcp"
+//   TISTORY_MCP_CMD="npx -y tistory-mcp"
 const NAVER_MCP_CMD = process.env.NAVER_MCP_CMD || "";
 const TISTORY_MCP_CMD = process.env.TISTORY_MCP_CMD || "";
+// 티스토리 발행 대상 블로그 host (예: movdlog.tistory.com). 조용한 폴백이 막혀 있어 필수.
+const TISTORY_BLOG_URL = (process.env.TISTORY_BLOG_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 // 플랫폼별 "글 생성" 툴 이름 후보 — MCP 서버 버전에 따라 다를 수 있어 tools/list 로
 // 실제 존재하는 것을 고릅니다. 필요하면 여기에 추가하세요.
@@ -118,7 +121,22 @@ async function publishJob(job) {
   }
 
   const isNaver = job.platform === "NAVER";
-  const content = isNaver ? job.bodyPlain : job.bodyMarkdown;
+
+  if (!isNaver && !TISTORY_BLOG_URL) {
+    await reportResult(job.id, job.platform, false, undefined, "TISTORY_BLOG_URL(.env)이 없습니다. 예: movdlog.tistory.com");
+    return;
+  }
+
+  const args = isNaver
+    ? { title: job.title, content: job.bodyPlain, tags: job.tags ?? [], publish: true }
+    : {
+        blogUrl: TISTORY_BLOG_URL,
+        title: job.title,
+        content: job.bodyMarkdown,
+        contentFormat: "markdown",
+        tags: job.tags ?? [],
+        visibility: "public", // 티스토리 기본값이 private — 명시 안 하면 비공개로 나감
+      };
 
   log(`발행 시작: [${job.platform}] ${job.title}`);
   try {
@@ -130,18 +148,13 @@ async function publishJob(job) {
           `글 생성 툴을 찾지 못했습니다. 사용 가능한 툴: ${tools.map((t) => t.name).join(", ")}`
         );
       }
-      const result = await client.callTool({
-        name: toolName,
-        arguments: {
-          title: job.title,
-          content,
-          tags: job.tags ?? [],
-          publish: true,
-          visibility: "public",
-        },
-      });
+      const result = await client.callTool({ name: toolName, arguments: args });
+      const errText = extractText(result);
+      if (/session required|tistory_session_init|세션.*만료|Session expired/i.test(errText)) {
+        throw new Error("티스토리 세션이 없거나 만료됐습니다. `node index.mjs --tistory-login` 을 먼저 실행하세요.");
+      }
       if (result.isError) {
-        throw new Error(extractText(result) || "MCP 툴이 오류를 반환했습니다.");
+        throw new Error(errText || "MCP 툴이 오류를 반환했습니다.");
       }
       // 이 MCP 서버들은 예외를 protocol 에러로 안 올리고 본문 JSON 에 담아 돌려줍니다.
       // { success, message, post_url } 형태면 파싱해서 판정합니다.
@@ -190,8 +203,32 @@ async function runOnce() {
   }
 }
 
+// 티스토리 카카오 로그인 1회 — 헤디드 크로미움이 떠서 사람이 승인하면 쿠키를
+// OS 자격증명 저장소에 저장. 이후엔 재실행 불필요(만료 전까지).
+async function tistoryLogin() {
+  if (!TISTORY_MCP_CMD) throw new Error("TISTORY_MCP_CMD(.env)이 없습니다.");
+  if (!TISTORY_BLOG_URL) throw new Error("TISTORY_BLOG_URL(.env)이 없습니다. 예: movdlog.tistory.com");
+  log(`티스토리 로그인 시작 — ${TISTORY_BLOG_URL} (크로미움 창에서 카카오 승인하세요, 최대 5분)`);
+  const out = await withMcp(TISTORY_MCP_CMD, async (client) => {
+    const { tools } = await client.listTools();
+    if (!tools.some((t) => t.name === "tistory_session_init")) {
+      throw new Error(`tistory_session_init 툴이 없습니다. 툴: ${tools.map((t) => t.name).join(", ")}`);
+    }
+    const r = await client.callTool({
+      name: "tistory_session_init",
+      arguments: { blogUrl: TISTORY_BLOG_URL, timeoutMs: 300000 },
+    });
+    return extractText(r);
+  });
+  log(`티스토리 로그인 결과:\n${out}`);
+}
+
 async function main() {
   requireEnv();
+  if (TISTORY_LOGIN) {
+    await tistoryLogin();
+    return;
+  }
   log(`퍼블리셔 시작 — API ${MOVD_API}, ${ONCE ? "1회 실행" : `폴링 ${POLL_MS / 1000}s`}`);
   if (ONCE) {
     await runOnce();

@@ -34,10 +34,19 @@ uv run playwright install chromium
 
 `.env` 의 `NAVER_MCP_CMD` 를 clone 한 경로로 맞춥니다.
 
-### 티스토리 MCP (kim-se-hee-tistory-mcp)
+### 티스토리 MCP (tistory-mcp)
 
-`npx -y kim-se-hee-tistory-mcp` 로 자동 설치됩니다. 첫 실행 시 카카오 로그인 등
-서버가 요구하는 초기화가 필요할 수 있습니다(그 패키지 문서 참고).
+`npm install` 시 의존성으로 함께 설치됩니다(크로미움도 자동 다운로드).
+`.env` 의 `TISTORY_BLOG_URL` 에 발행할 블로그 host 를 넣으세요 (예: `movdlog.tistory.com`).
+
+첫 1회 카카오 로그인:
+
+```bash
+node index.mjs --tistory-login
+```
+
+크로미움 창이 뜨면 카카오 로그인(푸시/2FA)을 승인합니다. 쿠키가 Windows 자격증명
+관리자에 저장돼 이후엔 재실행 불필요(만료 전까지). `tistory-login.bat` 더블클릭도 동일.
 
 ## 실행
 
