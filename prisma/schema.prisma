@@ -23,6 +23,7 @@ model AdminUser {
   manualLedgerEntries ManualLedgerEntry[] @relation("ManualLedgerCreatedBy")
   contracts          Contract[]          @relation("ContractCreatedBy")
   blogDrafts         BlogDraft[]         @relation("BlogDraftCreatedBy")
+  estimates          Estimate[]          @relation("EstimateCreatedBy")
 }
 
 // ---------- 블로그 글 초안 (네이버 블로그·티스토리에 직접 복붙) ----------
@@ -32,6 +33,16 @@ enum BlogPlatform {
   NAVER
   TISTORY
   GENERIC
+}
+
+// 네이버·티스토리 발행 상태. 앱은 대기열만 관리하고, 대표님 PC 의 로컬 퍼블리셔가
+// QUEUED 를 당겨가 MCP 서버로 실제 게시한 뒤 결과를 돌려줍니다.
+enum PublishState {
+  IDLE
+  QUEUED
+  PUBLISHING
+  PUBLISHED
+  FAILED
 }
 
 model BlogDraft {
@@ -45,10 +56,42 @@ model BlogDraft {
   metaDescription String   @default("") // 검색결과 미리보기용 한 줄 요약
   tags            String[] @default([]) // 네이버·티스토리 태그 칸에 붙여넣을 추천 태그
   model           String   @default("") // 생성에 쓴 모델 ID 기록
+
+  naverState   PublishState @default(IDLE)
+  naverUrl     String       @default("")
+  naverError   String       @default("")
+  tistoryState PublishState @default(IDLE)
+  tistoryUrl   String       @default("")
+  tistoryError String       @default("")
+  publishLog   Json? // [{ at, platform, state, note }] — 최근 발행 시도 이력
+
   createdById String?
   createdBy   AdminUser?   @relation("BlogDraftCreatedBy", fields: [createdById], references: [id])
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@index([createdAt])
+  @@index([naverState])
+  @@index([tistoryState])
+}
+
+// ---------- 견적 초안 ----------
+// 고객이 길게 적어 보낸 문의(채팅 등)를 붙여넣으면 Gemini 가 기능 그룹·항목으로
+// 쪼개고 항목별 예상 작업일수를 추정합니다. 금액은 대표가 직접 입력.
+// groups = [{ name, note, items: [{ name, detail, days }] }]
+model Estimate {
+  id          String     @id @default(cuid())
+  sourceText  String // 붙여넣은 문의 원문
+  projectName String     @default("")
+  summary     String     @default("") // 한 줄 요약
+  groups      Json // 위 형식
+  totalDays   Int        @default(0)
+  notes       String     @default("") // 가정·제외 범위
+  model       String     @default("")
+  createdById String?
+  createdBy   AdminUser?  @relation("EstimateCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@index([createdAt])
 }

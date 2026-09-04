@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/tools/blog-publisher/node_modules
+/tools/blog-publisher/run.log
+/tools/blog-publisher/package-lock.json
 /.pnp
 .pnp.*
 .yarn/*

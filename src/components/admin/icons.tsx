@@ -220,6 +220,15 @@ export function IconDownload({ className }: IconProps) {
   );
 }
 
+export function IconReceipt({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className}>
+      <path d="M4.5 2.5h11v15l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2V2.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M7.5 6.5h5M7.5 9.5h5M7.5 12.5h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconEdit({ className }: IconProps) {
   return (
     <svg viewBox="0 0 20 20" fill="none" className={className}>

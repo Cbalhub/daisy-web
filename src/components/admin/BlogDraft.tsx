@@ -7,7 +7,8 @@ import { useToast } from "@/components/ui/Toast";
 import { BLOG_PLATFORM_OPTIONS } from "@/lib/admin/blog-labels";
 import { BLOG_TONES } from "@/lib/validation/blog";
 import { analyzeSeo } from "@/lib/blog-seo";
-import type { BlogPlatform } from "@prisma/client";
+import { toPlainText } from "@/lib/blog-format";
+import type { BlogPlatform, PublishState } from "@prisma/client";
 
 const TONE_LABEL: Record<string, string> = {
   뼈때리기: "뼈때리기",
@@ -131,17 +132,6 @@ export function AddBlogDraft() {
   );
 }
 
-// ── 마크다운 → 붙여넣기용 일반 텍스트 (네이버 블로그용) ────────────
-function toPlainText(body: string): string {
-  return body
-    .replace(/^#{1,6}\s*/gm, "")
-    .replace(/^\s*[-*]\s+/gm, "· ")
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/\*(.+?)\*/g, "$1")
-    .replace(/`(.+?)`/g, "$1")
-    .replace(/^>\s?/gm, "")
-    .trim();
-}
 
 // ── 초안 편집기 ───────────────────────────────────────────────────
 export function BlogDraftEditor({
@@ -157,6 +147,12 @@ export function BlogDraftEditor({
     topic: string;
     model: string;
     platform: BlogPlatform;
+    naverState: PublishState;
+    naverUrl: string;
+    naverError: string;
+    tistoryState: PublishState;
+    tistoryUrl: string;
+    tistoryError: string;
   };
 }) {
   const isNaver = draft.platform === "NAVER";
@@ -237,6 +233,28 @@ export function BlogDraftEditor({
     } else {
       toast("삭제에 실패했습니다.", "error");
     }
+  }
+
+  async function publish(platform: "NAVER" | "TISTORY", action: "queue" | "unqueue" | "reset") {
+    if (dirty) {
+      toast("먼저 저장하고 발행하세요.", "error");
+      return;
+    }
+    const res = await fetch(`/api/admin/blog/${draft.id}/publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ platform, action }),
+    });
+    const b = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast(b?.error ?? "실패했습니다.", "error");
+      return;
+    }
+    toast(
+      action === "queue" ? "발행 대기열에 올렸어요" : action === "unqueue" ? "대기열에서 뺐어요" : "초기화했어요",
+      "success"
+    );
+    router.refresh();
   }
 
   async function copyOut(what: "post" | "tags") {
@@ -434,6 +452,31 @@ export function BlogDraftEditor({
         )}
       </div>
 
+      <div className="grid gap-3 border-t border-admin-border pt-4 sm:grid-cols-2">
+        <PublishCard
+          label="네이버 블로그"
+          state={draft.naverState}
+          url={draft.naverUrl}
+          error={draft.naverError}
+          onQueue={() => publish("NAVER", "queue")}
+          onUnqueue={() => publish("NAVER", "unqueue")}
+          onReset={() => publish("NAVER", "reset")}
+        />
+        <PublishCard
+          label="티스토리"
+          state={draft.tistoryState}
+          url={draft.tistoryUrl}
+          error={draft.tistoryError}
+          onQueue={() => publish("TISTORY", "queue")}
+          onUnqueue={() => publish("TISTORY", "unqueue")}
+          onReset={() => publish("TISTORY", "reset")}
+        />
+      </div>
+      <p className="text-[11px] text-admin-muted">
+        &ldquo;발행&rdquo;은 대기열에 올리는 것 — 실제 게시는 PC 의 로컬 퍼블리셔가 실행될 때
+        이뤄집니다(tools/blog-publisher). 자동화라 네이버 저품질/차단 위험이 있어요.
+      </p>
+
       <div className="flex flex-wrap items-center gap-2 border-t border-admin-border pt-4">
         <button
           onClick={regenerate}
@@ -453,6 +496,81 @@ export function BlogDraftEditor({
           {draft.model ? ` · ${draft.model}` : ""}
         </span>
       </div>
+    </div>
+  );
+}
+
+const PUBLISH_LABEL: Record<PublishState, { text: string; cls: string }> = {
+  IDLE: { text: "발행 안 함", cls: "bg-admin-bg-soft text-admin-muted" },
+  QUEUED: { text: "대기열", cls: "bg-admin-amber-soft text-admin-amber" },
+  PUBLISHING: { text: "발행 중…", cls: "bg-admin-blue-soft text-admin-blue" },
+  PUBLISHED: { text: "발행됨", cls: "bg-admin-green-soft text-admin-green" },
+  FAILED: { text: "실패", cls: "bg-admin-red-soft text-admin-red" },
+};
+
+function PublishCard({
+  label,
+  state,
+  url,
+  error,
+  onQueue,
+  onUnqueue,
+  onReset,
+}: {
+  label: string;
+  state: PublishState;
+  url: string;
+  error: string;
+  onQueue: () => void;
+  onUnqueue: () => void;
+  onReset: () => void;
+}) {
+  const s = PUBLISH_LABEL[state];
+  return (
+    <div className="rounded-lg border border-admin-border bg-admin-surface p-3.5">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-admin-text">{label}</span>
+        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.cls}`}>{s.text}</span>
+      </div>
+      <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        {(state === "IDLE" || state === "FAILED") && (
+          <button
+            onClick={onQueue}
+            className="rounded-lg bg-admin-blue px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            {state === "FAILED" ? "다시 발행" : "발행"}
+          </button>
+        )}
+        {state === "QUEUED" && (
+          <button
+            onClick={onUnqueue}
+            className="rounded-lg border border-admin-border px-3 py-1.5 text-xs font-medium text-admin-text hover:border-admin-blue"
+          >
+            대기열에서 빼기
+          </button>
+        )}
+        {state === "FAILED" && (
+          <button
+            onClick={onReset}
+            className="text-xs text-admin-muted hover:text-admin-text"
+          >
+            상태 초기화
+          </button>
+        )}
+        {state === "PUBLISHED" && url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium text-admin-blue hover:underline"
+          >
+            게시글 열기 →
+          </a>
+        )}
+      </div>
+      {state === "FAILED" && error && (
+        <p className="mt-2 line-clamp-3 text-[11px] text-admin-red">{error}</p>
+      )}
     </div>
   );
 }

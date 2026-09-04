@@ -24,12 +24,14 @@ import {
   IconTag,
   IconHelp,
   IconEdit,
+  IconReceipt,
 } from "@/components/admin/icons";
 
 const NAV = [
   { href: "/admin", label: "대시보드", icon: IconGrid, exact: true },
   { href: "/admin/chats", label: "채팅", icon: IconChat },
   { href: "/admin/orders", label: "주문 · 결제", icon: IconCard },
+  { href: "/admin/estimate", label: "견적", icon: IconReceipt },
   { href: "/admin/ledger", label: "장부", icon: IconCalendar },
   { href: "/admin/customers", label: "고객", icon: IconUsers },
   { href: "/admin/portfolio", label: "포트폴리오", icon: IconImage },

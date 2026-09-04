@@ -16,6 +16,13 @@ const DATE_FORMAT = new Intl.DateTimeFormat("ko-KR", {
   minute: "2-digit",
 });
 
+const PUB_DOT: Record<string, string> = {
+  QUEUED: "bg-admin-amber",
+  PUBLISHING: "bg-admin-blue",
+  PUBLISHED: "bg-admin-green",
+  FAILED: "bg-admin-red",
+};
+
 export default async function AdminBlogPage() {
   const drafts = await prisma.blogDraft.findMany({
     orderBy: { createdAt: "desc" },
@@ -53,6 +60,16 @@ export default async function AdminBlogPage() {
                     <span className="mt-0.5 block truncate text-xs text-admin-muted">{d.topic}</span>
                   </span>
                   <span className="flex shrink-0 items-center gap-3 text-xs text-admin-muted">
+                    {(["NAVER", "TISTORY"] as const).map((p) => {
+                      const st = p === "NAVER" ? d.naverState : d.tistoryState;
+                      if (st === "IDLE") return null;
+                      return (
+                        <span key={p} className="inline-flex items-center gap-1">
+                          <span className={`h-1.5 w-1.5 rounded-full ${PUB_DOT[st] ?? "bg-admin-muted"}`} />
+                          {p === "NAVER" ? "N" : "T"}
+                        </span>
+                      );
+                    })}
                     <AdminBadge tone="neutral">{BLOG_PLATFORM_LABEL[d.platform]}</AdminBadge>
                     {DATE_FORMAT.format(d.createdAt)}
                   </span>

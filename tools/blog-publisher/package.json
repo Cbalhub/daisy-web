@@ -1,0 +1,16 @@
+{
+  "name": "movd-blog-publisher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MOVD 블로그 발행 대기열을 당겨와 네이버 블로그·티스토리 MCP 서버로 게시하는 로컬 프로세스. Next 앱과 분리된 독립 패키지 — 대표님 PC(가정용 IP)에서 실행.",
+  "scripts": {
+    "start": "node index.mjs",
+    "once": "node index.mjs --once"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.19.1",
+    "dotenv": "^16.4.7",
+    "undici": "^7.16.0"
+  }
+}

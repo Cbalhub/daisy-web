@@ -40,6 +40,12 @@ export default async function BlogDraftPage({ params }: { params: Promise<{ id: 
             topic: draft.topic,
             model: draft.model,
             platform: draft.platform,
+            naverState: draft.naverState,
+            naverUrl: draft.naverUrl,
+            naverError: draft.naverError,
+            tistoryState: draft.tistoryState,
+            tistoryUrl: draft.tistoryUrl,
+            tistoryError: draft.tistoryError,
           }}
         />
       </div>
