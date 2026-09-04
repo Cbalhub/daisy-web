@@ -143,7 +143,17 @@ async function publishJob(job) {
       if (result.isError) {
         throw new Error(extractText(result) || "MCP 툴이 오류를 반환했습니다.");
       }
-      return extractUrl(result);
+      // 이 MCP 서버들은 예외를 protocol 에러로 안 올리고 본문 JSON 에 담아 돌려줍니다.
+      // { success, message, post_url } 형태면 파싱해서 판정합니다.
+      const text = extractText(result);
+      const obj = tryJson(text);
+      if (obj && obj.success === false) {
+        throw new Error(obj.message || obj.error || "발행에 실패했습니다.");
+      }
+      if (/오류 발생:|에러:/.test(text) && !obj) {
+        throw new Error(text.slice(0, 400));
+      }
+      return (obj && (obj.post_url || obj.url || obj.postUrl)) || extractUrl(result);
     });
 
     log(`발행 완료: [${job.platform}] ${url || "(URL 회수 실패 — 수동 확인 필요)"}`);
@@ -156,6 +166,17 @@ async function publishJob(job) {
 
 function extractText(result) {
   return (result?.content ?? []).map((c) => c.text ?? "").join("\n").trim();
+}
+
+function tryJson(text) {
+  const s = text.indexOf("{");
+  const e = text.lastIndexOf("}");
+  if (s === -1 || e <= s) return null;
+  try {
+    return JSON.parse(text.slice(s, e + 1));
+  } catch {
+    return null;
+  }
 }
 
 async function runOnce() {
