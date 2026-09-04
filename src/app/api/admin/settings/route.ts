@@ -19,6 +19,8 @@ const schema = z.object({
   bankName: z.string().trim().max(30),
   bankAccountNumber: z.string().trim().max(50),
   bankAccountHolder: z.string().trim().max(30),
+  // 폼에서 문자열로 옴 — 견적 금액 계산용 일당(원). 빈값·이상값은 0.
+  dailyRateKrw: z.coerce.number().int().min(0).max(100_000_000).catch(0),
 });
 
 export async function PATCH(req: NextRequest) {

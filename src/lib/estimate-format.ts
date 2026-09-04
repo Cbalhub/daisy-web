@@ -36,6 +36,14 @@ export function totalDays(groups: EstimateGroup[]): number {
   return Math.round(sum * 2) / 2;
 }
 
+// 원 단위 표시. rate(일당)가 0이면 금액 계산을 하지 않습니다.
+export function krw(n: number): string {
+  return `₩${Math.round(n).toLocaleString("ko-KR")}`;
+}
+export function groupDays(g: EstimateGroup): number {
+  return Math.round(g.items.reduce((a, it) => a + (it.days || 0), 0) * 2) / 2;
+}
+
 // 견적 초안 → 용역계약서 '용역 범위' 칸에 붙여넣을 여러 줄 텍스트.
 // 금액은 계약서에서 따로 넣으므로 여기엔 작업일수만.
 export function toScopeText(opts: {
@@ -43,20 +51,25 @@ export function toScopeText(opts: {
   summary: string;
   groups: EstimateGroup[];
   notes: string;
+  dailyRateKrw?: number;
 }): string {
+  const rate = opts.dailyRateKrw && opts.dailyRateKrw > 0 ? opts.dailyRateKrw : 0;
+  const amt = (days: number) => (rate ? ` — ${krw(days * rate)}` : "");
   const lines: string[] = [];
   if (opts.summary.trim()) lines.push(opts.summary.trim(), "");
 
   for (const g of opts.groups) {
-    const gDays = g.items.reduce((a, it) => a + (it.days || 0), 0);
-    lines.push(`■ ${g.name} (${fmtDays(gDays)})`);
+    const gDays = groupDays(g);
+    lines.push(`■ ${g.name} (${fmtDays(gDays)}${amt(gDays)})`);
     for (const it of g.items) {
       lines.push(`  - ${it.name}${it.detail ? `: ${it.detail}` : ""} (${fmtDays(it.days)})`);
     }
     lines.push("");
   }
 
-  lines.push(`합계: 약 ${fmtDays(totalDays(opts.groups))}`);
+  const td = totalDays(opts.groups);
+  lines.push(`합계: 약 ${fmtDays(td)}${amt(td)}`);
+  if (rate) lines.push(`(기준 일당 ${krw(rate)} · 부가세 별도)`);
   if (opts.notes.trim()) {
     lines.push("", "[가정 및 제외 범위]", opts.notes.trim());
   }

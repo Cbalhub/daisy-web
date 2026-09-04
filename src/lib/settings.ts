@@ -30,6 +30,7 @@ export async function updateBusinessSettings(
     bankName: string;
     bankAccountNumber: string;
     bankAccountHolder: string;
+    dailyRateKrw: number;
   }>
 ) {
   return prisma.businessSettings.upsert({

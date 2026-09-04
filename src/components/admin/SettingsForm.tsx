@@ -17,6 +17,7 @@ type Settings = {
   bankName: string;
   bankAccountNumber: string;
   bankAccountHolder: string;
+  dailyRateKrw: string;
 };
 
 export function SettingsForm({ initial }: { initial: Settings }) {
@@ -70,6 +71,25 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             name="bankAccountHolder"
             defaultValue={initial.bankAccountHolder}
             placeholder="홍길동"
+          />
+        </div>
+      </AdminCard>
+
+      <AdminCard>
+        <h2 className="text-sm font-semibold text-admin-text">견적 기준 일당</h2>
+        <p className="mt-1 text-xs text-admin-muted">
+          견적 화면에서 <b>항목 작업일수 × 이 일당 = 예상 금액</b>으로 자동 계산해요. 비워두면 금액 없이 일수만 표시됩니다.
+        </p>
+        <div className="mt-4 max-w-xs">
+          <label className="text-xs font-medium text-admin-muted">1일 단가 (원)</label>
+          <input
+            name="dailyRateKrw"
+            type="number"
+            min={0}
+            step={10000}
+            defaultValue={initial.dailyRateKrw}
+            placeholder="예: 300000"
+            className="mt-1.5 w-full rounded-lg border border-admin-border bg-admin-content px-3.5 py-2.5 text-sm tabular-nums outline-none focus:border-admin-blue"
           />
         </div>
       </AdminCard>

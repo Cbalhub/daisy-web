@@ -25,6 +25,7 @@ export default async function AdminSettingsPage() {
             bankName: settings.bankName,
             bankAccountNumber: settings.bankAccountNumber,
             bankAccountHolder: settings.bankAccountHolder,
+            dailyRateKrw: String(settings.dailyRateKrw || ""),
           }}
         />
 

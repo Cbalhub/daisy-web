@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminCard } from "@/components/admin/ui/Card";
 import { useToast } from "@/components/ui/Toast";
-import { totalDays, toScopeText, type EstimateGroup } from "@/lib/estimate-format";
+import { totalDays, toScopeText, krw, type EstimateGroup } from "@/lib/estimate-format";
 
 // ── 새 견적 생성 ──────────────────────────────────────────────────
 export function AddEstimate() {
@@ -68,9 +68,11 @@ type Draft = {
   groups: EstimateGroup[];
   model: string;
   sourceText: string;
+  dailyRateKrw: number;
 };
 
 export function EstimateEditor({ draft }: { draft: Draft }) {
+  const rate = draft.dailyRateKrw > 0 ? draft.dailyRateKrw : 0;
   const router = useRouter();
   const toast = useToast();
   const [projectName, setProjectName] = useState(draft.projectName);
@@ -147,7 +149,7 @@ export function EstimateEditor({ draft }: { draft: Draft }) {
   }
 
   async function copyScope() {
-    const text = toScopeText({ projectName, summary, groups, notes });
+    const text = toScopeText({ projectName, summary, groups, notes, dailyRateKrw: rate });
     try {
       await navigator.clipboard.writeText(text);
       toast("계약서 '용역 범위' 칸에 붙여넣으세요", "success");
@@ -176,8 +178,16 @@ export function EstimateEditor({ draft }: { draft: Draft }) {
         </button>
         <span className="ml-auto rounded-lg bg-admin-content px-3 py-2 text-sm font-semibold tabular-nums text-admin-text">
           합계 {total % 1 === 0 ? total : total.toFixed(1)}일
+          {rate > 0 && (
+            <span className="ml-2 font-normal text-admin-muted">≈ {krw(total * rate)}</span>
+          )}
         </span>
       </div>
+      {rate === 0 && (
+        <p className="text-[11px] text-admin-muted">
+          금액을 자동 계산하려면 <b>설정 → 견적 기준 일당</b>에 1일 단가를 넣으세요.
+        </p>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-[minmax(0,220px)_1fr]">
         <div>
@@ -213,6 +223,7 @@ export function EstimateEditor({ draft }: { draft: Draft }) {
                 />
                 <span className="shrink-0 text-xs font-medium tabular-nums text-admin-muted">
                   {gDays % 1 === 0 ? gDays : gDays.toFixed(1)}일
+                  {rate > 0 && <span className="ml-1.5 text-admin-muted/70">{krw(gDays * rate)}</span>}
                 </span>
                 <button
                   onClick={() => removeGroup(gi)}
