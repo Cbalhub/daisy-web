@@ -146,7 +146,8 @@ export async function getLedgerEntries(
       detail: p.order.description,
       businessRegNo: p.order.businessRegNo,
       phone: p.order.customerPhone,
-      proofType: p.ledgerProofType,
+      // 결제는 포트원 승인 = 계좌 입금이 기본 증빙. 관리자가 따로 바꾸지 않으면 계좌이체 내역으로.
+      proofType: p.ledgerProofType ?? ("TRANSFER_RECORD" as const),
       expenseCategory: null,
       taxInvoiceIssuedAt: p.ledgerTaxInvoiceIssuedAt,
       memo: p.ledgerMemo,
@@ -166,7 +167,7 @@ export async function getLedgerEntries(
       detail: r.payment.order.description,
       businessRegNo: r.payment.order.businessRegNo,
       phone: r.payment.order.customerPhone,
-      proofType: r.ledgerProofType,
+      proofType: r.ledgerProofType ?? ("TRANSFER_RECORD" as const),
       expenseCategory: null,
       taxInvoiceIssuedAt: r.ledgerTaxInvoiceIssuedAt,
       memo: r.ledgerMemo,

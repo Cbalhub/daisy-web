@@ -34,6 +34,7 @@ async function getOverview() {
     stageInProgress,
     stageDelivered,
     refundThisMonth,
+    manualRefundThisMonth,
     recentConversations,
     recentOrders,
     dailyRevenue,
@@ -62,6 +63,10 @@ async function getOverview() {
       where: { cancelledAt: { gte: startOfMonth } },
       _sum: { amount: true },
     }),
+    // 장부에 직접 적은 환불(계좌이체 환불 등)도 합칩니다 — Refund 테이블만 보면 누락돼요.
+    prisma.manualLedgerEntry
+      .aggregate({ where: { kind: "REFUND", occurredAt: { gte: startOfMonth } }, _sum: { amount: true } })
+      .catch(() => ({ _sum: { amount: 0 } })),
     prisma.chatConversation.findMany({
       orderBy: { lastMessageAt: "desc" },
       take: 5,
@@ -94,7 +99,7 @@ async function getOverview() {
     stageReceived,
     stageInProgress,
     stageDelivered,
-    refundThisMonth: refundThisMonth._sum.amount ?? 0,
+    refundThisMonth: (refundThisMonth._sum.amount ?? 0) + (manualRefundThisMonth._sum.amount ?? 0),
     recentConversations,
     recentOrders,
     dailyRevenue,
