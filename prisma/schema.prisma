@@ -210,6 +210,8 @@ model BusinessSettings {
   bankName           String   @default("")
   bankAccountNumber  String   @default("")
   bankAccountHolder  String   @default("")
+  // 견적 생성기에서 "항목 작업일수 × 이 일당 = 예상 금액" 계산에 씁니다. 0 이면 금액 계산 숨김.
+  dailyRateKrw       Int      @default(0)
   updatedAt          DateTime @updatedAt
 }
 
@@ -528,6 +530,9 @@ model ChatConversation {
   title         String? // 예: "챗봇 개발 프로젝트" — 비어 있으면 "일반 문의"로 표시
   status        ChatConversationStatus @default(OPEN)
   lastMessageAt DateTime               @default(now())
+  // 관리자 답장 시 고객에게 SMS 를 보낸 시각. 고객이 새 메시지를 보내면 null 로
+  // 되돌려, "관리자가 답장했는데 고객이 아직 안 본" 구간에 문자를 딱 한 번만 보냅니다.
+  lastCustomerNotifiedAt DateTime?
   createdAt     DateTime               @default(now())
 
   messages     ChatMessage[]

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sendNewMessageNotification } from "@/lib/email";
 import { sendSlackText } from "@/lib/slack";
 import { sendTelegramText } from "@/lib/telegram";
+import { sendDiscordText, isDiscordConfigured } from "@/lib/discord";
+import { sendSms, isSmsConfigured } from "@/lib/sms";
 import { encryptFieldTagged, decryptFieldTagged } from "@/lib/crypto";
 
 // 채팅 메시지 본문은 검색/필터링 대상이 아니라서(이름·연락처와 달리) 부분 일치
@@ -107,24 +109,59 @@ async function notifyAdminOfNewMessage(
   const customerLabel = customer?.name || customer?.email || "고객";
   const who = conversationTitle ? `${customerLabel} · ${conversationTitle}` : customerLabel;
   const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const chatUrl = `${siteUrl}/admin/chats/${conversationId}`;
+  const line = `💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`;
+
+  // 텔레그램·디스코드·슬랙 중 하나라도 켜져 있으면 이메일은 건너뜁니다(중복 알림 방지).
+  // 푸시 채널이 하나도 없을 때만 이메일이 폴백으로 동작합니다.
+  const hasPush =
+    Boolean(process.env.TELEGRAM_BOT_TOKEN) ||
+    isDiscordConfigured() ||
+    Boolean(process.env.SLACK_WEBHOOK_URL_CHAT || process.env.SLACK_WEBHOOK_URL);
+
   await Promise.allSettled([
-    sendNewMessageNotification({
-      customerName: who,
-      preview: preview.slice(0, 200),
-      conversationId,
-    }),
-    sendSlackText(`💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`, {
-      url: `${siteUrl}/admin/chats/${conversationId}`,
+    hasPush
+      ? Promise.resolve()
+      : sendNewMessageNotification({ customerName: who, preview: preview.slice(0, 200), conversationId }),
+    sendSlackText(line, {
+      url: chatUrl,
       urlLabel: "채팅 열기",
       webhook: process.env.SLACK_WEBHOOK_URL_CHAT || undefined,
       username: "MOVD 채팅",
       iconEmoji: ":speech_balloon:",
     }),
-    sendTelegramText(`💬 새 메시지 — ${who}\n${preview.slice(0, 200)}`, {
-      url: `${siteUrl}/admin/chats/${conversationId}`,
-      urlLabel: "채팅 열기",
-    }),
+    sendTelegramText(line, { url: chatUrl, urlLabel: "채팅 열기" }),
+    sendDiscordText(line, { url: chatUrl, urlLabel: "채팅 열기", username: "MOVD 채팅" }),
   ]);
+}
+
+/**
+ * 관리자가 답장·첨부·결제요청·진행상황 카드를 올렸을 때, 고객이 이메일을 잘 안
+ * 보므로 문자로 알립니다. lastCustomerNotifiedAt 이 이미 채워져 있으면(= 이번
+ * "고객이 안 본" 구간에 이미 한 번 보냄) 건너뛰어, 연속 답장에 문자가 쏟아지지
+ * 않게 합니다. 고객이 새 메시지를 보내면 이 값이 null 로 리셋됩니다.
+ */
+async function notifyCustomerOfReply(conversationId: string) {
+  if (!isSmsConfigured()) return;
+  try {
+    const convo = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: { lastCustomerNotifiedAt: true, customer: { select: { phone: true } } },
+    });
+    if (!convo || convo.lastCustomerNotifiedAt) return;
+    const phone = convo.customer?.phone?.trim();
+    if (!phone) return;
+
+    // 먼저 표시부터 남겨(동시 답장 경합 방지) 문자를 보냅니다.
+    await prisma.chatConversation.update({
+      where: { id: conversationId },
+      data: { lastCustomerNotifiedAt: new Date() },
+    });
+    const siteUrl = process.env.SITE_URL ?? "https://movd.co.kr";
+    await sendSms(phone, `[MOVD] 상담 채팅에 새 답변이 도착했어요.\n${siteUrl}/chat`);
+  } catch (err) {
+    console.error("[chat] 고객 문자 알림 실패:", err);
+  }
 }
 
 export async function postCustomerMessage(input: {
@@ -146,7 +183,7 @@ export async function postCustomerMessage(input: {
     });
     await tx.chatConversation.update({
       where: { id: conversation.id },
-      data: { lastMessageAt: created.createdAt, status: "OPEN" },
+      data: { lastMessageAt: created.createdAt, status: "OPEN", lastCustomerNotifiedAt: null },
     });
     return created;
   });
@@ -181,7 +218,7 @@ export async function postDepositClaimNotice(input: {
     });
     await tx.chatConversation.update({
       where: { id: input.conversationId },
-      data: { lastMessageAt: created.createdAt, status: "OPEN" },
+      data: { lastMessageAt: created.createdAt, status: "OPEN", lastCustomerNotifiedAt: null },
     });
     return created;
   });
@@ -211,6 +248,7 @@ export async function postAdminReply(input: { conversationId: string; body: stri
     });
     return created;
   });
+  void notifyCustomerOfReply(input.conversationId);
   return decryptMessage(message);
 }
 
@@ -246,7 +284,7 @@ export async function postCustomerAttachments(input: {
     }
     await tx.chatConversation.update({
       where: { id: conversation.id },
-      data: { lastMessageAt: rows[rows.length - 1].createdAt, status: "OPEN" },
+      data: { lastMessageAt: rows[rows.length - 1].createdAt, status: "OPEN", lastCustomerNotifiedAt: null },
     });
     return rows;
   });
@@ -289,6 +327,7 @@ export async function postAdminAttachments(input: {
     });
     return rows;
   });
+  void notifyCustomerOfReply(input.conversationId);
   return created.map(decryptMessage);
 }
 
@@ -338,6 +377,7 @@ export async function postPaymentRequestMessage(input: {
     });
     return created;
   });
+  void notifyCustomerOfReply(input.conversationId);
   return decryptMessage(message);
 }
 
@@ -368,6 +408,7 @@ export async function postProgressUpdateMessage(input: {
     });
     return created;
   });
+  void notifyCustomerOfReply(input.conversationId);
   return decryptMessage(message);
 }
 

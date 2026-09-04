@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { sendTelegramText } from "@/lib/telegram";
+import { sendDiscordText } from "@/lib/discord";
 
 export const runtime = "nodejs";
 
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
     note: ok ? url ?? "" : error ?? "",
   };
 
-  await prisma.blogDraft.update({
+  const updated = await prisma.blogDraft.update({
     where: { id },
     data: {
       [stateField]: ok ? "PUBLISHED" : "FAILED",
@@ -53,7 +55,18 @@ export async function POST(req: NextRequest) {
       [errorField]: ok ? "" : (error ?? "발행 실패").slice(0, 1000),
       publishLog: [...prevLog, entry].slice(-20) as Prisma.InputJsonValue,
     },
+    select: { title: true },
   });
+
+  if (!ok) {
+    const label = platform === "NAVER" ? "네이버 블로그" : "티스토리";
+    const line = `⚠️ 블로그 발행 실패 — ${label}\n${updated.title || id}\n${(error ?? "").slice(0, 300)}`;
+    const site = process.env.SITE_URL ?? "https://movd.co.kr";
+    void Promise.allSettled([
+      sendTelegramText(line, { url: `${site}/admin/blog/${id}`, urlLabel: "초안 열기" }),
+      sendDiscordText(line, { url: `${site}/admin/blog/${id}`, urlLabel: "초안 열기" }),
+    ]);
+  }
 
   return NextResponse.json({ ok: true });
 }

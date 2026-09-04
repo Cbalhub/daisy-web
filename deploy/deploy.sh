@@ -30,6 +30,8 @@ mkdir -p /opt/movd-www/uploads/chat /opt/movd-www/uploads/portfolio /opt/movd-ww
 cd "$NEW"
 echo "==> npm ci"
 npm ci --no-audit --no-fund
+# 고위험 취약점만 경고(빌드는 막지 않음).
+npm audit --omit=dev --audit-level=high || echo "!! npm audit: 고위험 취약점 있음 — 확인 필요"
 echo "==> prisma generate + db push (추가형 스키마만)"
 npx prisma generate
 # 이 워크플로는 스키마 변경을 관리자가 통제하며(추가/삭제 모두 의도적),
