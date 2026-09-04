@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { postAdminAttachment } from "@/lib/chat";
+import { postAdminAttachments } from "@/lib/chat";
 import { requireAdminSession } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/csrf";
 import { CHAT_UPLOAD_URL_RE } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
-const schema = z.object({
+const item = z.object({
   url: z.string().regex(CHAT_UPLOAD_URL_RE),
   name: z.string().trim().min(1).max(200),
   mime: z.string().trim().min(1).max(100),
+});
+const schema = z.object({
+  url: z.string().regex(CHAT_UPLOAD_URL_RE).optional(),
+  name: z.string().trim().min(1).max(200).optional(),
+  mime: z.string().trim().min(1).max(100).optional(),
+  items: z.array(item).min(1).max(10).optional(),
 });
 
 export async function POST(
@@ -31,8 +37,17 @@ export async function POST(
     return NextResponse.json({ error: "invalid payload" }, { status: 400 });
   }
 
-  const { id: conversationId } = await params;
-  const message = await postAdminAttachment({ conversationId, ...parsed.data });
+  const items =
+    parsed.data.items ??
+    (parsed.data.url && parsed.data.name && parsed.data.mime
+      ? [{ url: parsed.data.url, name: parsed.data.name, mime: parsed.data.mime }]
+      : []);
+  if (items.length === 0) {
+    return NextResponse.json({ error: "첨부할 파일이 없습니다." }, { status: 400 });
+  }
 
-  return NextResponse.json({ ok: true, message });
+  const { id: conversationId } = await params;
+  const messages = await postAdminAttachments({ conversationId, items });
+
+  return NextResponse.json({ ok: true, messages, message: messages[0] });
 }

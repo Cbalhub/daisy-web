@@ -216,65 +216,99 @@ export async function postAdminReply(input: { conversationId: string; body: stri
 
 type AttachmentInput = { url: string; name: string; mime: string };
 
-export async function postCustomerAttachment(
-  input: { customerId: string; conversationId: string } & AttachmentInput
-) {
+// 사진 여러 장을 한 번에 — 첨부 1건당 메시지 1건을 만들되, 대화 갱신·알림은 한 번만.
+export async function postCustomerAttachments(input: {
+  customerId: string;
+  conversationId: string;
+  items: AttachmentInput[];
+}) {
   const conversation = await requireOwnedConversation(input.customerId, input.conversationId);
   if (!conversation) throw new Error("CONVERSATION_NOT_FOUND");
 
   const notify = await shouldNotifyAdmin(conversation.id);
 
-  const message = await prisma.$transaction(async (tx) => {
-    const created = await tx.chatMessage.create({
-      data: {
-        conversationId: conversation.id,
-        sender: "VISITOR",
-        type: "ATTACHMENT",
-        body: encryptFieldTagged(input.name),
-        attachmentUrl: input.url,
-        attachmentName: input.name,
-        attachmentMime: input.mime,
-      },
-    });
+  const created = await prisma.$transaction(async (tx) => {
+    const rows = [];
+    for (const it of input.items) {
+      rows.push(
+        await tx.chatMessage.create({
+          data: {
+            conversationId: conversation.id,
+            sender: "VISITOR",
+            type: "ATTACHMENT",
+            body: encryptFieldTagged(it.name),
+            attachmentUrl: it.url,
+            attachmentName: it.name,
+            attachmentMime: it.mime,
+          },
+        })
+      );
+    }
     await tx.chatConversation.update({
       where: { id: conversation.id },
-      data: { lastMessageAt: created.createdAt, status: "OPEN" },
+      data: { lastMessageAt: rows[rows.length - 1].createdAt, status: "OPEN" },
     });
-    return created;
+    return rows;
   });
 
   if (notify) {
-    notifyAdminOfNewMessage(
-      input.customerId,
-      conversation.id,
-      conversation.title,
-      `📎 ${input.name}`
-    ).catch((err) => console.error("admin notify failed", err));
+    const label =
+      input.items.length === 1 ? `📎 ${input.items[0].name}` : `📎 사진 ${input.items.length}장`;
+    notifyAdminOfNewMessage(input.customerId, conversation.id, conversation.title, label).catch(
+      (err) => console.error("admin notify failed", err)
+    );
   }
 
-  return decryptMessage(message);
+  return created.map(decryptMessage);
+}
+
+export async function postAdminAttachments(input: {
+  conversationId: string;
+  items: AttachmentInput[];
+}) {
+  const created = await prisma.$transaction(async (tx) => {
+    const rows = [];
+    for (const it of input.items) {
+      rows.push(
+        await tx.chatMessage.create({
+          data: {
+            conversationId: input.conversationId,
+            sender: "ADMIN",
+            type: "ATTACHMENT",
+            body: encryptFieldTagged(it.name),
+            attachmentUrl: it.url,
+            attachmentName: it.name,
+            attachmentMime: it.mime,
+          },
+        })
+      );
+    }
+    await tx.chatConversation.update({
+      where: { id: input.conversationId },
+      data: { lastMessageAt: rows[rows.length - 1].createdAt },
+    });
+    return rows;
+  });
+  return created.map(decryptMessage);
+}
+
+export async function postCustomerAttachment(
+  input: { customerId: string; conversationId: string } & AttachmentInput
+) {
+  const [message] = await postCustomerAttachments({
+    customerId: input.customerId,
+    conversationId: input.conversationId,
+    items: [{ url: input.url, name: input.name, mime: input.mime }],
+  });
+  return message;
 }
 
 export async function postAdminAttachment(input: { conversationId: string } & AttachmentInput) {
-  const message = await prisma.$transaction(async (tx) => {
-    const created = await tx.chatMessage.create({
-      data: {
-        conversationId: input.conversationId,
-        sender: "ADMIN",
-        type: "ATTACHMENT",
-        body: encryptFieldTagged(input.name),
-        attachmentUrl: input.url,
-        attachmentName: input.name,
-        attachmentMime: input.mime,
-      },
-    });
-    await tx.chatConversation.update({
-      where: { id: input.conversationId },
-      data: { lastMessageAt: created.createdAt },
-    });
-    return created;
+  const [message] = await postAdminAttachments({
+    conversationId: input.conversationId,
+    items: [{ url: input.url, name: input.name, mime: input.mime }],
   });
-  return decryptMessage(message);
+  return message;
 }
 
 /**

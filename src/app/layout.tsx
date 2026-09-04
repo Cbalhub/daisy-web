@@ -9,7 +9,6 @@ import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getBusinessSettings } from "@/lib/settings";
 import { jsonLdScript } from "@/lib/json-ld";
-import { prisma } from "@/lib/prisma";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // 본문·UI 는 Pretendard 하나 — 제목/본문/숫자 모두. 위계는 굵기(400·600·800)와
@@ -103,16 +102,7 @@ export const metadata: Metadata = {
 // 보이지도 않는 <script> 태그 하나 때문에 전체가 막히는 걸 막으려고 별도
 // 컴포넌트로 분리해 Suspense로 감쌉니다.
 async function OrganizationJsonLd() {
-  const [settings, ratingAgg] = await Promise.all([
-    getBusinessSettings(),
-    // 지어낸 평점을 노출하지 않기 위해, 관리자가 실제로 입력한 평점이 있는
-    // 후기만 집계합니다 — 평점 없는 후기는 이 평균에 전혀 영향을 주지 않습니다.
-    prisma.review.aggregate({
-      where: { publishedAt: { not: null }, rating: { not: null } },
-      _avg: { rating: true },
-      _count: { rating: true },
-    }),
-  ]);
+  const settings = await getBusinessSettings();
   const graph = [
     {
       "@type": "WebSite",
@@ -151,15 +141,8 @@ async function OrganizationJsonLd() {
       ...(settings.address
         ? { address: { "@type": "PostalAddress", streetAddress: settings.address, addressCountry: "KR" } }
         : {}),
-      ...(ratingAgg._count.rating > 0
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: ratingAgg._avg.rating!.toFixed(1),
-              reviewCount: ratingAgg._count.rating,
-            },
-          }
-        : {}),
+      // aggregateRating 은 후기가 실제로 보이는 /reviews 페이지에서만 노출합니다.
+      // (전역 레이아웃에도 넣으면 /reviews 에서 집계 평점이 2개로 잡혀 Search Console 오류)
     },
   ];
 

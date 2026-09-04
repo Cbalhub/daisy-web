@@ -43,29 +43,36 @@ export async function POST(req: NextRequest) {
   }
 
   const form = await req.formData().catch(() => null);
-  const file = form?.get("file");
-  if (!(file instanceof File)) {
+  // 사진 여러 장을 한 번에 — "file" 이 여러 개 올 수 있습니다(하위호환: 1개도 그대로 처리).
+  const files = (form?.getAll("file") ?? []).filter((f): f is File => f instanceof File);
+  if (files.length === 0) {
     return NextResponse.json({ error: "첨부할 파일을 선택해 주세요." }, { status: 400 });
   }
-
-  if (file.size > MAX_CHAT_FILE_BYTES) {
+  if (files.length > 10) {
+    return NextResponse.json({ error: "한 번에 최대 10개까지 보낼 수 있어요." }, { status: 400 });
+  }
+  if (files.some((f) => f.size > MAX_CHAT_FILE_BYTES)) {
     return NextResponse.json({ error: "파일 용량은 50MB 이하만 가능합니다." }, { status: 400 });
   }
 
-  const bytes = Buffer.from(await file.arrayBuffer());
-
-  // 형식 제한 없음 — 저장 파일명은 UUID + 원본에서 뽑은 안전한 확장자.
-  // 실행/렌더 위험은 nginx 가 /uploads/ 를 attachment(octet-stream)로만 서빙해 차단.
-  const ext = safeExtFromName(file.name);
-  const filename = ext ? `${randomUUID()}.${ext}` : randomUUID();
   const dir = uploadsDir("chat");
   await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, filename), bytes);
 
-  return NextResponse.json({
-    ok: true,
-    url: `/uploads/chat/${filename}`,
-    name: file.name.slice(0, 200),
-    mime: file.type,
-  });
+  const saved: { url: string; name: string; mime: string }[] = [];
+  for (const file of files) {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    // 형식 제한 없음 — 저장 파일명은 UUID + 원본에서 뽑은 안전한 확장자.
+    // 실행/렌더 위험은 nginx 가 /uploads/ 를 attachment(octet-stream)로만 서빙해 차단.
+    const ext = safeExtFromName(file.name);
+    const filename = ext ? `${randomUUID()}.${ext}` : randomUUID();
+    await writeFile(path.join(dir, filename), bytes);
+    saved.push({
+      url: `/uploads/chat/${filename}`,
+      name: file.name.slice(0, 200),
+      mime: file.type,
+    });
+  }
+
+  // files: 항상 배열. url/name/mime: 첫 항목(하위호환).
+  return NextResponse.json({ ok: true, files: saved, ...saved[0] });
 }

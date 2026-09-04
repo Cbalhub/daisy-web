@@ -249,9 +249,13 @@ export function ChatPageView({
   }
 
   async function onFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const files = Array.from(e.target.files ?? []);
     e.target.value = "";
-    if (!file) return;
+    if (files.length === 0) return;
+    if (files.length > 10) {
+      setAttachError("한 번에 최대 10개까지 보낼 수 있어요.");
+      return;
+    }
 
     setAttachError("");
     setUploading(true);
@@ -260,7 +264,7 @@ export function ChatPageView({
       const conversationId = await resolveActiveConversation();
 
       const form = new FormData();
-      form.append("file", file);
+      for (const f of files) form.append("file", f);
       const uploadRes = await fetch("/api/chat/upload", { method: "POST", body: form });
       const uploaded = await uploadRes.json().catch(() => ({}));
       if (!uploadRes.ok) throw new Error(uploaded?.error ?? "파일 업로드에 실패했습니다.");
@@ -268,7 +272,7 @@ export function ChatPageView({
       const res = await fetch("/api/chat/attachment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId, url: uploaded.url, name: uploaded.name, mime: uploaded.mime }),
+        body: JSON.stringify({ conversationId, items: uploaded.files }),
       });
       if (res.status === 401) {
         setNeedsLogin(true);
@@ -278,8 +282,8 @@ export function ChatPageView({
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error ?? "첨부 전송에 실패했습니다.");
       }
-      const { message } = await res.json();
-      setMessages((prev) => mergeMessages(prev, [message]));
+      const { messages: sent } = await res.json();
+      setMessages((prev) => mergeMessages(prev, sent));
     } catch (err) {
       setAttachError(err instanceof Error ? err.message : "파일 업로드에 실패했습니다.");
     } finally {
@@ -431,6 +435,7 @@ export function ChatPageView({
               tab/Enter로는 여전히 접근 가능하게 둡니다. */}
           <input
             type="file"
+            multiple
             accept="image/*,application/pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp,.hwpx,.txt,.csv"
             className="sr-only"
             disabled={uploading}
