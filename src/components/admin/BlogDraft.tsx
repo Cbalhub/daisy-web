@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/Toast";
 import { BLOG_PLATFORM_OPTIONS } from "@/lib/admin/blog-labels";
 import { BLOG_TONES } from "@/lib/validation/blog";
 import { analyzeSeo } from "@/lib/blog-seo";
-import { toPlainText } from "@/lib/blog-format";
+import { toPlainText, toMarkdown } from "@/lib/blog-format";
 import type { BlogPlatform, PublishState } from "@prisma/client";
 
 const TONE_LABEL: Record<string, string> = {
@@ -262,7 +262,7 @@ export function BlogDraftEditor({
     if (what === "tags") {
       text = tags.join(", ");
     } else {
-      const main = copyMode === "plain" ? toPlainText(body) : body.trim();
+      const main = copyMode === "plain" ? toPlainText(body) : toMarkdown(body);
       const tail = ctaOn && cta.trim() ? `\n\n${cta.trim()}` : "";
       text = (title ? `${title}\n\n` : "") + main + tail;
     }
